@@ -1,7 +1,0 @@
-defaultName: Visitor
-
-database:
-  driverClass: org.postgresql.Driver
-  user: postgres
-  password: pgpass
-  url: jdbc:postgresql://localhost/crm-api
