@@ -1,7 +1,7 @@
-defaultName: Visitor
+jsonPrettyPrint: true
 
 database:
   driverClass: org.postgresql.Driver
-  user: sa
-  password: 
+  user: postgres
+  password: pgpass
   url: jdbc:postgresql://localhost/crm-api
