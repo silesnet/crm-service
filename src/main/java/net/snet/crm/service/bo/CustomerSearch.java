@@ -14,7 +14,7 @@ public class CustomerSearch {
     private String name;
     @JsonProperty
     private String supplementaryName;
-    private List<Long> contracts;
+    private List<String> contracts;
 
     public CustomerSearch(long id, String name, String supplementaryName) {
         this.id = id;
@@ -46,11 +46,11 @@ public class CustomerSearch {
         this.supplementaryName = supplementaryName;
     }
 
-    public List<Long> getContracts() {
+    public List<String> getContracts() {
         return contracts;
     }
 
-    public void setContracts(List<Long> contracts) {
+    public void setContracts(List<String> contracts) {
         this.contracts = contracts;
     }
 

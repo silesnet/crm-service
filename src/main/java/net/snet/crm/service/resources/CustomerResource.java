@@ -3,8 +3,10 @@ package net.snet.crm.service.resources;
 import com.yammer.metrics.annotation.Timed;
 import net.snet.crm.service.bo.CustomerSearch;
 import net.snet.crm.service.bo.Service;
+import net.snet.crm.service.bo.ServiceId;
 import net.snet.crm.service.dao.CustomerDAO;
 import net.snet.crm.service.dao.ServiceDAO;
+import net.snet.crm.service.utils.Utils;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,40 +27,22 @@ public class CustomerResource {
 
     private CustomerDAO customerDAO;
     private ServiceDAO serviceDAO;
-    //private Customers customers;
 
     public CustomerResource(DBI dbi) {
         this.customerDAO = dbi.onDemand(CustomerDAO.class);
         this.serviceDAO = dbi.onDemand(ServiceDAO.class);
     }
 
-    private String replaceChars(String str, String searchChars, String replaceChars) {
-        int replaceCharsLength = replaceChars.length();
-        int strLength = str.length();
-        StringBuilder buf = new StringBuilder(strLength);
-        for (int i = 0; i < strLength; i++) {
-            char ch = str.charAt(i);
-            int index = searchChars.indexOf(ch);
-            if (index >= 0) {
-                if (index < replaceCharsLength) {
-                    buf.append(replaceChars.charAt(index));
-                }
-            } else {
-                buf.append(ch);
-            }
-        }
-        return buf.toString();
-    }
-
     @GET
     @Produces({"application/json; charset=UTF-8"})
+    @HeaderParam("Access-Control-Allow-Origin=*;")
     @Timed(name = "get-requests")
     public Map<String, Object> getCustomersByQuery(@QueryParam("q") String name, @QueryParam("c") int count) {
         LOGGER.debug("customers called");
 
         final HashMap<String, Object> customersMap = new HashMap<>();
 
-        Iterator<CustomerSearch> tmp_customers = customerDAO.getCustomersByName("%" + replaceChars(name, FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
+        Iterator<CustomerSearch> tmp_customers = customerDAO.getCustomersByName("%" + Utils.replaceChars(name, FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
 
         List<CustomerSearch> customersSearchList = new ArrayList<CustomerSearch>();
         while (tmp_customers.hasNext()) {
@@ -75,18 +59,28 @@ public class CustomerResource {
     }
 
     /**
-     * Return an ArrayList with BillItems
+     * Return an ArrayList with Contracts
      *
-     * @param id Bill Id
-     * @return ArrayList with BillItems
+     * @param id Customer Id
+     * @return ArrayList with Contracts
      */
-    private ArrayList<Long> getContracts(long id) {
-        ArrayList<Long> retContracts = new ArrayList<Long>();
+    private ArrayList<String> getContracts(long id) {
+        ArrayList<String> retContracts = new ArrayList<String>();
 
         Iterator<Service> contracts = serviceDAO.findContractsByCustomerId(id);
 
         while (contracts.hasNext()) {
-            retContracts.add(contracts.next().getId());
+            ServiceId serviceId = ServiceId.serviceId((int) contracts.next().getId());
+            String contractCode = serviceId.country().getShortName().toUpperCase() + serviceId.contractNo().toString();
+            boolean contractExist = false;
+            for (String contract : retContracts) {
+                if (contract.equals(contractCode)) {
+                    contractExist = true;
+                }
+            }
+            if (!contractExist) {
+                retContracts.add(contractCode);
+            }
         }
         return retContracts;
     }

@@ -5,6 +5,7 @@ import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
 import com.yammer.dropwizard.jdbi.DBIFactory;
+import net.snet.crm.service.filter.CorsHeadersFilter;
 import net.snet.crm.service.resources.BaseResource;
 import net.snet.crm.service.resources.CustomerResource;
 import org.skife.jdbi.v2.DBI;
@@ -29,6 +30,7 @@ public class CrmService extends Service<CrmConfiguration> {
         }
 
         environment.addResource(new CustomerResource(dbi));
+        environment.addFilter(new CorsHeadersFilter(),"/*");
         environment.addResource(new BaseResource());
 
     }

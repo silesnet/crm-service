@@ -12,8 +12,9 @@ import java.util.Iterator;
 
 public interface CustomerDAO {
 
-    //@SqlQuery("SELECT * FROM customers WHERE id = :id")
-    //Customer findById(@Bind("id") long id);
+    @SqlQuery("SELECT * FROM customers WHERE id = :id")
+    @RegisterMapper(CustomerMapper.class)
+    Customer findById(@Bind("id") long id);
 
     @SqlQuery("SELECT id, name, supplementary_name FROM customers WHERE lower(translate(name , :fromChars, :toChars)) LIKE :query")
     @RegisterMapper(CustomerSearchMapper.class)

@@ -349,8 +349,6 @@ public class Customer {
         this.updated = updated;
     }
 
-
-
     public String getAccountNo() {
         return accountNo;
     }
