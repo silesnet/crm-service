@@ -8,53 +8,37 @@ import java.sql.Timestamp;
 @JsonSnakeCase
 public class Customer {
     private long id;
-    @JsonProperty
     private long historyId;
-    @JsonProperty
     private String publicId;
     private String name;
-    @JsonProperty
     private String supplementaryName;
     private String street;
     private String city;
-    @JsonProperty
     private String postalCode;
     private int country;
     private String email;
     private String dic;
-    @JsonProperty
     private String contractNo;
-    @JsonProperty
     private String connectionSpot;
-    @JsonProperty
     private Timestamp insertedOn;
     private int frequency;
-    @JsonProperty
     private Timestamp lastlyBilled;
     private boolean isBilledAfter;
-    @JsonProperty
     private boolean deliverByEmail;
-    @JsonProperty
     private String deliverCopyEmail;
-    @JsonProperty
     private boolean deliverByMail;
     private boolean isAutoBilling;
     private String info;
-    @JsonProperty
     private String contactName;
     private String phone;
     private boolean isActive;
     private int status;
-    @JsonProperty
     private long shireId;
     private int format;
-    @JsonProperty
     private boolean deliverSigned;
     private String symbol;
     private Timestamp updated;
-    @JsonProperty
     private String accountNo;
-    @JsonProperty
     private String bankNo;
     private int variable;
 

@@ -6,7 +6,6 @@ import org.skife.jdbi.v2.tweak.ResultSetMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 
 public class ServiceMapper implements ResultSetMapper<Service> {
 

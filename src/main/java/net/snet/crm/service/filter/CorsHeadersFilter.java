@@ -18,6 +18,7 @@ public class CorsHeadersFilter implements Filter {
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
             HttpServletRequest httpServletRequest = (HttpServletRequest) request;
             httpServletResponse.addHeader("Access-Control-Allow-Origin", "*");
+            httpServletResponse.addHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
             if ("OPTIONS".equals(httpServletRequest.getMethod())) {
                 httpServletResponse.addHeader("Access-Control-Allow-Headers", "Content-Type");
             }

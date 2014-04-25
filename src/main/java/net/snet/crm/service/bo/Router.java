@@ -1,10 +1,10 @@
 package net.snet.crm.service.bo;
 
-public class CustomerSearch {
+public class Router {
     private long id;
     private String name;
 
-    public CustomerSearch(long id, String name) {
+    public Router(long id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -24,6 +24,4 @@ public class CustomerSearch {
     public void setName(String name) {
         this.name = name;
     }
-
 }
-

@@ -122,6 +122,28 @@ CREATE TABLE services (
 
 ALTER TABLE public.services OWNER TO sisa;
 
+CREATE TABLE drafts (
+	id SERIAL,
+	type character varying(20),
+	user_id bigint,
+	data character varying(5000)
+);
+
+CREATE TABLE products (
+	id SERIAL,
+	name character varying(100),
+	downlink int,
+  uplink int,
+  price int,
+	channel character varying(100),
+  is_dedicated boolean
+);
+
+CREATE TABLE core_routers (
+	id SERIAL,
+	name character varying(50)
+); 
+
 --
 -- TOC entry 1788 (class 0 OID 53131)
 -- Dependencies: 1497

@@ -1,6 +1,7 @@
 package net.snet.crm.service.resources;
 
 import com.yammer.metrics.annotation.Timed;
+import net.snet.crm.service.bo.Customer;
 import net.snet.crm.service.bo.CustomerSearch;
 import net.snet.crm.service.bo.Service;
 import net.snet.crm.service.bo.ServiceId;
@@ -35,54 +36,36 @@ public class CustomerResource {
 
     @GET
     @Produces({"application/json; charset=UTF-8"})
-    @HeaderParam("Access-Control-Allow-Origin=*;")
+    @Path("/{customerId}")
+    @Timed(name = "get-requests")
+    public Map<String, Object> getCustomerById(@PathParam("customerId") long id) {
+        LOGGER.debug("customers called");
+
+        final HashMap<String, Object> customersMap = new HashMap<>();
+
+        customersMap.put("customer", customerDAO.findById(id));
+
+        return customersMap;
+    }
+
+    @GET
+    @Produces({"application/json; charset=UTF-8"})
     @Timed(name = "get-requests")
     public Map<String, Object> getCustomersByQuery(@QueryParam("q") String name, @QueryParam("c") int count) {
         LOGGER.debug("customers called");
 
         final HashMap<String, Object> customersMap = new HashMap<>();
 
-        Iterator<CustomerSearch> tmp_customers = customerDAO.getCustomersByName("%" + Utils.replaceChars(name, FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
+        Iterator<CustomerSearch> customers = customerDAO.getCustomersByName("%" + Utils.replaceChars(name, FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
 
-        List<CustomerSearch> customersSearchList = new ArrayList<CustomerSearch>();
-        while (tmp_customers.hasNext()) {
-            customersSearchList.add(tmp_customers.next());
+        List<CustomerSearch> retCustomers = new ArrayList<CustomerSearch>();
+        
+        while (customers.hasNext()) {
+            retCustomers.add(customers.next());
         }
-
-        for (CustomerSearch customerSearch : customersSearchList) {
-            customerSearch.setContracts(getContracts(customerSearch.getId()));
-        }
-
-        customersMap.put("customers", customersSearchList);
+        customersMap.put("customers", retCustomers);
 
         return customersMap;
-    }
-
-    /**
-     * Return an ArrayList with Contracts
-     *
-     * @param id Customer Id
-     * @return ArrayList with Contracts
-     */
-    private ArrayList<String> getContracts(long id) {
-        ArrayList<String> retContracts = new ArrayList<String>();
-
-        Iterator<Service> contracts = serviceDAO.findContractsByCustomerId(id);
-
-        while (contracts.hasNext()) {
-            ServiceId serviceId = ServiceId.serviceId((int) contracts.next().getId());
-            String contractCode = serviceId.country().getShortName().toUpperCase() + serviceId.contractNo().toString();
-            boolean contractExist = false;
-            for (String contract : retContracts) {
-                if (contract.equals(contractCode)) {
-                    contractExist = true;
-                }
-            }
-            if (!contractExist) {
-                retContracts.add(contractCode);
-            }
-        }
-        return retContracts;
     }
 }
 
