@@ -1,4 +1,4 @@
---
+﻿--
 -- PostgreSQL database dump
 --
 
@@ -64,36 +64,6 @@ CREATE TABLE customers (
 
 ALTER TABLE public.customers OWNER TO sisa;
 
---
--- TOC entry 1499 (class 1259 OID 60853)
--- Dependencies: 3
--- Name: products; Type: TABLE; Schema: public; Owner: sisa; Tablespace: 
---
-
-CREATE TABLE products (
-    id bigint NOT NULL,
-    name character varying(70) NOT NULL,
-    download integer,
-    upload integer,
-    price integer NOT NULL
-);
-
-
-ALTER TABLE public.products OWNER TO sisa;
-
---
--- TOC entry 1500 (class 1259 OID 60858)
--- Dependencies: 3
--- Name: regions; Type: TABLE; Schema: public; Owner: sisa; Tablespace: 
---
-
-CREATE TABLE regions (
-    id bigint NOT NULL,
-    name character varying(70) NOT NULL
-);
-
-
-ALTER TABLE public.regions OWNER TO sisa;
 
 --
 -- TOC entry 1498 (class 1259 OID 53139)
@@ -834,43 +804,6 @@ INSERT INTO customers VALUES (769, 2769, '9912310349', 'Luděk Rosenberg', '', '
 INSERT INTO customers VALUES (356, 2356, '9912310164', 'Alois Schwarz', '', 'Sokolovská 839', 'Mikulovice u Jeseníku 3', '790 83', 10, 'AloisSchwarz@fleckens.hu', '', '1504', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '771 187 817', true, 10, 255, 10, false, '5130', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:32.5', '', '', NULL);
 INSERT INTO customers VALUES (359, 2359, '9912310165', 'Milan Povolný', '', 'Poštovní 1787', 'Mohelnice nad Jizerou', '294 13', 10, 'MilanPovolny@cuvox.de', '', '558', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '320 343 202', true, 10, 255, 10, false, '5136', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:35.39', '', '', NULL);
 INSERT INTO customers VALUES (1528, 7681, '9912310683', 'Hynek Janků', '', 'Bedřicha Smetany 694', 'Jalubí', '687 05', 10, 'HynekJanku@fleckens.hu', '', '1893', '', '2006-03-22 10:05:31.316', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '771 743 620', true, 10, 254, 10, true, '5246', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:32.156', '', '', NULL);
-
-
---
--- TOC entry 1790 (class 0 OID 60853)
--- Dependencies: 1499
--- Data for Name: products; Type: TABLE DATA; Schema: public; Owner: sisa
---
-
-INSERT INTO products VALUES (1, 'WIRELESSmax', 10, 5, 360);
-INSERT INTO products VALUES (2, 'WIRELESSmax', 20, 10, 410);
-INSERT INTO products VALUES (3, 'LANaccess', 10, 5, 260);
-INSERT INTO products VALUES (4, 'LANaccess', 20, 10, 310);
-INSERT INTO products VALUES (5, 'LANfiber', 50, 50, 260);
-INSERT INTO products VALUES (6, 'LANfiber', 100, 100, 310);
-
-
---
--- TOC entry 1791 (class 0 OID 60858)
--- Dependencies: 1500
--- Data for Name: regions; Type: TABLE DATA; Schema: public; Owner: sisa
---
-
-INSERT INTO regions VALUES (1, '17listopadu1209');
-INSERT INTO regions VALUES (2, '28rijna42');
-INSERT INTO regions VALUES (3, 'akatova12');
-INSERT INTO regions VALUES (4, 'akatova13');
-INSERT INTO regions VALUES (5, 'albrechtice');
-INSERT INTO regions VALUES (6, 'alejmiru801');
-INSERT INTO regions VALUES (7, 'alejmiru806');
-INSERT INTO regions VALUES (8, 'andziolowka');
-INSERT INTO regions VALUES (9, 'antonicek');
-INSERT INTO regions VALUES (10, 'auxova');
-INSERT INTO regions VALUES (11, 'bachrata');
-INSERT INTO regions VALUES (12, 'balicky');
-INSERT INTO regions VALUES (13, 'balzacova1192');
-INSERT INTO regions VALUES (14, 'barabosz-ap2');
-
 
 --
 -- TOC entry 1789 (class 0 OID 53139)
@@ -1662,17 +1595,6 @@ ALTER TABLE ONLY customers
 ALTER TABLE ONLY products
     ADD CONSTRAINT products_pkey PRIMARY KEY (id);
 
-
---
--- TOC entry 1786 (class 2606 OID 60862)
--- Dependencies: 1500 1500
--- Name: regions_pkey; Type: CONSTRAINT; Schema: public; Owner: sisa; Tablespace: 
---
-
-ALTER TABLE ONLY regions
-    ADD CONSTRAINT regions_pkey PRIMARY KEY (id);
-
-
 --
 -- TOC entry 1782 (class 2606 OID 53143)
 -- Dependencies: 1498 1498
@@ -1700,18 +1622,6 @@ CREATE INDEX customer_index2 ON services USING btree (customer_id);
 
 ALTER TABLE ONLY services
     ADD CONSTRAINT fk5235105e31f2d3d FOREIGN KEY (customer_id) REFERENCES customers(id);
-
-
---
--- TOC entry 1796 (class 0 OID 0)
--- Dependencies: 3
--- Name: public; Type: ACL; Schema: -; Owner: der3k
---
-
-REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM der3k;
-GRANT ALL ON SCHEMA public TO der3k;
-GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
 -- Completed on 2013-12-22 09:43:50
