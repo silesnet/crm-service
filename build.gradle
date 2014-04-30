@@ -6,11 +6,11 @@ apply plugin: 'idea'
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-mainClassName = 'net.snet.crm.api.CrmApiService'
+mainClassName = 'net.snet.crm.service.CrmService'
 
 project.ext {
   dropwizardVersion = '0.6.2'
-  serviceConfig = 'crm-api-dev.yml'
+  serviceConfig = 'crm-service-dev.yml'
 }
 
 dependencies {
@@ -29,5 +29,4 @@ task wrapper(type: Wrapper) {
 
 run {
   args 'server', './src/dist/config/' + serviceConfig
-  debug true
 }
