@@ -7,7 +7,7 @@ public class Draft {
 
     private long id;
     private String type;
-    private long userId;
+    private String userId;
     private String data;
 
     public Draft(long id, String data) {
@@ -15,13 +15,13 @@ public class Draft {
         this.data = data;
     }
 
-    public Draft(String type, long userId, String data) {
+    public Draft(String type, String userId, String data) {
         this.type = type;
         this.userId = userId;
         this.data = data;
     }
 
-    public Draft(long id, String type, long userId, String data) {
+    public Draft(long id, String type, String userId, String data) {
         this.id = id;
         this.type = type;
         this.userId = userId;
@@ -44,11 +44,11 @@ public class Draft {
         this.type = type;
     }
 
-    public long getUserId() {
+    public String getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(String userId) {
         this.userId = userId;
     }
 

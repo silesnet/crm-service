@@ -13,7 +13,7 @@ public class DraftMapper implements ResultSetMapper<Draft> {
     public Draft map(int index, ResultSet r, StatementContext ctx) throws SQLException {
         return new Draft(r.getLong("id"),
                 r.getString("type"),
-                r.getLong("user_id"),
+                r.getString("user_id"),
                 r.getString("data"));
     }
 }

@@ -1,4 +1,4 @@
-﻿--
+--
 -- PostgreSQL database dump
 --
 
@@ -95,7 +95,7 @@ ALTER TABLE public.services OWNER TO sisa;
 CREATE TABLE drafts (
 	id SERIAL,
 	type character varying(20),
-	user_id bigint,
+	user_id character varying(50),
 	data character varying(5000)
 );
 
@@ -109,10 +109,25 @@ CREATE TABLE products (
   is_dedicated boolean
 );
 
+INSERT INTO products VALUES (1, 'LANaccess 10M', 10, 5, 315, 'lan', false);
+INSERT INTO products VALUES (2, 'LANaccess 20M', 20, 10, 375, 'lan', false);
+INSERT INTO products VALUES (5, 'Wireless 10M', 10, 5, 436, 'wireless', false);
+INSERT INTO products VALUES (6, 'Wireless 20M', 20, 10, 496, 'wireless', false);
+INSERT INTO products VALUES (7, 'Wireless Dedicated', NULL, NULL, NULL, 'wireless', true);
+INSERT INTO products VALUES (8, 'Lan Dedicated', NULL, NULL, NULL, 'lan', true);
+INSERT INTO products VALUES (9, 'Fiber Dedicated', NULL, NULL, NULL, 'fiber', true);
+INSERT INTO products VALUES (3, 'LANfiber 50M', 50, 50, 315, 'fiber', false);
+INSERT INTO products VALUES (4, 'LANfiber 100M', 100, 100, 375, 'fiber', false);
+
 CREATE TABLE core_routers (
 	id SERIAL,
 	name character varying(50)
 ); 
+
+INSERT INTO core_routers VALUES (1, 'Ostrava-Centrum');
+INSERT INTO core_routers VALUES (2, 'Ostrava-Poruba');
+INSERT INTO core_routers VALUES (3, 'Ostrava-Vitkovice');
+INSERT INTO core_routers VALUES (4, 'Ostrava-Zabreh');
 
 --
 -- TOC entry 1788 (class 0 OID 53131)
