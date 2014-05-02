@@ -26,7 +26,7 @@ public class DraftResource {
     @GET
     @Produces({"application/json; charset=UTF-8"})
     @Timed(name = "get-requests")
-    public Map<String, Object> getDraftsByUserId(@QueryParam("user_id") long userId) {
+    public Map<String, Object> getDraftsByUserId(@QueryParam("user_id") String userId) {
         LOGGER.debug("drafts called");
 
         final HashMap<String, Object> draftsMap = new HashMap<>();
@@ -49,7 +49,7 @@ public class DraftResource {
 
     @POST
     @Timed(name = "post-requests")
-    public String insertDraft(@QueryParam("user_id") Integer userId, String body) {
+    public String insertDraft(@QueryParam("user_id") String userId, String body) {
         LOGGER.debug("drafts called");
         return draftDAO.insertDraft(new Draft("service", userId, body)).toString();
     }

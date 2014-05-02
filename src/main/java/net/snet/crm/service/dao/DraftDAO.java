@@ -11,7 +11,7 @@ import java.util.Iterator;
 public interface DraftDAO {
 
     @SqlQuery("SELECT * FROM drafts WHERE user_id = :user_id and type = 'service' ORDER BY id DESC")
-    Iterator<Draft> findDraftsByUserId(@Bind("user_id") long user_id);
+    Iterator<Draft> findDraftsByUserId(@Bind("user_id") String user_id);
 
     @SqlQuery("SELECT * FROM drafts WHERE id = :id")
     Draft findDraftById(@Bind("id") long id);
