@@ -35,7 +35,7 @@ public class ContractResource {
     public Map<String, Object> findAllContractsByCustomerId(@PathParam("customerId") long customerId) {
         LOGGER.debug("contract called");
 
-        final HashMap<String, Object> contractsMap = new HashMap<>();
+        final HashMap<String, Object> contractsMap = new HashMap<String, Object>();
 
         Iterator<Service> contracts = serviceDAO.findContractsByCustomerId(customerId);
 

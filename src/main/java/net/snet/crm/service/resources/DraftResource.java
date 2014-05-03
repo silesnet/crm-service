@@ -29,7 +29,7 @@ public class DraftResource {
     public Map<String, Object> getDraftsByUserId(@QueryParam("user_id") String userId) {
         LOGGER.debug("drafts called");
 
-        final HashMap<String, Object> draftsMap = new HashMap<>();
+        final HashMap<String, Object> draftsMap = new HashMap<String, Object>();
 
         Iterator<Draft> drafts = draftDAO.findDraftsByUserId(userId);
 

@@ -2,6 +2,6 @@ jsonPrettyPrint: true
 
 database:
   driverClass: org.postgresql.Driver
-  user: sa
-  password: 
+  user: sisa
+  password: sis.sis
   url: jdbc:postgresql://localhost/crm-service
