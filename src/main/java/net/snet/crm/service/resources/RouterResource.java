@@ -29,7 +29,7 @@ public class RouterResource {
     public Map<String, Object> getAllRouters() {
         LOGGER.debug("routers called");
 
-        final HashMap<String, Object> routersMap = new HashMap<>();
+        final HashMap<String, Object> routersMap = new HashMap<String, Object>();
 
         Iterator<Router> routers = routerDAO.allRouters();
 

@@ -41,7 +41,7 @@ public class CustomerResource {
     public Map<String, Object> getCustomerById(@PathParam("customerId") long id) {
         LOGGER.debug("customers called");
 
-        final HashMap<String, Object> customersMap = new HashMap<>();
+        final HashMap<String, Object> customersMap = new HashMap<String, Object>();
 
         customersMap.put("customer", customerDAO.findById(id));
 
@@ -54,7 +54,7 @@ public class CustomerResource {
     public Map<String, Object> getCustomersByQuery(@QueryParam("q") String name, @QueryParam("c") int count) {
         LOGGER.debug("customers called");
 
-        final HashMap<String, Object> customersMap = new HashMap<>();
+        final HashMap<String, Object> customersMap = new HashMap<String, Object>();
 
         Iterator<CustomerSearch> customers = customerDAO.getCustomersByName("%" + Utils.replaceChars(name, FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
 

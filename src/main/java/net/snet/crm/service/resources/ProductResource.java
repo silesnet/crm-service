@@ -31,7 +31,7 @@ public class ProductResource {
     public Map<String, Object> getAllProducts() {
         LOGGER.debug("product called");
 
-        final HashMap<String, Object> productsMap = new HashMap<>();
+        final HashMap<String, Object> productsMap = new HashMap<String, Object>();
 
         Iterator<Product> products = productDAO.allProducts();
 
