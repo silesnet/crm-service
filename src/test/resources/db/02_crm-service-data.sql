@@ -17,97 +17,338 @@ SET default_tablespace = '';
 
 SET default_with_oids = false;
 
---
--- TOC entry 1497 (class 1259 OID 53131)
--- Dependencies: 3
--- Name: customers; Type: TABLE; Schema: public; Owner: sisa; Tablespace: 
---
+INSERT INTO labels VALUES (1030, 19, 'nydek2', NULL);
+INSERT INTO labels VALUES (996, 19, 'zssobesovice', NULL);
+INSERT INTO labels VALUES (997, 19, 'ulesa', NULL);
+INSERT INTO labels VALUES (998, 19, 'ulesa2', NULL);
+INSERT INTO labels VALUES (999, 19, 'ulesa3', NULL);
+INSERT INTO labels VALUES (1000, 19, 'ule-ab1-br', NULL);
+INSERT INTO labels VALUES (600, 19, 'nadrazni2', 0);
+INSERT INTO labels VALUES (900, 19, 'pioseczna2', 0);
+INSERT INTO labels VALUES (1001, 19, 'lazne2', NULL);
+INSERT INTO labels VALUES (901, 19, 'vrchy2', 0);
+INSERT INTO labels VALUES (916, 19, 'lom', 0);
+INSERT INTO labels VALUES (917, 19, 'caslavska3', 0);
+INSERT INTO labels VALUES (918, 19, 'frydecka', 0);
+INSERT INTO labels VALUES (919, 19, 'frydeckab', 0);
+INSERT INTO labels VALUES (920, 19, 'radvanov2', 0);
+INSERT INTO labels VALUES (921, 19, 'pisek2', 0);
+INSERT INTO labels VALUES (922, 19, 'velopolska', 0);
+INSERT INTO labels VALUES (923, 19, 'konska', 0);
+INSERT INTO labels VALUES (924, 19, 'konska2', 0);
+INSERT INTO labels VALUES (925, 19, 'kojkovice2', 0);
+INSERT INTO labels VALUES (926, 19, 'guty2', 0);
+INSERT INTO labels VALUES (927, 19, 'kbtesin2', 0);
+INSERT INTO labels VALUES (928, 19, 'karpentna2', 0);
+INSERT INTO labels VALUES (929, 19, 'lipova', 0);
+INSERT INTO labels VALUES (1002, 19, 'lazne3', NULL);
+INSERT INTO labels VALUES (1003, 19, 'lazne4', NULL);
+INSERT INTO labels VALUES (193, 19, 'nadrazni', 0);
+INSERT INTO labels VALUES (915, 19, 'taska', 0);
+INSERT INTO labels VALUES (114, 19, 'piast', 0);
+INSERT INTO labels VALUES (117, 19, 'vitalisov', 0);
+INSERT INTO labels VALUES (41, 15, 'Customer history', 0);
+INSERT INTO labels VALUES (200, 0, 'ServiceType', 0);
+INSERT INTO labels VALUES (184, 19, 'senov', 0);
+INSERT INTO labels VALUES (185, 19, 'zelena', 0);
+INSERT INTO labels VALUES (513, 19, 'boczna', 0);
+INSERT INTO labels VALUES (526, 19, 'delnice', 0);
+INSERT INTO labels VALUES (205, 200, 'LANaccess', 0);
+INSERT INTO labels VALUES (206, 200, 'WIRELESSdirect', 0);
+INSERT INTO labels VALUES (207, 200, 'INTERNETdedicated', 0);
+INSERT INTO labels VALUES (187, 19, 'sadovy', 0);
+INSERT INTO labels VALUES (201, 0, 'OneTimeType', 0);
+INSERT INTO labels VALUES (230, 201, 'Aktivace', 0);
+INSERT INTO labels VALUES (231, 201, 'Odpočet', 0);
+INSERT INTO labels VALUES (251, 250, 'Marcel', NULL);
+INSERT INTO labels VALUES (232, 201, 'Jiné', 0);
+INSERT INTO labels VALUES (188, 19, 'cisarska', 0);
+INSERT INTO labels VALUES (122, 19, 'osuvky', 0);
+INSERT INTO labels VALUES (156, 19, 'ropice', 0);
+INSERT INTO labels VALUES (157, 19, 'mostyuj', 0);
+INSERT INTO labels VALUES (158, 19, 'nydek', 0);
+INSERT INTO labels VALUES (159, 19, 'zbrojnice', 0);
+INSERT INTO labels VALUES (160, 19, 'caslavska', 0);
+INSERT INTO labels VALUES (161, 19, 'sucha', 0);
+INSERT INTO labels VALUES (162, 19, 'dlouha', 0);
+INSERT INTO labels VALUES (163, 19, 'krasnohorska7', 0);
+INSERT INTO labels VALUES (164, 19, 'dukelska', 0);
+INSERT INTO labels VALUES (165, 19, 'rybarna', 0);
+INSERT INTO labels VALUES (166, 19, 'bachrata', 0);
+INSERT INTO labels VALUES (167, 19, 'okrajova21', 0);
+INSERT INTO labels VALUES (168, 19, 'zukov', 0);
+INSERT INTO labels VALUES (169, 19, 'goleszow', 0);
+INSERT INTO labels VALUES (170, 19, 'sidliste', 0);
+INSERT INTO labels VALUES (189, 19, 'turek', 0);
+INSERT INTO labels VALUES (210, 200, 'WIRELESSplus', 0);
+INSERT INTO labels VALUES (171, 19, 'kossak', 0);
+INSERT INTO labels VALUES (172, 19, 'antonicek', 0);
+INSERT INTO labels VALUES (173, 19, 'chelm', 0);
+INSERT INTO labels VALUES (174, 19, 'naves', 0);
+INSERT INTO labels VALUES (115, 19, 'stonava', 0);
+INSERT INTO labels VALUES (190, 19, 'malcovna', 0);
+INSERT INTO labels VALUES (202, 200, 'WEBhosting', 0);
+INSERT INTO labels VALUES (518, 19, 'gazury', 0);
+INSERT INTO labels VALUES (191, 19, 'kojkovice', 0);
+INSERT INTO labels VALUES (113, 19, 'kostel', 0);
+INSERT INTO labels VALUES (175, 19, 'hrbitovni', 0);
+INSERT INTO labels VALUES (150, 19, 'nadrazi', 0);
+INSERT INTO labels VALUES (192, 19, 'vrchy', 0);
+INSERT INTO labels VALUES (904, 19, 'hnojnik2', 0);
+INSERT INTO labels VALUES (250, 0, 'shire', 0);
+INSERT INTO labels VALUES (252, 250, 'Radek', NULL);
+INSERT INTO labels VALUES (300, 0, 'responsible', 0);
+INSERT INTO labels VALUES (195, 19, 'karpentna', 0);
+INSERT INTO labels VALUES (558, 19, 'kamenity', 0);
+INSERT INTO labels VALUES (559, 19, 'varcop', 0);
+INSERT INTO labels VALUES (560, 19, 'zihla', 0);
+INSERT INTO labels VALUES (196, 19, 'zagori', 0);
+INSERT INTO labels VALUES (197, 19, 'radvanov', 0);
+INSERT INTO labels VALUES (199, 19, 'frydecka40', 0);
+INSERT INTO labels VALUES (500, 19, 'kontesinec', 0);
+INSERT INTO labels VALUES (501, 19, 'terlicko', 0);
+INSERT INTO labels VALUES (502, 19, 'tyrka', 0);
+INSERT INTO labels VALUES (503, 19, 'oldrichovice', 0);
+INSERT INTO labels VALUES (527, 19, 'stonava860', 0);
+INSERT INTO labels VALUES (504, 19, 'gmct', 0);
+INSERT INTO labels VALUES (203, 200, 'SERVERhousing', 0);
+INSERT INTO labels VALUES (505, 19, 'moniuszki', 0);
+INSERT INTO labels VALUES (507, 19, 'haller', 0);
+INSERT INTO labels VALUES (509, 19, 'istebna', 0);
+INSERT INTO labels VALUES (511, 19, 'bazanowice', 0);
+INSERT INTO labels VALUES (902, 19, 'bocanovice', 0);
+INSERT INTO labels VALUES (905, 19, 'polni2', 0);
+INSERT INTO labels VALUES (906, 19, 'konakov', 0);
+INSERT INTO labels VALUES (1004, 19, 'cihelni', NULL);
+INSERT INTO labels VALUES (907, 19, 'konakov2', 0);
+INSERT INTO labels VALUES (908, 19, 'stryc', 0);
+INSERT INTO labels VALUES (909, 19, 'novakovice', 0);
+INSERT INTO labels VALUES (910, 19, 'hornicka4', 0);
+INSERT INTO labels VALUES (911, 19, 'zvonek', 0);
+INSERT INTO labels VALUES (912, 19, 'lyzbice', 0);
+INSERT INTO labels VALUES (913, 19, 'listna', 0);
+INSERT INTO labels VALUES (1005, 19, 'detmarovice', NULL);
+INSERT INTO labels VALUES (914, 19, 'osuvky2', 0);
+INSERT INTO labels VALUES (528, 19, 'folwarczny', 0);
+INSERT INTO labels VALUES (529, 19, 'tov-gut-br', 0);
+INSERT INTO labels VALUES (530, 19, 'podvrch', 0);
+INSERT INTO labels VALUES (208, 200, 'WIRELESSstonavsky', 0);
+INSERT INTO labels VALUES (209, 200, 'LANstonavsky', 0);
+INSERT INTO labels VALUES (531, 19, 'nydek488', 0);
+INSERT INTO labels VALUES (532, 19, 'orlova', 0);
+INSERT INTO labels VALUES (533, 19, 'zorymbek', 0);
+INSERT INTO labels VALUES (534, 19, 'feco', 0);
+INSERT INTO labels VALUES (535, 19, 'jaseni', 0);
+INSERT INTO labels VALUES (536, 19, 'bachrata2', 0);
+INSERT INTO labels VALUES (537, 19, 'beskydska2', 0);
+INSERT INTO labels VALUES (538, 19, 'beskydska3', 0);
+INSERT INTO labels VALUES (539, 19, 'bystrice2', 0);
+INSERT INTO labels VALUES (540, 19, 'caslavska2', 0);
+INSERT INTO labels VALUES (541, 19, 'chotebuz2', 0);
+INSERT INTO labels VALUES (542, 19, 'dukelska2', 0);
+INSERT INTO labels VALUES (543, 19, 'gmct2', 0);
+INSERT INTO labels VALUES (544, 19, 'hornicka2', 0);
+INSERT INTO labels VALUES (545, 19, 'hornicka3', 0);
+INSERT INTO labels VALUES (546, 19, 'hrbitovni2', 0);
+INSERT INTO labels VALUES (547, 19, 'o12b', 0);
+INSERT INTO labels VALUES (548, 19, 'ostravska2', 0);
+INSERT INTO labels VALUES (549, 19, 'ostravska3', 0);
+INSERT INTO labels VALUES (550, 19, 'piast2', 0);
+INSERT INTO labels VALUES (551, 19, 'podvrch2', 0);
+INSERT INTO labels VALUES (552, 19, 'prior', 0);
+INSERT INTO labels VALUES (553, 19, 'vapenka2', 0);
+INSERT INTO labels VALUES (554, 19, 'vendryne2', 0);
+INSERT INTO labels VALUES (555, 19, 'zbrojnice2', 0);
+INSERT INTO labels VALUES (556, 19, 'kostkov', 0);
+INSERT INTO labels VALUES (557, 19, 'bystrice3', 0);
+INSERT INTO labels VALUES (186, 19, 'pioseczna', 0);
+INSERT INTO labels VALUES (931, 19, 'albrechtice2', NULL);
+INSERT INTO labels VALUES (932, 19, 'belehradska2', NULL);
+INSERT INTO labels VALUES (253, 250, 'David', NULL);
+INSERT INTO labels VALUES (255, 250, 'Archiv', NULL);
+INSERT INTO labels VALUES (254, 250, 'Mirek', 0);
+INSERT INTO labels VALUES (934, 19, 'novysvet', NULL);
+INSERT INTO labels VALUES (935, 19, 'hriste', NULL);
+INSERT INTO labels VALUES (936, 19, 'mexiko', NULL);
+INSERT INTO labels VALUES (1006, 19, 'ufarmy', NULL);
+INSERT INTO labels VALUES (930, 19, 'nadrazni3', NULL);
+INSERT INTO labels VALUES (937, 19, 'flachbartova', NULL);
+INSERT INTO labels VALUES (938, 19, 'paseky', NULL);
+INSERT INTO labels VALUES (939, 19, 'macura', NULL);
+INSERT INTO labels VALUES (940, 19, 'stonava860b', NULL);
+INSERT INTO labels VALUES (941, 19, 'fara', NULL);
+INSERT INTO labels VALUES (942, 19, 'fara2', NULL);
+INSERT INTO labels VALUES (943, 19, 'oustonava', NULL);
+INSERT INTO labels VALUES (944, 19, 'balicky', NULL);
+INSERT INTO labels VALUES (945, 19, 'osinky', NULL);
+INSERT INTO labels VALUES (946, 19, 'baron', NULL);
+INSERT INTO labels VALUES (947, 19, 'sidliste2', NULL);
+INSERT INTO labels VALUES (948, 19, 'kornas', NULL);
+INSERT INTO labels VALUES (949, 19, 'valica', NULL);
+INSERT INTO labels VALUES (950, 19, 'stanislavice', NULL);
+INSERT INTO labels VALUES (951, 19, 'klimsza', NULL);
+INSERT INTO labels VALUES (952, 19, 'stonava2', NULL);
+INSERT INTO labels VALUES (953, 19, 'sina', NULL);
+INSERT INTO labels VALUES (954, 19, 'stonava1036', NULL);
+INSERT INTO labels VALUES (955, 19, 'nadrazi2', NULL);
+INSERT INTO labels VALUES (956, 19, 'nadrazi3', NULL);
+INSERT INTO labels VALUES (957, 19, 'borsicanka', NULL);
+INSERT INTO labels VALUES (958, 19, 'orli2', NULL);
+INSERT INTO labels VALUES (959, 19, 'senov2', NULL);
+INSERT INTO labels VALUES (960, 19, 'nad-blu-br', NULL);
+INSERT INTO labels VALUES (961, 19, 'bartovice', NULL);
+INSERT INTO labels VALUES (962, 19, 'bartovice2', NULL);
+INSERT INTO labels VALUES (995, 19, 'sobesovice', NULL);
+INSERT INTO labels VALUES (964, 19, 'hruska', NULL);
+INSERT INTO labels VALUES (965, 19, 'auxova', NULL);
+INSERT INTO labels VALUES (966, 19, 'bludovice2', NULL);
+INSERT INTO labels VALUES (967, 19, 'bludovice3', NULL);
+INSERT INTO labels VALUES (968, 19, 'terlicko2', NULL);
+INSERT INTO labels VALUES (969, 19, 'macecek', NULL);
+INSERT INTO labels VALUES (970, 19, 'macecek2', NULL);
+INSERT INTO labels VALUES (971, 19, 'barabosz', NULL);
+INSERT INTO labels VALUES (972, 19, 'safran', NULL);
+INSERT INTO labels VALUES (973, 19, 'hudziec', NULL);
+INSERT INTO labels VALUES (974, 19, 'sumbark2', NULL);
+INSERT INTO labels VALUES (975, 19, 'dlouha2', NULL);
+INSERT INTO labels VALUES (976, 19, 'turcina', NULL);
+INSERT INTO labels VALUES (963, 19, 'bezruce2', NULL);
+INSERT INTO labels VALUES (977, 19, 'bezruce3', NULL);
+INSERT INTO labels VALUES (978, 19, 'sucha2', NULL);
+INSERT INTO labels VALUES (979, 19, 'cihelka', NULL);
+INSERT INTO labels VALUES (980, 19, 'palowska', NULL);
+INSERT INTO labels VALUES (981, 19, 'weiser', NULL);
+INSERT INTO labels VALUES (982, 19, 'mladeznicka7', NULL);
+INSERT INTO labels VALUES (983, 19, 'galuszka', NULL);
+INSERT INTO labels VALUES (984, 19, 'bacak', NULL);
+INSERT INTO labels VALUES (985, 19, 'panec', NULL);
+INSERT INTO labels VALUES (986, 19, 'havirov2', NULL);
+INSERT INTO labels VALUES (987, 19, 'havirov3', NULL);
+INSERT INTO labels VALUES (988, 19, 'havirov4', NULL);
+INSERT INTO labels VALUES (989, 19, 'hav-sob-br', NULL);
+INSERT INTO labels VALUES (990, 19, 'hlavni73', NULL);
+INSERT INTO labels VALUES (991, 19, 'svabiskeho', NULL);
+INSERT INTO labels VALUES (992, 19, 'krasnohorska7b', NULL);
+INSERT INTO labels VALUES (147, 19, 'vendryne', 0);
+INSERT INTO labels VALUES (194, 19, 'klidna', 0);
+INSERT INTO labels VALUES (525, 19, 'pastwiska', 0);
+INSERT INTO labels VALUES (198, 19, 'o12', 0);
+INSERT INTO labels VALUES (131, 19, 'pacaluvka', 0);
+INSERT INTO labels VALUES (135, 19, 'pisek', 0);
+INSERT INTO labels VALUES (141, 19, 'capkova5', 0);
+INSERT INTO labels VALUES (145, 19, 'przybyla', 0);
+INSERT INTO labels VALUES (109, 19, 'navsi', 0);
+INSERT INTO labels VALUES (112, 19, 'okruzni', 0);
+INSERT INTO labels VALUES (151, 19, 'hornicka', 0);
+INSERT INTO labels VALUES (152, 19, 'ostravska', 0);
+INSERT INTO labels VALUES (993, 19, 'datyne', NULL);
+INSERT INTO labels VALUES (994, 19, 'palackeho2', NULL);
+INSERT INTO labels VALUES (16, 15, 'Node history', 0);
+INSERT INTO labels VALUES (17, 15, 'User history', 0);
+INSERT INTO labels VALUES (11, 10, 'AP', 0);
+INSERT INTO labels VALUES (12, 10, 'SA', 0);
+INSERT INTO labels VALUES (18, 10, 'BR', 0);
+INSERT INTO labels VALUES (19, 0, 'Domain', 0);
+INSERT INTO labels VALUES (10, 0, 'Node type', 0);
+INSERT INTO labels VALUES (15, 0, 'History type', 0);
+INSERT INTO labels VALUES (42, 15, 'Billing audit', 0);
+INSERT INTO labels VALUES (27, 0, 'YesNo', 0);
+INSERT INTO labels VALUES (28, 27, 'Yes', 0);
+INSERT INTO labels VALUES (29, 27, 'No', 0);
+INSERT INTO labels VALUES (30, 0, 'Polarization', 0);
+INSERT INTO labels VALUES (31, 30, 'Horizontal', 0);
+INSERT INTO labels VALUES (32, 30, 'Vertical', 0);
+INSERT INTO labels VALUES (153, 19, 'cieszyn', 0);
+INSERT INTO labels VALUES (154, 19, 'tovarni3', 0);
+INSERT INTO labels VALUES (155, 19, 'alternet', 0);
+INSERT INTO labels VALUES (933, 19, 'folvark', 0);
+INSERT INTO labels VALUES (116, 19, 'guty', 0);
+INSERT INTO labels VALUES (127, 19, 'milikov', 0);
+INSERT INTO labels VALUES (101, 19, 'tovarni', 0);
+INSERT INTO labels VALUES (102, 19, 'tovarni2', 0);
+INSERT INTO labels VALUES (103, 19, 'albrechtice', 0);
+INSERT INTO labels VALUES (104, 19, 'studentska', 0);
+INSERT INTO labels VALUES (105, 19, 'sumbark', 0);
+INSERT INTO labels VALUES (106, 19, 'havirov', 0);
+INSERT INTO labels VALUES (107, 19, 'bezruce', 0);
+INSERT INTO labels VALUES (108, 19, 'beskydska', 0);
+INSERT INTO labels VALUES (43, 15, 'Invoicing history', 0);
+INSERT INTO labels VALUES (110, 19, 'bystrice', 0);
+INSERT INTO labels VALUES (111, 19, 'baranova', 0);
+INSERT INTO labels VALUES (506, 19, 'otwarta', 0);
+INSERT INTO labels VALUES (516, 19, 'wiejska', 0);
+INSERT INTO labels VALUES (508, 19, 'zapasieki', 0);
+INSERT INTO labels VALUES (510, 19, 'jaworzynka', 0);
+INSERT INTO labels VALUES (512, 19, 'godziszow', 0);
+INSERT INTO labels VALUES (176, 19, 'belehradska', 0);
+INSERT INTO labels VALUES (1018, 19, 'macura2', NULL);
+INSERT INTO labels VALUES (119, 19, 'hradek', 0);
+INSERT INTO labels VALUES (120, 19, 'chotebuz', 0);
+INSERT INTO labels VALUES (121, 19, 'jablunkov', 0);
+INSERT INTO labels VALUES (177, 19, 'dukelska108', 0);
+INSERT INTO labels VALUES (123, 19, 'kbtesin', 0);
+INSERT INTO labels VALUES (514, 19, 'ustronska', 0);
+INSERT INTO labels VALUES (125, 19, 'knihud', 0);
+INSERT INTO labels VALUES (126, 19, 'kongrpol', 0);
+INSERT INTO labels VALUES (515, 19, 'cicha', 0);
+INSERT INTO labels VALUES (128, 19, 'lazne', 0);
+INSERT INTO labels VALUES (129, 19, 'lmc', 0);
+INSERT INTO labels VALUES (179, 19, 'zsstonava', 0);
+INSERT INTO labels VALUES (180, 19, 'bukovec', 0);
+INSERT INTO labels VALUES (132, 19, 'mosty', 0);
+INSERT INTO labels VALUES (181, 19, 'vapenka', 0);
+INSERT INTO labels VALUES (134, 19, 'namesti', 0);
+INSERT INTO labels VALUES (182, 19, 'bludovice', 0);
+INSERT INTO labels VALUES (183, 19, 'grafity', 0);
+INSERT INTO labels VALUES (137, 19, 'polni', 0);
+INSERT INTO labels VALUES (517, 19, 'loucka', 0);
+INSERT INTO labels VALUES (519, 19, 'kanada', 0);
+INSERT INTO labels VALUES (520, 19, 'koniakow', 0);
+INSERT INTO labels VALUES (521, 19, 'puncow', 0);
+INSERT INTO labels VALUES (142, 19, 'skalka', 0);
+INSERT INTO labels VALUES (522, 19, 'borek', 0);
+INSERT INTO labels VALUES (523, 19, 'zadky', 0);
+INSERT INTO labels VALUES (524, 19, 'krasna', 0);
+INSERT INTO labels VALUES (903, 19, 'hnojnik', 0);
+INSERT INTO labels VALUES (1007, 19, 'ufarmy2', NULL);
+INSERT INTO labels VALUES (1008, 19, 'studentska2', NULL);
+INSERT INTO labels VALUES (1009, 19, 'studentska3', NULL);
+INSERT INTO labels VALUES (1010, 19, 'petrovice', NULL);
+INSERT INTO labels VALUES (1011, 19, 'studentska2363', NULL);
+INSERT INTO labels VALUES (1012, 19, 'linnert', NULL);
+INSERT INTO labels VALUES (1013, 19, 'zssuchapl', NULL);
+INSERT INTO labels VALUES (1014, 19, 'ule-ufa-br', NULL);
+INSERT INTO labels VALUES (1015, 19, 'glac', NULL);
+INSERT INTO labels VALUES (1016, 19, 'lutyne', NULL);
+INSERT INTO labels VALUES (1017, 19, 'pekna', NULL);
+INSERT INTO labels VALUES (118, 19, 'kopernikova5', 0);
+INSERT INTO labels VALUES (1031, 19, 'kosariska', NULL);
+INSERT INTO labels VALUES (1032, 19, 'belehradska3', NULL);
+INSERT INTO labels VALUES (1033, 19, 'barabosz2', NULL);
+INSERT INTO labels VALUES (1034, 19, 'kaczyce', NULL);
+INSERT INTO labels VALUES (1019, 19, 'chelm2', NULL);
+INSERT INTO labels VALUES (1020, 19, 'gazury2', NULL);
+INSERT INTO labels VALUES (1021, 19, 'zrodlana', NULL);
+INSERT INTO labels VALUES (1022, 19, 'mysliwska2', NULL);
+INSERT INTO labels VALUES (1023, 19, 'bazanowice2', NULL);
+INSERT INTO labels VALUES (1024, 19, 'godziszow2', NULL);
+INSERT INTO labels VALUES (1025, 19, 'haller2', NULL);
+INSERT INTO labels VALUES (1026, 19, 'boczna2', NULL);
+INSERT INTO labels VALUES (1027, 19, 'jaworzynka2', NULL);
+INSERT INTO labels VALUES (1028, 19, 'andziolowka', NULL);
+INSERT INTO labels VALUES (1029, 19, 'andziolowka2', NULL);
+INSERT INTO labels VALUES (1035, 19, 'kaczyce2', NULL);
+INSERT INTO labels VALUES (1036, 19, 'cross', NULL);
+INSERT INTO labels VALUES (1037, 19, 'sloneczna', NULL);
+INSERT INTO labels VALUES (1038, 19, 'antonicek2', 0);
+INSERT INTO labels VALUES (1039, 19, 'hrbitovni3', 0);
+INSERT INTO labels VALUES (1040, 19, 'tranovice', NULL);
+INSERT INTO labels VALUES (1041, 19, 'core', NULL);
+INSERT INTO labels VALUES (204, 200, 'WIRELESSmax', NULL);
+INSERT INTO labels VALUES (211, 200, 'WIRELESShome', NULL);
+INSERT INTO labels VALUES (212, 200, 'LANfiber', 0);
+INSERT INTO labels VALUES (213, 200, 'Ethernet', 0);
 
-CREATE TABLE customers (
-    id bigint NOT NULL,
-    history_id bigint NOT NULL,
-    public_id character varying(20) NOT NULL,
-    name character varying(80) NOT NULL,
-    supplementary_name character varying(40),
-    street character varying(40),
-    city character varying(40),
-    postal_code character varying(10),
-    country integer,
-    email character varying(50),
-    dic character varying(20),
-    contract_no character varying(50),
-    connection_spot character varying(100),
-    inserted_on timestamp without time zone NOT NULL,
-    frequency integer,
-    lastly_billed timestamp without time zone,
-    is_billed_after boolean,
-    deliver_by_email boolean,
-    deliver_copy_email character varying(100),
-    deliver_by_mail boolean,
-    is_auto_billing boolean,
-    info character varying(150),
-    contact_name character varying(50),
-    phone character varying(60),
-    is_active boolean,
-    status integer,
-    shire_id bigint,
-    format integer,
-    deliver_signed boolean,
-    symbol character varying(20),
-    updated timestamp without time zone,
-    synchronized timestamp without time zone,
-    account_no character varying(26),
-    bank_no character varying(4),
-    variable integer
-);
-
-
-ALTER TABLE public.customers OWNER TO sisa;
-
-
---
--- TOC entry 1498 (class 1259 OID 53139)
--- Dependencies: 3
--- Name: services; Type: TABLE; Schema: public; Owner: sisa; Tablespace: 
---
-
-CREATE TABLE services (
-    id bigint NOT NULL,
-    customer_id bigint,
-    period_from timestamp without time zone NOT NULL,
-    period_to timestamp without time zone,
-    name character varying(70) NOT NULL,
-    price integer NOT NULL,
-    frequency integer,
-    download integer,
-    upload integer,
-    is_aggregated boolean,
-    info character varying(150),
-    replace_id bigint,
-    additionalname character varying(50),
-    bps character(1),
-    old_id bigint
-);
-
-
-ALTER TABLE public.services OWNER TO sisa;
-
-CREATE TABLE drafts (
-	id SERIAL,
-	type character varying(20),
-	user_id character varying(50),
-	data character varying(5000)
-);
-
-CREATE TABLE products (
-	id SERIAL,
-	name character varying(100),
-	downlink int,
-  uplink int,
-  price int,
-	channel character varying(100),
-  is_dedicated boolean
-);
 
 INSERT INTO products VALUES (1, 'LANaccess 10M', 10, 5, 315, 'lan', false);
 INSERT INTO products VALUES (2, 'LANaccess 20M', 20, 10, 375, 'lan', false);
@@ -119,21 +360,10 @@ INSERT INTO products VALUES (9, 'Fiber Dedicated', NULL, NULL, NULL, 'fiber', tr
 INSERT INTO products VALUES (3, 'LANfiber 50M', 50, 50, 315, 'fiber', false);
 INSERT INTO products VALUES (4, 'LANfiber 100M', 100, 100, 375, 'fiber', false);
 
-CREATE TABLE core_routers (
-	id SERIAL,
-	name character varying(50)
-); 
-
 INSERT INTO core_routers VALUES (1, 'Ostrava-Centrum');
 INSERT INTO core_routers VALUES (2, 'Ostrava-Poruba');
 INSERT INTO core_routers VALUES (3, 'Ostrava-Vitkovice');
 INSERT INTO core_routers VALUES (4, 'Ostrava-Zabreh');
-
---
--- TOC entry 1788 (class 0 OID 53131)
--- Dependencies: 1497
--- Data for Name: customers; Type: TABLE DATA; Schema: public; Owner: sisa
---
 
 INSERT INTO customers VALUES (58, 2058, '9912310024', 'Milena Hejnová', '', 'Stožická 885', 'Tábor 2', '390 02', 10, 'MilenaHejnova@einrot.com', '', '1564', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '725 672 583', true, 10, 255, 10, false, '4441', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.859', '', '', NULL);
 INSERT INTO customers VALUES (287, 2287, '9912310135', 'Jana Pulkrábková', '', 'U Parku 387', 'Dolní Bukovsko', '373 65', 10, 'JanaPulkrabkova@rhyta.com', '', '1061', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '394 624 584', true, 10, 255, 10, false, '5005', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:32.89', '', '', NULL);
@@ -1590,58 +1820,82 @@ INSERT INTO services VALUES (10466503, 244, '2008-09-15 00:00:00', NULL, 'SERVER
 INSERT INTO services VALUES (10466504, 244, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 700, 40, 10, 10, false, 'vendryne', 0, '', 'M', 15480);
 INSERT INTO services VALUES (10466505, 244, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 7790, 40, 100, 50, false, 'karvinska', 0, '', 'M', 2440);
 
+INSERT INTO network VALUES (1188, 'bes-koz-br', '5340, 5715, 5700', true, 30, 20, true, 5705, 'Ubiquiti', 'tyra', 'BES-KOZ', '30', 30, 10, '802.11n', 'beskydska', true, '20 MHz', '25', '5', 'beskydska', 'beskydska-br-dist', 'bes-koz-br-dist', true, '', '', '2014-05-21 01:34:33.601335', 'XM.ar7240.v5.5.6.17762.130528.1755', 'Rocket M5', '-55', '984', '130.0', '130.0', '97', '94', '100Mbps-Full', '10
+', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => beskydska => beskydska-eth1 => beskydska-br-dist => bes-koz-br', '0.878', 5705);
+INSERT INTO network VALUES (3484, 'glowna121a-sa', '', NULL, 30, 30, NULL, NULL, 'Ubiquiti', NULL, NULL, NULL, NULL, 20, NULL, 'glowna121a', NULL, NULL, '', '', 'kossak', 'simoradz-ap', 'glowna121a-sa', NULL, '', '', '2014-05-21 02:28:29.616715', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoBridge M5', '-65', '840', '117.0', '117.0', '90', '84', '100Mbps-Full', '10
+', 'Ping', 'core30 => gmct-br => gmc-mon-br => mon-gmc-br => moniuszki-br => mon-kos-br => kos-mon-br => kossak-br => kossak => kossak-eth1 => kossak-br-dist => kos-sim-br => sim-kos-br => simoradz-br => simoradz-ap => glowna121a-sa', '4.02', 5500);
+INSERT INTO network VALUES (2508, 'cross-br', '', NULL, 40, NULL, NULL, NULL, 'Mikrotik', NULL, NULL, NULL, NULL, 20, NULL, 'cross', NULL, NULL, NULL, NULL, 'morcinka', 'cro-kac-br', 'cross-br', NULL, '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ping', 'core30 => ulesa-br => ule-mor-br => mor-ule-br => morcinka => morcinka-br => mor-kac-br => kac-mor-br => kaczyce-br => kac-cro-br => cro-kac-br => cross-br', '5.606', NULL);
+INSERT INTO network VALUES (403, 'beskydska-ap4', '5640', true, 30, 10, true, 5640, 'Ubiquiti', 'kamionka', 'TRINEC4', '40', 30, 10, '802.11n', 'beskydska', true, '20 MHz', '13', '15', 'beskydska', 'beskydska-br-dist', 'beskydska-ap4', true, '49.3946795', '18.4020690', '2014-05-21 01:34:36.750349', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation M5', '-58', '988', '128.4', '78.8', '84', '85', '100Mbps-Full', '14
+', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => beskydska => beskydska-eth1 => beskydska-br-dist => beskydska-ap4', '0.862', 5640);
+INSERT INTO network VALUES (926, 'haller-ap6', '', true, 30, 10, true, 5560, 'Ubiquiti', 'kierunek ZOR', 'HALLER6', '40', 30, 20, '802.11n', 'haller', true, '20 MHz', 'NanoStation Loco M5', '17', 'kossak', 'haller-sw', 'haller-ap6', true, '', '', '2014-05-21 02:29:44.213152', 'XM.ar7240.v5.5.4.16501.130308.1015', 'NanoStation Loco M5', '-63', '965', '127.8', '127.8', '91', '91', '100Mbps-Full', '17
+', 'Ping', 'core30 => gmct-br => gmc-mon-br => mon-gmc-br => moniuszki-br => mon-kos-br => kos-mon-br => kossak-br => kossak => kossak-eth1 => kossak-br-dist => kos-hal-br => hal-kos-br => haller-sw => haller-ap6', '2.458', 5560);
+INSERT INTO network VALUES (331, 'bubik-ap', '5700, 5600', true, 30, 10, true, 5520, 'Ubiquiti', '', 'BUBIK', '40', 30, 10, '802.11n', 'bubik', true, '20 MHz', '13', '17', 'albrechtice', 'bubik-br', 'bubik-ap', true, '', '', '2014-05-21 01:36:46.324181', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-42', '1000', '54.0', '54.0', '99', '49', '100Mbps-Full', '17
+', 'Ping', 'core20 => albrechtice-br => albrechtice => albrechtice-eth1 => albrechtice-br-dist => alb-mac-br => mac-alb-br => macura-br => mac-fla-br => fla-mac-br => flachbartova-br => flachbartova-ap2 => bubik-sa => bubik-br => bubik-ap', '3.39', 5520);
+INSERT INTO network VALUES (2852, 'godziszow-ap2', '5600', true, 30, 10, true, 5500, 'Ubiquiti', '', 'GODZISZOW2', '40', 30, 20, '802.11n', 'godziszow', true, '20 MHz', '', '', 'helios', 'godziszow-br', 'godziszow-ap2', true, '', '', '2014-05-21 02:28:52.196142', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation M5', '-66', '985', '90.5', '83.0', '75', '58', '100Mbps-Full', '17
+', 'Ping', 'core30 => gmct-br => gmc-mon-br => mon-gmc-br => moniuszki-br => mon-kos-br => kos-mon-br => kossak-br => kos-hel-br => hel-kos-br => helios => helios-br => hel-ols-br => ols-hel-br => olszowa-br => ols-god-br => god-ols-br => godziszow-br => godziszow-ap2', '3.922', 5500);
+INSERT INTO network VALUES (166, 'otwarta-ap', '', true, 30, 10, false, 2452, 'Mikrotik', 'Ropice', 'OTWARTA', '20', 20, 20, '802.11g', 'otwarta', false, '20 MHz', '', '', 'caslavska', 'otwarta', 'otwarta', false, '', '', NULL, '', '', '', '', '', '', '', '', '', '', 'Ping', 'core30 => tovarni-br => tov-cas-br => cas-tov-br => caslavska => caslavska-br => cas-tet-br => tet-cas-br => tetmajer-br => tetmajer-ap3 => ptasia-sa => ptasia-sw => ptasia-ap => otwarta-sa => otwarta => otwarta-ap', '5.73', NULL);
+INSERT INTO network VALUES (1129, 'potok-ap', '', true, 30, 10, true, 5500, 'Ubiquiti', 'nebory unipaxk', 'POTOK', '40', 30, 10, '802.11n', 'potok', true, '20 MHz', '13', '17', 'podvrch', 'potok-sw', 'potok-ap', true, '', '', '2014-05-21 02:10:40.809708', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-49', '999', '130.0', '130.0', '96', '88', '100Mbps-Full', '17
+', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => bes-pod-br => pod-bes-br => podvrch => podvrch-br => pod-pot-br => pot-pod-br => potok-sw => potok-ap', '3.362', 5500);
+INSERT INTO network VALUES (219, 'dukelska108-ap4', 'Loco M5', true, 30, 10, true, 5560, 'Ubiquiti', 'namesti jablunkov', 'DUKELSKA1084', '40', 30, 10, '802.11n', 'dukelska108', true, '20 MHz', '13', '17', 'nadrazni', 'dukelska108-sw', 'dukelska108-ap4', true, '', '', '2014-05-21 01:41:06.533795', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-49', '969', '104.0', '102.1', '73', '64', '100Mbps-Full', '17
+', 'Ping', 'core20 => navsi-br => nav-nad-br => nad-nav-br => nadrazni => nadrazni-br => nad-lip-br => lip-nad-br => lipova-br => lip-duk-br => duk-lip-br => dukelska108-sw => dukelska108-ap4', '3.766', 5560);
+INSERT INTO network VALUES (38, 'brezova-ap3', 'MAC radius Loco M5, 5680', true, 30, 10, true, 5660, 'Ubiquiti', 'bartovice', 'BREZOVA3', '40', 30, 10, '802.11n', 'brezova', true, '20 MHz', '13', '17', 'nadrazi', 'brezova-br', 'brezova-ap3', true, '49.4744577', '18.2234345', '2014-05-21 01:36:43.070425', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-51', '893', '117.0', '78.0', '84', '61', '100Mbps-Full', '17
+', 'Ping', 'core20 => nadrazi-br => nadrazi => nadrazi-eth1 => nadrazi-br-dist => nad-sen-br => sen-nad-br => senov-br => sen-bre-br => bre-sen-br => brezova-br => brezova-ap3', '3.904', 5660);
+INSERT INTO network VALUES (2293, 'ame-dlo-br', '', NULL, 30, 30, NULL, NULL, 'Ubiquiti', NULL, NULL, NULL, NULL, 10, NULL, 'amerika', NULL, NULL, '', '', 'mladeznicka', 'dlo-ame-br', 'ame-dlo-br', NULL, '', '', '2014-05-21 01:32:51.587259', 'XM.ar7240.v5.5.6.17762.130528.1755', 'NanoBridge M5', '-65', '980', '130.0', '130.0', '91', '82', '100Mbps-Full', '5
+', 'Ping', 'core20 => nadrazi-br => nad-mla-br => mla-nad-br => mladeznicka => mladeznicka-br => mla-dlo-br => dlo-mla-br => dlouha-br => dlo-ame-br => ame-dlo-br', '3.484', 5480);
+INSERT INTO network VALUES (27, 'panec-ap2', '', true, 30, 10, false, 2472, 'Mikrotik', 'havirov sucha skola a peugeot', 'PANEC2', '20', 10, 10, '802.11g', 'panec', false, '20 MHz', '', '', 'mladeznicka', 'panec', 'panec', false, '', '', NULL, '', '', '', '', '', '', '', '', '', '', 'Ping', 'core20 => nadrazi-br => nad-mla-br => mla-nad-br => mladeznicka => mladeznicka-br => mla-pan-br => pan-mla-br => panec => panec-ap2', '3.78', NULL);
+INSERT INTO network VALUES (749, 'hav-pol-br', '4920,5000,5100,5200,5300,5400,5800,5900,6000,6100 19.6.12 5400-5360 nedrzely DR NB M5, 5360', true, 30, 20, true, 5475, 'Ubiquiti', 'autopollak', 'HAV-POL', '40', 30, 10, '802.11n', 'havirov', true, '10 MHz', '24', '15', 'havirov', 'havirov-br', 'hav-pol-br', true, '', '', '2014-05-21 01:45:35.431515', 'XM.ar7240.v5.5.6.17762.130528.1755', 'NanoBridge M5', '-51', '991', '65.0', '65.0', '99', '97', '100Mbps-Full', '5
+', 'Ping', 'core20 => nadrazi-br => nad-hav-br => hav-nad-br => havirov => havirov-br => hav-pol-br', '0.936', 5475);
+INSERT INTO network VALUES (869, 'borek-ap3', 'MAC radius Loco M5', true, 30, 10, true, 5580, 'Ubiquiti', 'betonarka Skanska', 'BOREK3', '40', 30, 10, '802.11n', 'borek', true, '20 MHz', '13', '17', 'beskydska', 'borek-sw', 'borek-ap3', false, '', '', '2014-05-21 01:36:09.870396', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-54', '991', '108.7', '104.3', '86', '78', '100Mbps-Full', '17
+', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => beskydska => beskydska-eth1 => beskydska-br-dist => bes-osu-br => osu-bes-br => osuvky-br => osu-bor-br => bor-osu-br => borek-sw => borek-ap3', '2.608', 5580);
+INSERT INTO network VALUES (185, 'bezruce-ap4', '', true, 30, 10, true, 5560, 'Ubiquiti', 'dukla', 'BEZRUCE4', '30', 30, 10, '802.11n', 'bezruce', true, '20 MHz', '13', '17', 'mladeznicka', 'bezruce-br', 'bezruce-ap4', true, '49.4637452', '18.2732911', '2014-05-21 01:35:16.779759', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-58', '981', '130.0', '123.5', '93', '90', '100Mbps-Full', '17
+', 'Ping', 'core20 => nadrazi-br => nad-mla-br => mla-nad-br => mladeznicka => mladeznicka-br => mla-bez-br => bez-mla-br => bezruce-br => bezruce-ap4', '2.182', 5560);
+INSERT INTO network VALUES (2680, 'navsi-br', '', NULL, 40, NULL, NULL, NULL, 'HP', NULL, NULL, NULL, NULL, 10, NULL, 'navsi', NULL, NULL, NULL, NULL, 'core20', 'core20', 'navsi-br', NULL, '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ping', 'core20 => navsi-br', '1.924', NULL);
+INSERT INTO network VALUES (959, 'caslavska-ap2', 'NanoStation M5, 5700, 5620', true, 30, 10, true, 5600, 'Ubiquiti', 'mladeznicka', 'CASLAVSKA2', '40', 30, 10, '802.11n', 'caslavska', true, '20 MHz', '14', '15', 'caslavska', 'caslavska-br', 'caslavska-ap2', true, '49.4353643', '18.3655928', '2014-05-21 01:37:43.19107', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation M5', '-55', '975', '127.4', '130.0', '94', '90', '100Mbps-Full', '15
+', 'Ping', 'core30 => tovarni-br => tov-cas-br => cas-tov-br => caslavska => caslavska-br => caslavska-ap2', '1.98', 5600);
+INSERT INTO network VALUES (1647, 'petrovice', '', NULL, 30, NULL, NULL, NULL, 'Mikrotik', NULL, NULL, NULL, NULL, 10, NULL, 'petrovice', NULL, NULL, NULL, NULL, 'ulesa', 'petrovice-sa', 'petrovice', NULL, '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ping', 'core30 => ulesa-br => ulesa => ulesa-eth1 => ulesa-br-dist => ule-stu-br => stu-ule-br => studentska-br => studentska2 => stu-pet-br => petrovice-sa => petrovice', '4.532', NULL);
+INSERT INTO network VALUES (592, 'hnojnik-ap3', 'sektor 90st/17db , 5520, 5580', true, 30, 10, false, 5660, 'Ubiquiti', 'komorni lhotka', 'HNOJNIK3', '20', 30, 10, '802.11n', 'hnojnik', true, '20 MHz', '', '', 'podvrch', 'hnojnik-br', 'hnojnik-ap3', true, '', '', '2014-05-21 01:46:16.807902', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-71', '962', '60.7', '63.0', '0', '0', '100Mbps-Full', '17
+', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => bes-pod-br => pod-bes-br => podvrch => podvrch-br => pod-gut-br => gut-pod-br => guty-br => gut-hno-br => hno-gut-br => hnojnik-br => hnojnik-ap3', '4.922', 5660);
+INSERT INTO network VALUES (804, 'csa-det-br', '4940, 4960, 4980, 5300, 5320, 5350, 5370, 5390, 5900, 5920, 5940, 5960, 5980, 6000, 6020, 6040, 6060, 6080, 6100 NB M25, 5300', true, 30, 20, true, 5480, 'Ubiquiti', 'detmarovice', 'CAS-DET', '40', 30, 10, '802.11n', 'csa', true, '10 MHz', '25', '15', 'ulesa', 'csa-sw', 'csa-det-br', true, '', '', '2014-05-21 01:39:16.147021', 'XM.ar7240.v5.5.6.17762.130528.1755', 'NanoBridge M5', '-65', '968', '130.0', '130.0', '95', '94', '100Mbps-Full', '10
+', 'Ping', 'core30 => ulesa-br => ulesa => ulesa-eth1 => ulesa-br-dist => ule-csa-br => csa-ule-br => csa-sw => csa-det-br', '3.6', 5480);
+INSERT INTO network VALUES (435, 'baron-ap2', '', true, 30, 10, true, 5500, 'Ubiquiti', 'Bludovicak', 'BARON2', '20', 30, 10, '802.11n', 'baron', true, '20 MHz', '14', '17', 'obecni', 'baron-br', 'baron-ap2', false, '', '', '2014-05-21 01:34:00.850652', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-60', '976', '82.6', '81.8', '0', '0', '100Mbps-Full', '17
+', 'Ping', 'core20 => albrechtice-br => alb-obe-br => obe-alb-br => obecni => obecni-br => obe-pac-br => pac-obe-br => pacaluvka-br => pac-bar-br => bar-pac-br => baron-br => baron-ap2', '4.896', 5500);
+INSERT INTO network VALUES (1000, 'lisky-ap3', 'MAC radius, 5560, 5600 NanoStation M5', true, 30, 10, false, 5580, 'Ubiquiti', 'bocanovice8', 'LISKY3', '40', 30, 10, '802.11n', 'lisky', true, '20 MHz', '14', '15', 'nadrazni', 'lisky-br', 'lisky-ap3', true, '', '', '2014-05-21 01:55:06.495205', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation M5', '-61', '992', '114.8', '107.0', '0', '0', '100Mbps-Full', '14
+', 'Ping', 'core20 => navsi-br => nav-nad-br => nad-nav-br => nadrazni => nadrazni-br => nad-lis-br => lis-nad-br => lisky-br => lisky-ap3', '2.496', 5580);
+INSERT INTO network VALUES (3090, 'petrvald-br', '', NULL, 30, NULL, NULL, NULL, 'TP-Link', NULL, NULL, NULL, NULL, 10, NULL, 'petrvald', NULL, NULL, NULL, NULL, 'ulesa', 'pet-orl-br', 'petrvald-br', NULL, '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ping', 'core30 => ulesa-br => ulesa => ulesa-eth1 => ulesa-br-dist => ule-orl-br => orl-ule-br => orlova-br => orl-pet-br => pet-orl-br => petrvald-br', '4.722', NULL);
+INSERT INTO network VALUES (798, 'gmc-noi-br', '4920, 4940, 4960, 4980, 5350, 5370, 5390, 5400, 5485, 5900, 5920, 5940, 5960, 5980, 6000, 6020, 6040, 6060, 6080, 6100, sirka kanalu 10Mhz, puvodne 6100, 5485, NB M25', true, 30, 20, true, 5485, 'Ubiquiti', 'noiva', 'GMC-NOI', '30', 30, 10, '802.11n', 'gmct', true, '10 MHz', '25', '5', 'gmct', 'gmct-br-dist', 'gmc-noi-br', true, '49.4431399', '18.3655520', '2014-05-21 01:43:52.31366', 'XM.ar7240.v5.5.6.17762.130528.1755', 'NanoBridge M5', '-50', '991', '65.0', '65.0', '96', '91', '100Mbps-Full', '5
+', 'Ping', 'core30 => gmct-br => gmct => gmct-eth1 => gmct-br-dist => gmc-noi-br', '1.264', 5485);
+INSERT INTO network VALUES (3480, 'dziegielow-br', '', NULL, 40, NULL, NULL, NULL, 'TP-Link', NULL, NULL, NULL, NULL, 20, NULL, 'dziegielow', NULL, NULL, NULL, NULL, 'kossak', 'dzi-kos-br', 'dziegielow-br', NULL, '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ping', 'core30 => gmct-br => gmc-mon-br => mon-gmc-br => moniuszki-br => mon-kos-br => kos-mon-br => kossak-br => kossak => kossak-eth1 => kossak-br-dist => kos-dzi-br => dzi-kos-br => dziegielow-br', '3.412', NULL);
+INSERT INTO network VALUES (741, 'pod-tyr-br', '', true, 30, 20, true, 10574, 'Ubiquiti', 'tyrka', 'POD-TYR', '30', 30, 10, '10GHz', 'podvrch', true, '28 MHz', '28', '3', 'podvrch', 'podvrch-br', 'pod-tyr-br', true, '', '', '2014-05-21 02:09:44.017473', 'XM.ar7240.v5.5.8.20991.140205.1824', 'PowerBridge M10', '-64', '991', '163.8', '109.2', '82', '67', '100Mbps-Full', '3
+', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => bes-pod-br => pod-bes-br => podvrch => podvrch-br => pod-tyr-br', '1.026', 10574);
+INSERT INTO network VALUES (1418, 'polni18-sa', '', NULL, 30, 30, NULL, NULL, 'Ubiquiti', NULL, NULL, NULL, NULL, 10, NULL, 'polni18', NULL, NULL, '', '', 'frydecka', 'frydecka-ap3', 'polni18-sa', NULL, '', '', '2014-05-21 02:10:09.947207', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoBridge M5', '-57', '971', '130.0', '130.0', '93', '91', '100Mbps-Full', '10
+', 'Ping', 'core20 => frydecka-br => frydecka => frydecka-eth1 => frydecka-br-dist => frydecka-ap3 => polni18-sa', '1.652', 5660);
+INSERT INTO network VALUES (1067, 'por-kom-br', 'NB M25 M5', false, 30, 20, true, 0, 'Ubiquiti', 'komorni lhotka', 'POR-KOM', '40', 30, 10, '802.11n', 'poruby', true, '20 MHz', '25', '15', 'podvrch', 'poruby-sw', 'por-kom-br', true, '', '', '2014-05-21 02:10:34.298849', 'XM.ar7240.v5.5.6.17762.130528.1755', 'NanoBridge M5', '-96', '0', '0.0', '0.0', '0', '0', '100Mbps-Full', '15
+', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => bes-pod-br => pod-bes-br => podvrch => podvrch-br => pod-gut-br => gut-pod-br => guty-br => gut-hno-br => hno-gut-br => hnojnik-br => hno-por-br => por-hno-br => poruby-sw => por-kom-br', '5.78', 5180);
+INSERT INTO network VALUES (146, 'podvrch-ap4', '5620', true, 30, 10, true, 5660, 'Ubiquiti', 'guty pawliskova', 'PODVRCH4', '30', 30, 10, '802.11n', 'podvrch', true, '20 MHz', '14', '15', 'podvrch', 'podvrch-br', 'podvrch-ap4', false, '', '', '2014-05-21 02:09:51.960592', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation M5', '-59', '982', '130.0', '130.0', '95', '85', '100Mbps-Full', '15
+', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => bes-pod-br => pod-bes-br => podvrch => podvrch-br => podvrch-ap4', '1.032', 5660);
+INSERT INTO network VALUES (3485, 'glowna121a-br', '', NULL, 40, NULL, NULL, NULL, 'Mikrotik', NULL, NULL, NULL, NULL, 20, NULL, 'glowna121a', NULL, NULL, NULL, NULL, 'kossak', 'glowna121a-sa', 'glowna121a-br', NULL, '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ping', 'core30 => gmct-br => gmc-mon-br => mon-gmc-br => moniuszki-br => mon-kos-br => kos-mon-br => kossak-br => kossak => kossak-eth1 => kossak-br-dist => kos-sim-br => sim-kos-br => simoradz-br => simoradz-ap => glowna121a-sa => glowna121a-br', '4.448', NULL);
+INSERT INTO network VALUES (2651, 'cihelka-ap', '', true, 30, 10, true, 5600, 'Ubiquiti', '9. kveten vlevo', 'CIHELKA', '30', 30, 10, '802.11n', 'cihelka', true, '20 MHz', '13', '17', 'mladeznicka', 'cihelka-sw', 'cihelka-ap', false, '', '', '2014-05-21 01:38:26.296055', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-63', '993', '92.0', '77.0', '0', '0', '100Mbps-Full', '17
+', 'Ping', 'core20 => nadrazi-br => nad-mla-br => mla-nad-br => mladeznicka => mladeznicka-br => mla-suc-br => suc-mla-br => sucha-br => sucha-ap7 => cihelka-sa => cihelka-sw => cihelka-ap', '2.632', 5600);
+INSERT INTO network VALUES (3479, 'dzi-kos-br', '', NULL, 30, 30, NULL, NULL, 'Ubiquiti', NULL, NULL, NULL, NULL, 20, NULL, 'dziegielow', NULL, NULL, '', '', 'kossak', 'kos-dzi-br', 'dzi-kos-br', NULL, '', '', '2014-05-21 02:28:04.626075', 'XW.ar934x.v5.5.6.18861.130830.1623', 'NanoBeamM5', '-59', '991', '144.4', '144.4', '99', '98', '1000Mbps-Full', '10
+', 'Ping', 'core30 => gmct-br => gmc-mon-br => mon-gmc-br => moniuszki-br => mon-kos-br => kos-mon-br => kossak-br => kossak => kossak-eth1 => kossak-br-dist => kos-dzi-br => dzi-kos-br', '2.764', 5685);
+INSERT INTO network VALUES (2656, 'buk-zor-br', '', NULL, 30, 30, NULL, NULL, 'Ubiquiti', NULL, NULL, NULL, NULL, 10, NULL, 'bukovec', NULL, NULL, '', '', 'navsi', 'zor-buk-br', 'buk-zor-br', NULL, '', '', '2014-05-21 01:37:02.191637', 'XM.ar7240.v5.5.6.17762.130528.1755', 'NanoBridge M5', '-49', '991', '130.0', '130.0', '99', '98', '100Mbps-Full', '5
+', 'Ping', 'core20 => navsi-br => navsi => navsi-eth1 => navsi-br-dist => nav-laz-br => laz-nav-br => lazy-br => laz-pis-br => pis-laz-br => pisek-br => pis-zor-br => zor-pis-br => zorymbek-br => zor-buk-br => buk-zor-br', '4.602', 5715);
+INSERT INTO network VALUES (2195, 'del-moj-br', '', NULL, 30, 30, NULL, NULL, 'Ubiquiti', NULL, NULL, NULL, NULL, 10, NULL, 'delnice', NULL, NULL, '', '', 'mojska', 'moj-del-br', 'del-moj-br', NULL, '', '', '2014-05-21 01:39:30.82897', 'XM.ar7240.v5.5.6.17762.130528.1755', 'NanoBridge M5', '-56', '918', '117.0', '117.0', '90', '74', '100Mbps-Full', '8
+', 'Ping', 'core30 => gmct-br => gmc-moj-br => moj-gmc-br => mojska => mojska-eth1 => mojska-br => moj-del-br => del-moj-br', '2.802', 5480);
+INSERT INTO network VALUES (887, 'pioseczna-ap3', 'MAC radius Loco M5, 5500', true, 30, 10, true, 5520, 'Ubiquiti', 'pisek', 'PISECNA3', '40', 30, 10, '802.11n', 'pioseczna', true, '20 MHz', '13', '17', 'nadrazni', 'pioseczna-br', 'pioseczna-ap3', false, '', '', '2014-05-21 02:08:50.13424', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-57', '979', '124.2', '124.2', '86', '81', '100Mbps-Full', '17
+', 'Ping', 'core20 => navsi-br => nav-nad-br => nad-nav-br => nadrazni => nadrazni-br => nad-lis-br => lis-nad-br => lisky-br => lis-pio-br => pio-lis-br => pioseczna-br => pioseczna-ap3', '3.788', 5520);
+INSERT INTO network VALUES (4, 'alb-mac-br', '4920,5000,5100,5200,5300,5400,5700,5800,5900,6000,6100 nanobridge m25', true, 30, 20, true, 10378, 'Ubiquiti', 'albrechtice', 'ALB-MAC', '30', 30, 10, '10GHz', 'albrechtice', true, '28 MHz', '30', '-5', 'albrechtice', 'albrechtice-br-dist', 'alb-mac-br', true, '', '', '2014-05-21 01:32:27.108587', 'XM.ar7240.v5.5.8.20991.140205.1824', 'PowerBridge M10', '-47', '995', '163.8', '182.0', '94', '83', '100Mbps-Full', '-5
+', 'Ping', 'core20 => albrechtice-br => albrechtice => albrechtice-eth1 => albrechtice-br-dist => alb-mac-br', '0.762', 10378);
+INSERT INTO network VALUES (1334, 'csa2860-sa', '', NULL, 30, 30, NULL, NULL, 'Ubiquiti', NULL, NULL, NULL, NULL, 10, NULL, 'csa2860', NULL, NULL, '', '', 'ulesa', 'csa-ap2', 'csa2860-sa', NULL, '', '', '2014-05-21 01:38:50.6397', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoBridge M5', '-65', '947', '117.0', '130.0', '88', '84', '100Mbps-Full', '23
+', 'Ping', 'core30 => ulesa-br => ulesa => ulesa-eth1 => ulesa-br-dist => ule-csa-br => csa-ule-br => csa-sw => csa-ap2 => csa2860-sa', '5.358', 5560);
+INSERT INTO network VALUES (298, 'ostravska-ap2', '', true, 30, 10, false, 2432, 'Mikrotik', 'polsko komin', 'OSTRAVSKA2', '20', 20, 10, '802.11g', 'ostravska', false, '20 MHz', '', '', 'ostravska', 'ostravska2', 'ostravska2', false, '', '', NULL, '', '', '', '', '', '', '', '', '', '', 'Ping', 'core20 => o12-br => o12-ost-br => ost-o12-br => ostravska => ostravska-br => ostravska2 => ostravska-ap2', '1.122', NULL);
+INSERT INTO network VALUES (2560, 'nydek560-sa', '', NULL, 30, 30, NULL, NULL, 'Mikrotik', NULL, NULL, NULL, NULL, 10, NULL, 'nydek560', NULL, NULL, '', '', 'nadolsi', 'ukohuta-ap', 'nydek560', NULL, '', '', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Ping', 'core20 => nadolsi-br => nadolsi => nadolsi-eth1 => nadolsi-br-dist => nad-nyd-br => nyd-nad-br => nydek-br => nyd-uko-br => uko-nyd-br => ukohuta-sw => ukohuta-ap => nydek560-sa', '3.308', NULL);
+INSERT INTO network VALUES (3199, 'machula-ap', '', true, 30, 10, false, 5540, 'Ubiquiti', '', 'MACHULA', '10', 30, 20, '802.11n', 'machula', true, '20 MHz', '', '', 'helios', 'machula-br', 'machula-ap', true, '', '', '2014-05-21 02:34:21.323877', 'XM.ar7240.v5.5.8.20991.140205.1824', 'NanoStation Loco M5', '-96', '0', '0.0', '0.0', '0', '0', '100Mbps-Full', '17
+', 'Ping', 'core30 => gmct-br => gmc-mon-br => mon-gmc-br => moniuszki-br => mon-kos-br => kos-mon-br => kossak-br => kos-hel-br => hel-kos-br => helios => helios-br => hel-che-br => che-hel-br => chelm-br => che-zro-br => zro-che-br => zrodlana-br => zro-gor-br => gor-zro-br => goruszka-br => goruszka-ap => machula-sa => machula-br => machula-ap', '6.728', 5540);
 
---
--- TOC entry 1779 (class 2606 OID 53138)
--- Dependencies: 1497 1497
--- Name: customers_pkey; Type: CONSTRAINT; Schema: public; Owner: sisa; Tablespace: 
---
-
-ALTER TABLE ONLY customers
-    ADD CONSTRAINT customers_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 1784 (class 2606 OID 60857)
--- Dependencies: 1499 1499
--- Name: products_pkey; Type: CONSTRAINT; Schema: public; Owner: sisa; Tablespace: 
---
-
-ALTER TABLE ONLY products
-    ADD CONSTRAINT products_pkey PRIMARY KEY (id);
-
---
--- TOC entry 1782 (class 2606 OID 53143)
--- Dependencies: 1498 1498
--- Name: services_pkey; Type: CONSTRAINT; Schema: public; Owner: sisa; Tablespace: 
---
-
-ALTER TABLE ONLY services
-    ADD CONSTRAINT services_pkey PRIMARY KEY (id);
-
-
---
--- TOC entry 1780 (class 1259 OID 53149)
--- Dependencies: 1498
--- Name: customer_index2; Type: INDEX; Schema: public; Owner: sisa; Tablespace: 
---
-
-CREATE INDEX customer_index2 ON services USING btree (customer_id);
-
-
---
--- TOC entry 1787 (class 2606 OID 53144)
--- Dependencies: 1498 1497 1778
--- Name: fk5235105e31f2d3d; Type: FK CONSTRAINT; Schema: public; Owner: sisa
---
-
-ALTER TABLE ONLY services
-    ADD CONSTRAINT fk5235105e31f2d3d FOREIGN KEY (customer_id) REFERENCES customers(id);
-
-
--- Completed on 2013-12-22 09:43:50
-
---
--- PostgreSQL database dump complete
---
-
+INSERT INTO users VALUES (1, 'anonymousUser', NULL, 'anonymousUser', NULL, NULL);
+INSERT INTO users VALUES (2, 'system', NULL, 'system', 'ROLE_ANONYMOUS,ROLE_USER,ROLE_TECH_ADMIN,ROLE_ACCOUNTING', NULL);
+INSERT INTO users VALUES (13, 'franta', 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3', 'Franta', 'ROLE_ANONYMOUS,ROLE_USER,ROLE_CUST_VIEW', NULL);
+INSERT INTO users VALUES (28, 'karel', 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3', 'Karel', 'ROLE_ANONYMOUS,ROLE_USER,ROLE_ACCOUNTING', NULL);
+INSERT INTO users VALUES (25, 'josef', 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3', 'Josef', 'ROLE_ANONYMOUS,ROLE_USER,ROLE_CUST_VIEW', NULL);
+INSERT INTO users VALUES (16, 'lukas', 'a94a8fe5ccb19ba61c4c0873d391e987982fbbd3', 'Luáš', 'ROLE_ANONYMOUS,ROLE_USER,ROLE_CUST_VIEW', NULL);
