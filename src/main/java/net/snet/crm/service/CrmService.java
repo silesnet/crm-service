@@ -32,6 +32,8 @@ public class CrmService extends Service<CrmConfiguration> {
         environment.addResource(new CustomerResource(dbi));
         environment.addResource(new DraftResource(dbi));
         environment.addResource(new RouterResource(dbi));
+        environment.addResource(new NetworkResource(dbi));
+        environment.addResource(new UserResource(dbi));
         environment.addResource(new ProductResource(dbi));
         environment.addResource(new ContractResource(dbi));
         environment.addResource(new BaseResource());
