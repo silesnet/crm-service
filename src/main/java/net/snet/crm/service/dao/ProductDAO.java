@@ -10,7 +10,7 @@ import java.util.Iterator;
 @RegisterMapper(ProductMapper.class)
 public interface ProductDAO {
 
-    @SqlQuery("SELECT * FROM products ORDER BY name")
+    @SqlQuery("SELECT * FROM products ORDER BY priority, name")
     Iterator<Product> allProducts();
 
     void close();
