@@ -347,23 +347,18 @@ INSERT INTO labels VALUES (1041, 19, 'core', NULL);
 INSERT INTO labels VALUES (204, 200, 'WIRELESSmax', NULL);
 INSERT INTO labels VALUES (211, 200, 'WIRELESShome', NULL);
 INSERT INTO labels VALUES (212, 200, 'LANfiber', 0);
-INSERT INTO labels VALUES (213, 200, 'Ethernet', 0);
+INSERT INTO labels VALUES (213, 200, 'Ethernet', 0);     
 
-
-INSERT INTO products VALUES (1, 'LANaccess 10M', 10, 5, 315, 'lan', false);
-INSERT INTO products VALUES (2, 'LANaccess 20M', 20, 10, 375, 'lan', false);
-INSERT INTO products VALUES (5, 'Wireless 10M', 10, 5, 436, 'wireless', false);
-INSERT INTO products VALUES (6, 'Wireless 20M', 20, 10, 496, 'wireless', false);
-INSERT INTO products VALUES (7, 'Wireless Dedicated', NULL, NULL, NULL, 'wireless', true);
-INSERT INTO products VALUES (8, 'Lan Dedicated', NULL, NULL, NULL, 'lan', true);
-INSERT INTO products VALUES (9, 'Fiber Dedicated', NULL, NULL, NULL, 'fiber', true);
-INSERT INTO products VALUES (3, 'LANfiber 50M', 50, 50, 315, 'fiber', false);
-INSERT INTO products VALUES (4, 'LANfiber 100M', 100, 100, 375, 'fiber', false);
-
-INSERT INTO core_routers VALUES (1, 'Ostrava-Centrum');
-INSERT INTO core_routers VALUES (2, 'Ostrava-Poruba');
-INSERT INTO core_routers VALUES (3, 'Ostrava-Vitkovice');
-INSERT INTO core_routers VALUES (4, 'Ostrava-Zabreh');
+INSERT INTO products VALUES (1, 'LANaccess 10/5M', 10, 5, 315, 'lan', false, 0);
+INSERT INTO products VALUES (2, 'LANaccess 20/10M', 20, 10, 375, 'lan', false, 0);
+INSERT INTO products VALUES (5, 'WIRELESShome 10/5M', 10, 5, 436, 'wireless', false, 15);
+INSERT INTO products VALUES (10, 'WIRELESSmax 10/5M', 10, 5, 436, 'wireless', false, 15);
+INSERT INTO products VALUES (6, 'WIRELESSmax 20/10M ', 20, 10, 496, 'wireless', false, 15);
+INSERT INTO products VALUES (7, 'WIRELESSdedicated', NULL, NULL, NULL, 'wireless', true, 20);
+INSERT INTO products VALUES (8, 'LANdedicated', NULL, NULL, NULL, 'lan', true, 10);
+INSERT INTO products VALUES (9, 'InternetDedicated', NULL, NULL, NULL, 'fiber', true, 25);
+INSERT INTO products VALUES (3, 'LANfiber 50/50M', 50, 50, 315, 'fiber', false, 5);
+INSERT INTO products VALUES (4, 'LANfiber 100/100M', 100, 100, 375, 'fiber', false, 5);       
 
 INSERT INTO customers VALUES (58, 2058, '9912310024', 'Milena Hejnová', '', 'Stožická 885', 'Tábor 2', '390 02', 10, 'MilenaHejnova@einrot.com', '', '1564', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '725 672 583', true, 10, 255, 10, false, '4441', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.859', '', '', NULL);
 INSERT INTO customers VALUES (287, 2287, '9912310135', 'Jana Pulkrábková', '', 'U Parku 387', 'Dolní Bukovsko', '373 65', 10, 'JanaPulkrabkova@rhyta.com', '', '1061', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '394 624 584', true, 10, 255, 10, false, '5005', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:32.89', '', '', NULL);
