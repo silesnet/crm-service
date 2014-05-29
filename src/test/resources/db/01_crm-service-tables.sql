@@ -226,7 +226,8 @@ CREATE TABLE products (
     uplink integer,
     price integer,
     channel character varying(100),
-    is_dedicated boolean
+    is_dedicated boolean,
+    priority integer
 );
 
 
