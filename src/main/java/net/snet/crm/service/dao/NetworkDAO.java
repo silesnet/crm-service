@@ -10,10 +10,10 @@ import java.util.Iterator;
 @RegisterMapper(NetworkMapper.class)
 public interface NetworkDAO {
 
-    @SqlQuery("SELECT DISTINCT ON (master) * FROM network AS n1 WHERE EXISTS (SELECT 1 FROM network AS n2 WHERE n1.master = n2.name) ORDER BY master")
+    @SqlQuery("SELECT * FROM network AS n1 WHERE EXISTS (SELECT 1 FROM network AS n2 WHERE n1.name = n2.master) ORDER BY name")
     Iterator<Network> allMasters();
 
-    @SqlQuery("SELECT DISTINCT ON (ssid) * FROM network WHERE ssid IS NOT NULL ORDER BY ssid")
+    @SqlQuery("SELECT * FROM network WHERE ssid IS NOT NULL ORDER BY ssid")
     Iterator<Network> allSsids();
 
     void close();
