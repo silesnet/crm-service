@@ -2,12 +2,14 @@ package net.snet.crm.service.bo;
 
 public class Network {
     private long id;
+		private String name;
     private String master;
     private String ssid;
 
-    public Network(long id, String name, String ssid) {
+    public Network(long id, String name, String master, String ssid) {
         this.id = id;
-        this.master = name;
+				this.name = name;
+        this.master = master;
         this.ssid = ssid;
     }
 
@@ -19,7 +21,15 @@ public class Network {
         this.id = id;
     }
 
-    public String getMaster() {
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getMaster() {
         return master;
     }
 

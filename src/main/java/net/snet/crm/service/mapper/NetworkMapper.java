@@ -12,6 +12,7 @@ public class NetworkMapper implements ResultSetMapper<Network> {
     @Override
     public Network map(int index, ResultSet r, StatementContext ctx) throws SQLException {
         return new Network(r.getLong("id"),
+								r.getString("name"),
                 r.getString("master"),
                 r.getString("ssid"));
     }
