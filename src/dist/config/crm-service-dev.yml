@@ -5,3 +5,8 @@ database:
   user: sisa
   password: sis.sis
   url: jdbc:postgresql://localhost/crm-service
+
+logging:
+  level: INFO
+  loggers:
+    "net.snet": DEBUG
