@@ -1,12 +1,12 @@
 package net.snet.crm.service.resources;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
+import com.google.common.collect.*;
 import com.yammer.metrics.annotation.Timed;
 import net.snet.crm.service.bo.CustomerSearch;
 import net.snet.crm.service.dao.CustomerDAO;
 import net.snet.crm.service.utils.Utils;
+import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.tweak.HandleCallback;
@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,8 +107,58 @@ public class CustomerResource {
 			}
 		}
 
-
 		return customersMap;
+	}
+
+	@PUT
+	@Timed(name = "get-requests")
+	public Response updateCustomers(Map<String, Object> updates) {
+		LOGGER.debug("update customers called");
+		HashMap<String, Object> response = Maps.newHashMap();
+		List<Map> updated = Lists.newArrayList();
+		try {
+			@SuppressWarnings("unchecked")
+			List<Map<String, Object>> customerUpdates = (List<Map<String, Object>>) updates.get("customers");
+			for (Map<String, Object> customerUpdate : customerUpdates) {
+				LOGGER.debug("updating customer with '{}'", customerUpdate);
+				try {
+					final long id = Long.valueOf(customerUpdate.get("id").toString());
+					final String symbol = customerUpdate.get("symbol").toString();
+					final DateTime synchronizedOn = DateTime.parse(customerUpdate.get("synchronized").toString());
+					dbi.withHandle(new HandleCallback<Void>() {
+						@Override
+						public Void withHandle(Handle handle) throws Exception {
+							int changed = handle.createStatement(
+									"UPDATE customers\n" +
+											"  SET symbol = :symbol,\n" +
+											"    synchronized = :synchronizedOn\n" +
+											"  WHERE id = :id\n")
+									.bind("id", id)
+									.bind("symbol", symbol)
+									.bind("synchronizedOn", synchronizedOn.toDate())
+									.execute();
+							if (changed != 1) {
+								throw new RuntimeException("customer with id '" + id + "' not found, cannot update");
+							}
+							LOGGER.debug("customer with id '{}' was synchronized on '{}'", id, synchronizedOn);
+							return null;
+						}
+					});
+				} catch (Exception e) {
+					LOGGER.error(e.getMessage());
+					customerUpdate.put("errors", ImmutableList.of(ImmutableMap.of("message", "" + e.getMessage())));
+				}
+				updated.add(customerUpdate);
+			}
+		} catch (Exception e) {
+			response.put("errors", ImmutableList.of(ImmutableMap.of("message", "" + e.getMessage())));
+			throw new WebApplicationException(
+					Response.status(Response.Status.BAD_REQUEST)
+						.entity(response)
+						.build());
+		}
+		response.put("customers", updated);
+		return Response.ok(response).build();
 	}
 }
 
