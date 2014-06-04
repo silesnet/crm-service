@@ -1,71 +1,113 @@
 package net.snet.crm.service.resources;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.yammer.metrics.annotation.Timed;
-import net.snet.crm.service.bo.Customer;
 import net.snet.crm.service.bo.CustomerSearch;
-import net.snet.crm.service.bo.Service;
-import net.snet.crm.service.bo.ServiceId;
 import net.snet.crm.service.dao.CustomerDAO;
-import net.snet.crm.service.dao.ServiceDAO;
 import net.snet.crm.service.utils.Utils;
 import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Path("/customers")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class CustomerResource {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CustomerResource.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerResource.class);
 
-    private final String FROM_CHARS = "ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź.-,;:&+? ";
-    private final String TO_CHARS = "aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz";
+	private final String FROM_CHARS = "ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź.-,;:&+? ";
+	private final String TO_CHARS = "aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz";
 
-    private CustomerDAO customerDAO;
-    private ServiceDAO serviceDAO;
+	private final Pattern LEDGER_IMPORT = Pattern.compile("ledger-(\\w\\w)-import");
 
-    public CustomerResource(DBI dbi) {
-        this.customerDAO = dbi.onDemand(CustomerDAO.class);
-        this.serviceDAO = dbi.onDemand(ServiceDAO.class);
-    }
+	private CustomerDAO customerDAO;
+	private final DBI dbi;
 
-    @GET
-    @Produces({"application/json; charset=UTF-8"})
-    @Path("/{customerId}")
-    @Timed(name = "get-requests")
-    public Map<String, Object> getCustomerById(@PathParam("customerId") long id) {
-        LOGGER.debug("customers called");
+	public CustomerResource(DBI dbi) {
+		this.customerDAO = dbi.onDemand(CustomerDAO.class);
+		this.dbi = dbi;
+	}
 
-        final HashMap<String, Object> customersMap = new HashMap<String, Object>();
+	@GET
+	@Produces({"application/json; charset=UTF-8"})
+	@Path("/{customerId}")
+	@Timed(name = "get-requests")
+	public Map<String, Object> getCustomerById(@PathParam("customerId") long id) {
+		LOGGER.debug("customers called");
 
-        customersMap.put("customer", customerDAO.findById(id));
+		final HashMap<String, Object> customersMap = new HashMap<String, Object>();
 
-        return customersMap;
-    }
+		customersMap.put("customer", customerDAO.findById(id));
 
-    @GET
-    @Produces({"application/json; charset=UTF-8"})
-    @Timed(name = "get-requests")
-    public Map<String, Object> getCustomersByQuery(@QueryParam("q") String name, @QueryParam("c") int count) {
-        LOGGER.debug("customers called");
+		return customersMap;
+	}
 
-        final HashMap<String, Object> customersMap = new HashMap<String, Object>();
+	@GET
+	@Produces({"application/json; charset=UTF-8"})
+	@Timed(name = "get-requests")
+	public Map<String, Object> getCustomersByQuery(@QueryParam("qn") Optional<String> queryName, @QueryParam("q") Optional<String> name) {
+		LOGGER.debug("customers called");
 
-        Iterator<CustomerSearch> customers = customerDAO.getCustomersByName("%" + Utils.replaceChars(name, FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
+		final HashMap<String, Object> customersMap = new HashMap<String, Object>();
+		customersMap.put("customers", Lists.newArrayList());
+		if (queryName.isPresent()) {
+			String query = queryName.get().toLowerCase();
+			LOGGER.debug("querying customers for named query '{}'", query);
+			Iterator<Map<String, Object>> customers = Iterators.emptyIterator();
+			Matcher ledgerMatcher = LEDGER_IMPORT.matcher(query);
+			if (ledgerMatcher.matches()) {
+				String country = ledgerMatcher.group(1);
+				final long countryId = country.equals("cs") ? 10 : (country.equals("pl") ? 20: 0);
+				if (countryId > 0) {
+					LOGGER.debug("customers import query for country '{}:{}'", country, countryId);
+					customers = dbi.withHandle(new HandleCallback<Iterator<Map<String, Object>>>() {
+						@Override
+						public Iterator<Map<String, Object>> withHandle(Handle handle) throws Exception {
+							String sql = "SELECT * FROM customers\n" +
+									"  WHERE country = :countryId\n" +
+									"    AND is_active\n" +
+									"    AND (\n" +
+									"        synchronized IS NULL\n" +
+									"        OR synchronized <= updated\n" +
+									"    )\n" +
+									"    AND public_id != '9999999'";
+							return handle.createQuery(sql)
+									.bind("countryId", countryId)
+									.list()
+									.iterator();
+						}
+					});
+				} else {
+					LOGGER.debug("customers import query for unknown country '{}:{}'", country, countryId );
+				}
+			}
+			customersMap.put("customers", Lists.newArrayList(customers));
+		} else {
+			if (name.isPresent()) {
+				Iterator<CustomerSearch> customers = customerDAO.getCustomersByName("%" + Utils.replaceChars(name.get(), FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
 
-        List<CustomerSearch> retCustomers = new ArrayList<CustomerSearch>();
-        
-        while (customers.hasNext()) {
-            retCustomers.add(customers.next());
-        }
-        customersMap.put("customers", retCustomers);
+				List<CustomerSearch> retCustomers = new ArrayList<CustomerSearch>();
 
-        return customersMap;
-    }
+				while (customers.hasNext()) {
+					retCustomers.add(customers.next());
+				}
+				customersMap.put("customers", retCustomers);
+			}
+		}
+
+
+		return customersMap;
+	}
 }
 
