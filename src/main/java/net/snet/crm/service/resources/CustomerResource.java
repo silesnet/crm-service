@@ -123,18 +123,15 @@ public class CustomerResource {
 				LOGGER.debug("updating customer with '{}'", customerUpdate);
 				try {
 					final long id = Long.valueOf(customerUpdate.get("id").toString());
-					final String symbol = customerUpdate.get("symbol").toString();
 					final DateTime synchronizedOn = DateTime.parse(customerUpdate.get("synchronized").toString());
 					dbi.withHandle(new HandleCallback<Void>() {
 						@Override
 						public Void withHandle(Handle handle) throws Exception {
 							int changed = handle.createStatement(
 									"UPDATE customers\n" +
-											"  SET symbol = :symbol,\n" +
-											"    synchronized = :synchronizedOn\n" +
+											"  SET synchronized = :synchronizedOn\n" +
 											"  WHERE id = :id\n")
 									.bind("id", id)
-									.bind("symbol", symbol)
 									.bind("synchronizedOn", synchronizedOn.toDate())
 									.execute();
 							if (changed != 1) {
