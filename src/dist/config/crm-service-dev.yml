@@ -2,11 +2,19 @@ jsonPrettyPrint: true
 
 database:
   driverClass: org.postgresql.Driver
-  user: sisa
-  password: sis.sis
+  user: sa
+  password: 
   url: jdbc:postgresql://localhost/crm-service
 
 logging:
   level: INFO
   loggers:
     "net.snet": DEBUG
+  console:
+    logFormat: "%d{yyyyMMdd HH:mm:ss.SSS} %5p %m%n"
+  file:
+    enabled: true
+    threshold: DEBUG
+    currentLogFilename: log/crm-service.log
+    archivedLogFilenamePattern: log/crm-service-%d{yyyy-MM-dd}.log.gz
+    archivedFileCount: 30
