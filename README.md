@@ -2,6 +2,35 @@
 
 Implements business logic of CRM system.
 
+## Resources
+**Customer** - person receiving provided service.
+
+**Agreement** - agreement between customer and company.
+
+**Service** - product being provided.
+
+**Connection** - network link from customer's device to operator's device.
+
+**Account** - customers invoicing record.
+
+**Address** - postal address.
+
+## REST API
+
+### POST /customers
+Create new Customer.
+
+### POST /customers/:customerId/agreements
+Create new Agreement with the Customer.
+
+### POST /customers/:customerId/agreements/:agreementId/services
+Create new Service under specific Agreement.
+
+### POST /customers/:customerId/services/:serviceId/connections
+Create new Connection for specific Service.
+
+All data should be sent in JSON (application/vnd.api+json), http://jsonapi.org/
+
 ## Building
 
 Project uses [gradle](http://www.gradle.org/) build tool.
@@ -30,18 +59,6 @@ you need to unzip the packege and `cd` into it.
 ### Database
 
 [PostgreSql](http://www.postgresql.org/) databse is used. Database connection details are defined in `src/dist/config/crm-api-dev.yml`. Initialization script (containing sample data) can be found in `src/test/resources/db` folder.
-
-## REST API
-
-API specification is provided at http://silesnet.github.io/.
-
-This project aims at implementing following resource APIs:
-* customers
-* services
-* products
-* regions
-
-All data should be sent in JSON (application/vnd.api+json), http://jsonapi.org/
 
 ## Technology
 * Dropwizard (http://dropwizard.codahale.com)
