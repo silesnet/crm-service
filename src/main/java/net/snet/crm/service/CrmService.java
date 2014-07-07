@@ -6,7 +6,9 @@ import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.yammer.dropwizard.Service;
 import com.yammer.dropwizard.config.Bootstrap;
 import com.yammer.dropwizard.config.Environment;
+import com.yammer.dropwizard.db.DatabaseConfiguration;
 import com.yammer.dropwizard.jdbi.DBIFactory;
+import com.yammer.dropwizard.migrations.MigrationsBundle;
 import net.snet.crm.service.filter.CorsHeadersFilter;
 import net.snet.crm.service.resources.*;
 import org.skife.jdbi.v2.DBI;
@@ -22,6 +24,12 @@ public class CrmService extends Service<CrmConfiguration> {
 		bootstrap.setName("crm-service");
 		bootstrap.getObjectMapperFactory().registerModule(new JodaModule());
 		bootstrap.getObjectMapperFactory().setDateFormat(new ISO8601DateFormat());
+		bootstrap.addBundle(new MigrationsBundle<CrmConfiguration>() {
+			@Override
+			public DatabaseConfiguration getDatabaseConfiguration(CrmConfiguration configuration) {
+				return configuration.getDatabaseConfiguration();
+			}
+		});
 	}
 
 	@Override

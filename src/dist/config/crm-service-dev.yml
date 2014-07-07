@@ -2,12 +2,12 @@ jsonPrettyPrint: true
 
 database:
   driverClass: org.postgresql.Driver
-  user: sa
-  password: 
+  user: sisa
+  password: sisa
   url: jdbc:postgresql://localhost/crm-service
 
 logging:
-  level: INFO
+  level: WARN
   loggers:
     "net.snet": DEBUG
   console:
