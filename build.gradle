@@ -19,7 +19,12 @@ project.ext {
 dependencies {
   compile group: 'com.yammer.dropwizard', name: 'dropwizard-core', version: dropwizardVersion
 	compile group: 'com.yammer.dropwizard', name: 'dropwizard-jdbi', version: dropwizardVersion
+	compile group: 'com.yammer.dropwizard', name: 'dropwizard-migrations', version: dropwizardVersion
 	compile 'postgresql:postgresql:9.1-901.jdbc4'
+	testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+	testCompile group: 'com.yammer.dropwizard', name: 'dropwizard-testing', version: dropwizardVersion
+	testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+	testCompile 'com.h2database:h2:1.4.179'
 }
 
 repositories {
@@ -40,7 +45,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.github.rholder:gradle-one-jar:1.0.3'
+    classpath 'com.github.rholder:gradle-one-jar:1.0.4'
   }
 }
 
