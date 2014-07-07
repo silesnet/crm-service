@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'gradle-one-jar'
+
+version = '0.1.0-SNAPSHOT'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -39,20 +40,18 @@ run {
   args 'server', './src/dist/config/' + serviceConfig
 }
 
-buildscript {
-  repositories {
-    mavenCentral()
+task uberJar(type: Jar, dependsOn: [':compileJava']) {
+  baseName = "$baseName-standalone"
+
+  manifest {
+    attributes 'Main-Class': mainClassName
   }
 
-  dependencies {
-    classpath 'com.github.rholder:gradle-one-jar:1.0.4'
+  from files(sourceSets.main.output.classesDir)
+  from (configurations.runtime.resolve().collect { it.isDirectory() ? it : zipTree(it) }) {
+    exclude 'META-INF/MANIFEST.MF'
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
   }
-}
-
-task oneJar(type: OneJar) {
-  mainClass = mainClassName
-}
-
-artifacts {
-  oneJar
 }
