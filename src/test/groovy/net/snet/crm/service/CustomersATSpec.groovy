@@ -1,4 +1,4 @@
-package net.snet.cmr.service
+package net.snet.crm.service
 
 import spock.lang.Specification
 

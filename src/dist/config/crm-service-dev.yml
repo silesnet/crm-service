@@ -10,11 +10,13 @@ logging:
   level: WARN
   loggers:
     "net.snet": DEBUG
-  console:
-    logFormat: "%d{yyyyMMdd HH:mm:ss.SSS} %5p %m%n"
-  file:
-    enabled: true
-    threshold: DEBUG
-    currentLogFilename: log/crm-service.log
-    archivedLogFilenamePattern: log/crm-service-%d{yyyy-MM-dd}.log.gz
-    archivedFileCount: 30
+
+  appenders:
+    - type: console
+      logFormat: "%d{yyyyMMdd HH:mm:ss.SSS} %5p %m%n"
+
+    - type: file
+      threshold: DEBUG
+      currentLogFilename: log/crm-service.log
+      archivedLogFilenamePattern: log/crm-service-%d{yyyy-MM-dd}.log.gz
+      archivedFileCount: 30

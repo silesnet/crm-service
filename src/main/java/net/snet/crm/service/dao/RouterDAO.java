@@ -2,7 +2,7 @@ package net.snet.crm.service.dao;
 
 import net.snet.crm.service.bo.Router;
 import net.snet.crm.service.mapper.RouterMapper;
-import org.skife.jdbi.v2.sqlobject.*;
+import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
 import java.util.Iterator;

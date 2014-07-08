@@ -1,4 +1,4 @@
-package net.snet.cmr.service
+package net.snet.crm.service
 
 import groovyx.net.http.RESTClient
 import spock.lang.Specification

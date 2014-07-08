@@ -1,6 +1,6 @@
 package net.snet.crm.service.bo;
 
-import com.yammer.dropwizard.json.JsonSnakeCase;
+import io.dropwizard.jackson.JsonSnakeCase;
 
 @JsonSnakeCase
 public class Draft {

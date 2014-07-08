@@ -1,13 +1,15 @@
 package net.snet.crm.service.resources;
 
-import com.yammer.metrics.annotation.Timed;
+import com.codahale.metrics.annotation.Timed;
 import net.snet.crm.service.bo.Router;
 import net.snet.crm.service.dao.RouterDAO;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;

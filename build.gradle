@@ -13,17 +13,17 @@ tasks.withType(Compile) {
 mainClassName = 'net.snet.crm.service.CrmService'
 
 project.ext {
-  dropwizardVersion = '0.6.2'
+  dropwizardVersion = '0.7.1'
   serviceConfig = 'crm-service-dev.yml'
 }
 
 dependencies {
-  compile group: 'com.yammer.dropwizard', name: 'dropwizard-core', version: dropwizardVersion
-	compile group: 'com.yammer.dropwizard', name: 'dropwizard-jdbi', version: dropwizardVersion
-	compile group: 'com.yammer.dropwizard', name: 'dropwizard-migrations', version: dropwizardVersion
+  compile "io.dropwizard:dropwizard-core:$dropwizardVersion"
+	compile "io.dropwizard:dropwizard-jdbi:$dropwizardVersion"
+	compile "io.dropwizard:dropwizard-migrations:$dropwizardVersion"
 	compile 'postgresql:postgresql:9.1-901.jdbc4'
 	testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-	testCompile group: 'com.yammer.dropwizard', name: 'dropwizard-testing', version: dropwizardVersion
+	testCompile "io.dropwizard:dropwizard-testing:$dropwizardVersion"
 	testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 	testCompile 'com.h2database:h2:1.4.179'
 }

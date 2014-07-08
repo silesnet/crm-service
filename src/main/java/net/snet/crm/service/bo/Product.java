@@ -1,7 +1,7 @@
 package net.snet.crm.service.bo;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.yammer.dropwizard.json.JsonSnakeCase;
+import io.dropwizard.jackson.JsonSnakeCase;
 
 @JsonSnakeCase
 public class Product {

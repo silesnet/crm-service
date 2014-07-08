@@ -1,6 +1,6 @@
 package net.snet.crm.service.resources;
 
-import com.yammer.metrics.annotation.Timed;
+import com.codahale.metrics.annotation.Timed;
 import net.snet.crm.service.bo.Product;
 import net.snet.crm.service.dao.ProductDAO;
 import org.skife.jdbi.v2.DBI;

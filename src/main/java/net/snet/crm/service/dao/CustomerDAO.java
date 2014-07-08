@@ -1,8 +1,8 @@
 package net.snet.crm.service.dao;
 
+import net.snet.crm.service.bo.Customer;
 import net.snet.crm.service.bo.CustomerSearch;
 import net.snet.crm.service.mapper.CustomerMapper;
-import net.snet.crm.service.bo.Customer;
 import net.snet.crm.service.mapper.CustomerSearchMapper;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
