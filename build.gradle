@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'shadow'
 
-version = '0.1.0-SNAPSHOT'
+version = '0.1.0'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -22,9 +22,10 @@ dependencies {
   compile "io.dropwizard:dropwizard-core:$dropwizardVersion"
 	compile "io.dropwizard:dropwizard-jdbi:$dropwizardVersion"
 	compile "io.dropwizard:dropwizard-migrations:$dropwizardVersion"
-	compile 'postgresql:postgresql:9.1-901.jdbc4'
-	testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-	testCompile "io.dropwizard:dropwizard-testing:$dropwizardVersion"
+  compile 'postgresql:postgresql:9.1-901.jdbc4'
+  testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+  testCompile "io.dropwizard:dropwizard-testing:$dropwizardVersion"
+  testCompile "io.dropwizard:dropwizard-client:$dropwizardVersion"
 	testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
 	testCompile 'com.h2database:h2:1.4.179'
 }
