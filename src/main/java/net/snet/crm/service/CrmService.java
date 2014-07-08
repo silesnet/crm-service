@@ -3,31 +3,35 @@ package net.snet.crm.service;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.yammer.dropwizard.Service;
-import com.yammer.dropwizard.config.Bootstrap;
-import com.yammer.dropwizard.config.Environment;
-import com.yammer.dropwizard.db.DatabaseConfiguration;
-import com.yammer.dropwizard.jdbi.DBIFactory;
-import com.yammer.dropwizard.migrations.MigrationsBundle;
+import io.dropwizard.Application;
+import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.migrations.MigrationsBundle;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 import net.snet.crm.service.filter.CorsHeadersFilter;
 import net.snet.crm.service.resources.*;
 import org.skife.jdbi.v2.DBI;
 
-public class CrmService extends Service<CrmConfiguration> {
+public class CrmService extends Application<CrmConfiguration> {
 
 	public static void main(String[] args) throws Exception {
 		new CrmService().run(args);
 	}
 
 	@Override
+	public String getName() {
+		return "crm-service";
+	}
+
+	@Override
 	public void initialize(Bootstrap<CrmConfiguration> bootstrap) {
-		bootstrap.setName("crm-service");
-		bootstrap.getObjectMapperFactory().registerModule(new JodaModule());
-		bootstrap.getObjectMapperFactory().setDateFormat(new ISO8601DateFormat());
+		bootstrap.getObjectMapper().registerModule(new JodaModule());
+		bootstrap.getObjectMapper().setDateFormat(new ISO8601DateFormat());
 		bootstrap.addBundle(new MigrationsBundle<CrmConfiguration>() {
 			@Override
-			public DatabaseConfiguration getDatabaseConfiguration(CrmConfiguration configuration) {
-				return configuration.getDatabaseConfiguration();
+			public DataSourceFactory getDataSourceFactory(CrmConfiguration configuration) {
+				return configuration.getDataSourceFactory();
 			}
 		});
 	}
@@ -35,20 +39,20 @@ public class CrmService extends Service<CrmConfiguration> {
 	@Override
 	public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException {
 		final DBIFactory dbiFactory = new DBIFactory();
-		final DBI dbi = dbiFactory.build(environment, configuration.getDatabaseConfiguration(), "postgresql");
+		final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
 		if (configuration.getJsonPrettyPrint()) {
-			environment.getObjectMapperFactory().enable(SerializationFeature.INDENT_OUTPUT);
+			environment.getObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 		}
 
-		environment.addFilter(new CorsHeadersFilter(), "/*");
-		environment.addResource(new CustomerResource(dbi));
-		environment.addResource(new DraftResource(dbi));
-		environment.addResource(new RouterResource(dbi));
-		environment.addResource(new NetworkResource(dbi));
-		environment.addResource(new UserResource(dbi));
-		environment.addResource(new ProductResource(dbi));
-		environment.addResource(new ContractResource(dbi));
-		environment.addResource(new BaseResource());
+		environment.servlets().addFilter("/*", new CorsHeadersFilter());
+		environment.jersey().register(new CustomerResource(dbi));
+		environment.jersey().register(new DraftResource(dbi));
+		environment.jersey().register(new RouterResource(dbi));
+		environment.jersey().register(new NetworkResource(dbi));
+		environment.jersey().register(new UserResource(dbi));
+		environment.jersey().register(new ProductResource(dbi));
+		environment.jersey().register(new ContractResource(dbi));
+		environment.jersey().register(new BaseResource());
 
 	}
 

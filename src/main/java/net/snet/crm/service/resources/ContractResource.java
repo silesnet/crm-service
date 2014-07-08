@@ -1,6 +1,6 @@
 package net.snet.crm.service.resources;
 
-import com.yammer.metrics.annotation.Timed;
+import com.codahale.metrics.annotation.Timed;
 import net.snet.crm.service.bo.Service;
 import net.snet.crm.service.bo.ServiceId;
 import net.snet.crm.service.dao.ServiceDAO;

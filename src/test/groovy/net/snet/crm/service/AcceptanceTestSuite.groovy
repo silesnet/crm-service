@@ -1,13 +1,11 @@
-package net.snet.cmr.service
+package net.snet.crm.service
 
-import com.yammer.dropwizard.config.Environment
-import com.yammer.dropwizard.db.ManagedDataSourceFactory
-import com.yammer.dropwizard.lifecycle.ServerLifecycleListener
+import com.codahale.metrics.MetricRegistry
+import io.dropwizard.lifecycle.ServerLifecycleListener
+import io.dropwizard.setup.Environment
 import liquibase.Liquibase
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.FileSystemResourceAccessor
-import net.snet.crm.service.CrmConfiguration
-import net.snet.crm.service.CrmService
 import org.eclipse.jetty.server.Server
 import org.junit.ClassRule
 import org.junit.rules.ExternalResource
@@ -30,17 +28,19 @@ class AcceptanceTestSuite {
 		@Override
 		protected void before() throws Throwable {
 			println 'CRM service start...'
+      def MetricRegistry metricRegistry
 			def service = new CrmService() {
 				@Override
 				void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException {
-					environment.addServerLifecycleListener(new ServerLifecycleListener() {
+          metricRegistry = environment.metrics()
+					environment.lifecycle().addServerLifecycleListener(new ServerLifecycleListener() {
 						@Override
 						void serverStarted(Server server) {
 							AcceptanceTestSuite.DW.jettyServer = server
 						}
 					})
 					// implement Liquibase update based on configuration and migrations.xml
-					def dataSource = new ManagedDataSourceFactory().build(configuration.getDatabaseConfiguration())
+					def dataSource = configuration.getDataSourceFactory().build(metricRegistry, 'test-libuibase-ds')
 					def liquibase = new Liquibase('src/main/resources/migrations.xml', new FileSystemResourceAccessor(), new JdbcConnection(dataSource.getConnection()))
 					liquibase.update(null)
 					super.run(configuration, environment)

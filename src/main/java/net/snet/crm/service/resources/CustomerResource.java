@@ -1,8 +1,8 @@
 package net.snet.crm.service.resources;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
-import com.yammer.metrics.annotation.Timed;
 import net.snet.crm.service.bo.CustomerSearch;
 import net.snet.crm.service.dao.CustomerDAO;
 import net.snet.crm.service.utils.Utils;
