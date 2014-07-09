@@ -115,7 +115,7 @@ public class CustomerResource {
 	public Response updateCustomers(Map<String, Object> updates) {
 		LOGGER.debug("update customers called");
 		HashMap<String, Object> response = Maps.newHashMap();
-		List<Map> updated = Lists.newArrayList();
+		List<Map<String, Object>> updated = Lists.newArrayList();
 		try {
 			@SuppressWarnings("unchecked")
 			List<Map<String, Object>> customerUpdates = (List<Map<String, Object>>) updates.get("customers");
