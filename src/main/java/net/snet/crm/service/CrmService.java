@@ -11,7 +11,11 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.snet.crm.service.filter.CorsHeadersFilter;
 import net.snet.crm.service.resources.*;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.skife.jdbi.v2.DBI;
+
+import javax.servlet.DispatcherType;
+import java.util.EnumSet;
 
 public class CrmService extends Application<CrmConfiguration> {
 
@@ -44,7 +48,8 @@ public class CrmService extends Application<CrmConfiguration> {
 			environment.getObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 		}
 
-		environment.servlets().addFilter("/*", new CorsHeadersFilter());
+		environment.servlets().addFilter("CORS", new CrossOriginFilter())
+				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 		environment.jersey().register(new CustomerResource(dbi));
 		environment.jersey().register(new DraftResource(dbi));
 		environment.jersey().register(new RouterResource(dbi));
