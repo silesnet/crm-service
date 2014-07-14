@@ -80,7 +80,7 @@ public class CustomerResource {
 									"    AND is_active\n" +
 									"    AND (\n" +
 									"        synchronized IS NULL\n" +
-									"        OR synchronized <= updated\n" +
+									"        OR synchronized < updated\n" +
 									"    )\n" +
 									"    AND public_id != '9999999'";
 							return handle.createQuery(sql)
@@ -123,24 +123,45 @@ public class CustomerResource {
 				LOGGER.debug("updating customer with '{}'", customerUpdate);
 				try {
 					final long id = Long.valueOf(customerUpdate.get("id").toString());
-					final DateTime synchronizedOn = DateTime.parse(customerUpdate.get("synchronized").toString());
-					dbi.withHandle(new HandleCallback<Void>() {
-						@Override
-						public Void withHandle(Handle handle) throws Exception {
-							int changed = handle.createStatement(
-									"UPDATE customers\n" +
-											"  SET synchronized = :synchronizedOn\n" +
-											"  WHERE id = :id\n")
-									.bind("id", id)
-									.bind("synchronizedOn", synchronizedOn.toDate())
-									.execute();
-							if (changed != 1) {
-								throw new RuntimeException("customer with id '" + id + "' not found, cannot update");
-							}
-							LOGGER.debug("customer with id '{}' was synchronized on '{}'", id, synchronizedOn);
-							return null;
+					if (customerUpdate.containsKey("synchronized")) {
+						if (customerUpdate.get("synchronized") != null) {
+							final DateTime synchronizedOn = DateTime.parse(customerUpdate.get("synchronized").toString());
+							dbi.withHandle(new HandleCallback<Void>() {
+								@Override
+								public Void withHandle(Handle handle) throws Exception {
+									int changed = handle.createStatement(
+											"UPDATE customers\n" +
+													"  SET synchronized = :synchronizedOn\n" +
+													"  WHERE id = :id\n")
+											.bind("id", id)
+											.bind("synchronizedOn", synchronizedOn.toDate())
+											.execute();
+									if (changed != 1) {
+										throw new RuntimeException("customer with id '" + id + "' not found, cannot update");
+									}
+									LOGGER.debug("customer with id '{}' was synchronized on '{}'", id, synchronizedOn);
+									return null;
+								}
+							});
+						} else {
+							dbi.withHandle(new HandleCallback<Object>() {
+								@Override
+								public Void withHandle(Handle handle) throws Exception {
+									int changed = handle.createStatement(
+											"UPDATE customers\n" +
+													"  SET synchronized = updated\n" +
+													"  WHERE id = :id\n")
+											.bind("id", id)
+											.execute();
+									if (changed != 1) {
+										throw new RuntimeException("customer with id '" + id + "' not found, cannot update");
+									}
+									LOGGER.debug("customer with id '{}' was NOT synchronized", id);
+									return null;
+								}
+							});
 						}
-					});
+					}
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage());
 					customerUpdate.put("errors", ImmutableList.of(ImmutableMap.of("message", "" + e.getMessage())));
