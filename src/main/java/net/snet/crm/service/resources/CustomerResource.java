@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import net.snet.crm.service.bo.CustomerSearch;
 import net.snet.crm.service.dao.CustomerDAO;
+import net.snet.crm.service.dao.CustomerRepository;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,10 +36,12 @@ public class CustomerResource {
 
 	private CustomerDAO customerDAO;
 	private final DBI dbi;
+	private final CustomerRepository repository;
 
-	public CustomerResource(DBI dbi) {
+	public CustomerResource(DBI dbi, CustomerRepository repository) {
 		this.customerDAO = dbi.onDemand(CustomerDAO.class);
 		this.dbi = dbi;
+		this.repository = repository;
 	}
 
 	@GET
@@ -111,7 +115,7 @@ public class CustomerResource {
 	}
 
 	@PUT
-	@Timed(name = "get-requests")
+	@Timed(name = "put-requests")
 	public Response updateCustomers(Map<String, Object> updates) {
 		LOGGER.debug("update customers called");
 		HashMap<String, Object> response = Maps.newHashMap();
@@ -178,5 +182,21 @@ public class CustomerResource {
 		response.put("customers", updated);
 		return Response.ok(response).build();
 	}
+
+	@POST
+	@Produces({"application/vnd.api+json; charset=UTF-8"})
+	@Consumes({"application/vnd.api+json; charset=UTF-8"})
+	@Timed(name = "post-requests")
+	public Response createCustomer(Map<String, Object> customerData) {
+		LOGGER.debug("creating new customer");
+		@SuppressWarnings("unchecked")
+		Map<String, Object> customer = (Map<String, Object>) customerData.get("customers");
+		final Map<String, Object> customersMap = repository.insert(customer);
+
+		return Response.created(URI.create("/" + customersMap.get("id").toString()))
+				.entity(ImmutableMap.of("customers", customersMap))
+				.build();
+	}
+
 }
 
