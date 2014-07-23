@@ -12,7 +12,7 @@ CREATE TABLE customers (
     dic character varying(20),
     contract_no character varying(50),
     connection_spot character varying(100),
-    inserted_on timestamp  NOT NULL,
+    inserted_on timestamp NOT NULL,
     frequency integer,
     lastly_billed timestamp ,
     is_billed_after boolean,
@@ -29,9 +29,26 @@ CREATE TABLE customers (
     format integer,
     deliver_signed boolean,
     symbol character varying(20),
-    updated timestamp ,
-    synchronized timestamp ,
+    updated timestamp,
+    synchronized timestamp,
     account_no character varying(26),
     bank_no character varying(4),
     variable integer
+);
+
+CREATE TABLE audit_items (
+  id bigint NOT NULL,
+  history_id bigint NOT NULL,
+  history_type_label_id bigint,
+  user_id bigint,
+  time_stamp timestamp NOT NULL,
+  field_name character varying(255) NOT NULL,
+  old_value character varying(255),
+  new_value character varying(255)
+);
+
+CREATE TABLE agreements (
+  id bigint NOT NULL,
+  country character varying(2) NOT NULL,
+  customer_id bigint
 );

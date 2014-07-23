@@ -9,7 +9,7 @@ import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import net.snet.crm.service.dao.CustomerRepositoryJdbi;
+import net.snet.crm.service.dao.CrmRepositoryJdbi;
 import net.snet.crm.service.resources.*;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.skife.jdbi.v2.DBI;
@@ -50,7 +50,7 @@ public class CrmService extends Application<CrmConfiguration> {
 
 		environment.servlets().addFilter("CORS", new CrossOriginFilter())
 				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-		environment.jersey().register(new CustomerResource(dbi, new CustomerRepositoryJdbi(dbi)));
+		environment.jersey().register(new CustomerResource(dbi, new CrmRepositoryJdbi(dbi)));
 		environment.jersey().register(new DraftResource(dbi));
 		environment.jersey().register(new RouterResource(dbi));
 		environment.jersey().register(new NetworkResource(dbi));

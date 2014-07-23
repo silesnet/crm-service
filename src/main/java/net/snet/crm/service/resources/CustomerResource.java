@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import net.snet.crm.service.bo.CustomerSearch;
 import net.snet.crm.service.dao.CustomerDAO;
-import net.snet.crm.service.dao.CustomerRepository;
+import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
@@ -15,9 +15,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
+import javax.ws.rs.core.UriInfo;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,11 +35,13 @@ public class CustomerResource {
 
 	private final Pattern LEDGER_IMPORT = Pattern.compile("ledger-(\\w\\w)-import");
 
+	private @Context UriInfo uriInfo;
+
 	private CustomerDAO customerDAO;
 	private final DBI dbi;
-	private final CustomerRepository repository;
+	private final CrmRepository repository;
 
-	public CustomerResource(DBI dbi, CustomerRepository repository) {
+	public CustomerResource(DBI dbi, CrmRepository repository) {
 		this.customerDAO = dbi.onDemand(CustomerDAO.class);
 		this.dbi = dbi;
 		this.repository = repository;
@@ -184,19 +187,32 @@ public class CustomerResource {
 	}
 
 	@POST
-	@Produces({"application/vnd.api+json; charset=UTF-8"})
-	@Consumes({"application/vnd.api+json; charset=UTF-8"})
 	@Timed(name = "post-requests")
 	public Response createCustomer(Map<String, Object> customerData) {
 		LOGGER.debug("creating new customer");
 		@SuppressWarnings("unchecked")
 		Map<String, Object> customer = (Map<String, Object>) customerData.get("customers");
-		final Map<String, Object> customersMap = repository.insert(customer);
-
-		return Response.created(URI.create("/" + customersMap.get("id").toString()))
+		final Map<String, Object> customersMap = repository.insertCustomer(customer);
+		return Response.created(uriInfo.getAbsolutePathBuilder().path("/" + customersMap.get("id")).build())
 				.entity(ImmutableMap.of("customers", customersMap))
 				.build();
 	}
 
+	@POST
+	@Path("/{customerId}/agreements")
+	@Timed(name = "post-requests")
+	public Response createCustomerAgreement(@PathParam("customerId") long customerId,
+	                                        Map<String, Object> agreementData) {
+		@SuppressWarnings("unchecked")
+		Map<String, Object> agreementPrototype = (Map<String, Object>) agreementData.get("agreements");
+		String country = agreementPrototype.get("country").toString();
+		LOGGER.debug("creating new agreement for customer id '{}' in country '{}'", customerId, country);
+		Map<String, Object> customer = repository.findCustomerById(customerId);
+		final Map<String, Object> agreement = repository.insertAgreement((Long) customer.get("id"), country);
+		return Response.created(uriInfo.getAbsolutePathBuilder()
+				.replacePath("/agreements/" + agreement.get("id")).replaceQuery("").build())
+				.entity(ImmutableMap.of("agreements", agreement))
+				.build();
+	}
 }
 
