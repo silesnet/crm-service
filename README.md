@@ -29,6 +29,9 @@ Create new Service under specific Agreement.
 ### POST /services/{id}/connections
 Create new Connection for specific Service.
 
+### PUT /connections/{id}
+Update Connection parameters.
+
 All data should be sent in JSON (application/vnd.api+json), http://jsonapi.org/
 
 ## Building
