@@ -1,8 +1,7 @@
 package net.snet.crm.service.dao;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
@@ -16,15 +15,14 @@ import org.skife.jdbi.v2.tweak.HandleCallback;
 
 import java.sql.Timestamp;
 import java.util.Map;
-import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static com.google.common.base.Preconditions.checkState;
 
 public class CrmRepositoryJdbi implements CrmRepository {
 
-	private final static Set<String> COUNTRIES = ImmutableSet.of("CZ", "PL");
+	private final static Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
 
 	private final CrmDatabase db;
 
@@ -55,12 +53,12 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
-	public Map<String, Object> findCustomerById(final long custoemrId) {
+	public Map<String, Object> findCustomerById(final long customerId) {
 		return db.withHandle(new HandleCallback<Map<String, Object>>() {
 			@Override
 			public Map<String, Object> withHandle(Handle handle) throws Exception {
 				return handle.createQuery("SELECT * FROM customers WHERE id=:id")
-						.bind("id", custoemrId)
+						.bind("id", customerId)
 						.first();
 			}
 		});
@@ -68,17 +66,22 @@ public class CrmRepositoryJdbi implements CrmRepository {
 
 	@Override
 	public Map<String, Object> insertAgreement(long customerId, String country) {
-		checkArgument(COUNTRIES.contains(country), "unknown country '%s'", country);
+		checkArgument(COUNTRIES.keySet().contains(country), "unknown country '%s'", country);
 		Map<String, Object> customer = findCustomerById(customerId);
 		checkNotNull(customer.get("id"), "customer with id '%s' does not exist", customerId);
 		db.begin();
 		try {
-			long agreementId = db.lastAgreementIdByCountry(country) + 1;
+			long lastAgreementId = db.lastAgreementIdByCountry(country);
+			if (lastAgreementId == 0) {
+				lastAgreementId = COUNTRIES.get(country) * 100000;
+			}
+			long agreementId = lastAgreementId + 1;
 			db.insertAgreement(agreementId, country, customerId);
-			String agreements = "" + agreementId;
+			long contractNumber = agreementId % 1000000;
+			String agreements = "" + contractNumber;
 			Optional<Object> currentAgreements = Optional.fromNullable(customer.get("contract_no"));
 			if (currentAgreements.isPresent() && currentAgreements.get().toString().trim().length() > 0) {
-				agreements = currentAgreements.get().toString().trim() + ", " + agreementId;
+				agreements = currentAgreements.get().toString().trim() + ", " + contractNumber;
 			}
 			db.setCustomerAgreements(customerId, agreements);
 			db.commit();
@@ -89,6 +92,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		}
 	}
 
+	@Override
 	public Map<String, Object> findAgreementById(final long agreementId) {
 		return db.withHandle(new HandleCallback<Map<String, Object>>() {
 			@Override
@@ -100,38 +104,102 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		});
 	}
 
+	@Override
+	public Map<String, Object> insertService(long agreementId) {
+		Map<String, Object> agreement = findAgreementById(agreementId);
+		checkNotNull(agreement.get("id"), "agreement with id '%s' does not exist", agreementId);
+		checkNotNull(agreement.get("customer_id"), "agreement with id '%s' is not associated with a customer", agreementId);
+		db.begin();
+		try {
+			long lastServiceId = lastServiceIdByAgreement(agreementId);
+			checkState((lastServiceId % 100) < 99, "cannot add new service to the agreement '%s', max of 99 services already exists", agreementId);
+			long serviceId = lastServiceId + 1;
+			db.insertService(serviceId, Long.valueOf(agreement.get("customer_id").toString()), now());
+			db.insertServiceInfo(serviceId);
+			db.commit();
+			return findServiceById(serviceId);
+		} catch (Exception e) {
+			db.rollback();
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public Map<String, Object> findServiceById(final long serviceId) {
+		final Map<String, Object> service = db.withHandle(new HandleCallback<Map<String, Object>>() {
+			@Override
+			public Map<String, Object> withHandle(Handle handle) throws Exception {
+				return handle.createQuery("SELECT * FROM services WHERE id=:id")
+						.bind("id", serviceId)
+						.first();
+			}
+		});
+		final Map<String, Object> serviceInfo = db.withHandle(new HandleCallback<Map<String, Object>>() {
+			@Override
+			public Map<String, Object> withHandle(Handle handle) throws Exception {
+				return handle.createQuery("SELECT * FROM services_info WHERE service_id=:service_id")
+						.bind("service_id", serviceId)
+						.first();
+			}
+		});
+		service.put("status", serviceInfo.get("status"));
+		return service;
+	}
+
+	private long lastServiceIdByAgreement(long agreementId) {
+		final long first = agreementId * 100;
+		final long last = (agreementId + 1) * 100;
+		long lastUsed = db.lastServiceIdInRange(first, last);
+		if (lastUsed == 0) {
+			lastUsed = first;
+		}
+		return lastUsed;
+	}
+
 	public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe {
 
 		@SqlQuery("SELECT max(id) FROM customers")
-		public abstract long lastCustomerId();
+		long lastCustomerId();
 
 		@SqlQuery("SELECT max(history_id) FROM audit_items")
-		public abstract long lastAuditId();
+		long lastAuditId();
 
 		@SqlQuery("SELECT max(id) FROM audit_items")
-		public abstract long lastAuditItemId();
+		long lastAuditItemId();
 
-		@SqlQuery("SELECT max(id) FROM agreements where country=:country")
-		public abstract long lastAgreementIdByCountry(@Bind("country") String country);
+		@SqlQuery("SELECT max(id) FROM agreements WHERE country=:country")
+		long lastAgreementIdByCountry(@Bind("country") String country);
+
+		@SqlQuery("SELECT max(id) FROM services WHERE :first < id AND id < :last ")
+		long lastServiceIdInRange(@Bind("first") long fist, @Bind("last") long last);
 
 		@SqlUpdate("INSERT INTO customers (id, history_id, name, public_id, inserted_on, is_active) " +
 				"VALUES (:id, :history_id, :name, '9999999', :inserted_on, false)")
-		public abstract void insertCustomer(@Bind("id") long id, @Bind("history_id") long auditId,
+		void insertCustomer(@Bind("id") long id, @Bind("history_id") long auditId,
 		                                    @Bind("name") String name, @Bind("inserted_on") Timestamp insertedOn);
 
 		@SqlUpdate("INSERT INTO audit_items (id, history_id, history_type_label_id, user_id, time_stamp, field_name, old_value, new_value) " +
 				"VALUES (:id, :history_id, :history_type_label_id, :user_id, :time_stamp, :field_name, :old_value, :new_value)")
-		public abstract void insertAudit(@Bind("id") long id, @Bind("history_id") long auditId,
-		                                 @Bind("history_type_label_id") long auditType, @Bind("user_id") long userId,
-		                                 @Bind("time_stamp") Timestamp stamp, @Bind("field_name") String field,
-		                                 @Bind("old_value") String oldValue, @Bind("new_value") String newValue);
+		void insertAudit(@Bind("id") long id, @Bind("history_id") long auditId,
+                     @Bind("history_type_label_id") long auditType, @Bind("user_id") long userId,
+                     @Bind("time_stamp") Timestamp stamp, @Bind("field_name") String field,
+                     @Bind("old_value") String oldValue, @Bind("new_value") String newValue);
 
 		@SqlUpdate("INSERT INTO agreements (id, country, customer_id) " +
 				"VALUES (:id, :country, :customer_id)")
-		public abstract void insertAgreement(@Bind("id") long id, @Bind("country") String country,
+		void insertAgreement(@Bind("id") long id, @Bind("country") String country,
 		                                     @Bind("customer_id") long customerId);
 
 		@SqlUpdate("UPDATE customers SET contract_no=:agreements WHERE id=:id")
-		public abstract void setCustomerAgreements(@Bind("id") long customerId, @Bind("agreements") String agreements);
+		void setCustomerAgreements(@Bind("id") long customerId, @Bind("agreements") String agreements);
+
+		@SqlUpdate("INSERT INTO services (id, customer_id, period_from, name, price) " +
+				"VALUES (:service_id, :customer_id, :period_from, 'NEW', 0)")
+		void insertService(@Bind("service_id") long serviceId, @Bind("customer_id") long customerId,
+		                   @Bind("period_from") Timestamp periodFrom);
+
+		@SqlUpdate("INSERT INTO services_info (service_id, status, other_info) " +
+				"VALUES (:service_id, 'NEW', '{}')")
+		void insertServiceInfo(@Bind("service_id") long serviceId);
 	}
 }

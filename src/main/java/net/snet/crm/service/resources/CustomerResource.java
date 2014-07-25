@@ -210,7 +210,7 @@ public class CustomerResource {
 		Map<String, Object> customer = repository.findCustomerById(customerId);
 		final Map<String, Object> agreement = repository.insertAgreement((Long) customer.get("id"), country);
 		return Response.created(uriInfo.getAbsolutePathBuilder()
-				.replacePath("/agreements/" + agreement.get("id")).replaceQuery("").build())
+				.replacePath("/agreements/" + agreement.get("id")).build())
 				.entity(ImmutableMap.of("agreements", agreement))
 				.build();
 	}

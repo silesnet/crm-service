@@ -52,3 +52,43 @@ CREATE TABLE agreements (
   country character varying(2) NOT NULL,
   customer_id bigint
 );
+
+CREATE TABLE services (
+    id bigint NOT NULL,
+    customer_id bigint,
+    period_from timestamp NOT NULL,
+    period_to timestamp,
+    name character varying(70) NOT NULL,
+    price integer NOT NULL,
+    frequency integer,
+    download integer,
+    upload integer,
+    is_aggregated boolean,
+    info character varying(150),
+    replace_id bigint,
+    additionalname character varying(50),
+    bps character(1),
+    old_id bigint
+);
+
+CREATE TABLE services_info (
+  service_id bigint NOT NULL,
+  status character varying(8),
+  other_info character varying(1024)
+);
+
+CREATE TABLE connections (
+  service_id bigint NOT NULL,
+  auth_type character varying(10),
+  auth_name character varying(32),
+  auth_value character varying(32),
+  downlink smallint,
+  uplink smallint,
+  area character varying(32),
+  is_public_ip boolean,
+  ip character varying(15),
+  master_router character varying(32),
+  ssid character varying(32),
+  sa_mac character varying(30),
+  other_info character varying(1024)
+);
