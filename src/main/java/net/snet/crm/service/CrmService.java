@@ -50,7 +50,9 @@ public class CrmService extends Application<CrmConfiguration> {
 
 		environment.servlets().addFilter("CORS", new CrossOriginFilter())
 				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-		environment.jersey().register(new CustomerResource(dbi, new CrmRepositoryJdbi(dbi)));
+		CrmRepositoryJdbi crmRepository = new CrmRepositoryJdbi(dbi);
+		environment.jersey().register(new CustomerResource(dbi, crmRepository));
+		environment.jersey().register(new AgreementResource(crmRepository));
 		environment.jersey().register(new DraftResource(dbi));
 		environment.jersey().register(new RouterResource(dbi));
 		environment.jersey().register(new NetworkResource(dbi));

@@ -62,10 +62,61 @@ class CrmRepositoryJdbiTest extends Specification {
     when: 'insert customer agreement for country'
       def agreement = repository.insertAgreement(customer.id as Long, country)
     then: 'agreement is inserted'
-      agreement.id == 1
+      agreement.id == 1000001
       agreement.country == 'CZ'
       agreement.customer_id == 1
     and: 'customer agreements are updated'
       repository.findCustomerById(1).contract_no == '1'
   }
+
+  def 'it should properly calculate agreement id'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing customer'
+      def customer = repository.insertCustomer([name: 'existing customer'])
+    and: 'country'
+      def country = 'CZ'
+    when: 'insert customer agreement for country twice'
+      def agreement1 = repository.insertAgreement(customer.id as Long, country)
+      def agreement2 = repository.insertAgreement(customer.id as Long, country)
+    then: 'agreement is inserted'
+      agreement1.id == 1000001
+      agreement2.id == 1000002
+    and: 'customer agreements are updated'
+      repository.findCustomerById(1).contract_no == '1, 2'
+  }
+
+  def 'it should insert new agreement service'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing customer and agreement'
+      def customer = repository.insertCustomer([name: 'existing customer'])
+      def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+    when: 'insert agreement service'
+      def service = repository.insertService(agreement.id as Long)
+      println service
+    then: 'service is inserted'
+      service.id == (agreement.id * 100) + 1
+      service.customer_id == customer.id
+      service.status == 'NEW'
+  }
+
+  def 'it should fail inserting 100th service for agreement'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing customer and agreement with 99 services'
+      def customer = repository.insertCustomer([name: 'existing customer'])
+      def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+      def lastService = [:]
+      for (int i = 0; i < 99; i++) {
+        lastService = repository.insertService(agreement.id as Long)
+      }
+    when: 'inserting 100th agreement service'
+      repository.insertService(agreement.id as Long)
+    then: 'service last service sequence is 99'
+      lastService.id == (agreement.id * 100) + 99
+    and: 'failed to insert 100th service'
+      thrown RuntimeException
+  }
+
 }
