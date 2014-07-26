@@ -15,4 +15,9 @@ public interface CrmRepository {
 
 	Map<String, Object> findServiceById(long serviceId);
 
+	Map<String,Object> insertConnection(long serviceId);
+
+	Map<String,Object> findConnectionById(long serviceId);
+
+
 }

@@ -41,7 +41,7 @@ public class AgreementResource {
 	@Path("/{agreementId}/services")
 	@Timed(name = "post-request")
 	public Response insertService(@PathParam("agreementId") long agreementId) {
-		LOGGER.debug("inserting new service for agreement id '{}'");
+		LOGGER.debug("inserting new service for agreement id '{}'", agreementId);
 		Map<String, Object> agreement = repository.findAgreementById(agreementId);
 		checkNotNull(agreement.get("id"), "agreement with id '%s' does not exist", agreementId);
 		Map<String, Object> service = repository.insertService(agreementId);

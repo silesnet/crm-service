@@ -68,7 +68,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	public Map<String, Object> insertAgreement(long customerId, String country) {
 		checkArgument(COUNTRIES.keySet().contains(country), "unknown country '%s'", country);
 		Map<String, Object> customer = findCustomerById(customerId);
-		checkNotNull(customer.get("id"), "customer with id '%s' does not exist", customerId);
+		checkNotNull(customer, "customer with id '%s' does not exist", customerId);
 		db.begin();
 		try {
 			long lastAgreementId = db.lastAgreementIdByCountry(country);
@@ -76,6 +76,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 				lastAgreementId = COUNTRIES.get(country) * 100000;
 			}
 			long agreementId = lastAgreementId + 1;
+			checkState(agreementId > COUNTRIES.get(country) * 100000, "inconsistent agreement id '%s', check agreements table consistency", agreementId);
 			db.insertAgreement(agreementId, country, customerId);
 			long contractNumber = agreementId % 1000000;
 			String agreements = "" + contractNumber;
@@ -107,7 +108,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	@Override
 	public Map<String, Object> insertService(long agreementId) {
 		Map<String, Object> agreement = findAgreementById(agreementId);
-		checkNotNull(agreement.get("id"), "agreement with id '%s' does not exist", agreementId);
+		checkNotNull(agreement, "agreement with id '%s' does not exist", agreementId);
 		checkNotNull(agreement.get("customer_id"), "agreement with id '%s' is not associated with a customer", agreementId);
 		db.begin();
 		try {
@@ -156,6 +157,35 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		return lastUsed;
 	}
 
+	@Override
+	public Map<String, Object> insertConnection(long serviceId) {
+		Map<String, Object> service = findServiceById(serviceId);
+		checkNotNull(service.get("id"), "service with id '%s' does not exist", serviceId);
+		Map<String, Object> existingConnection = findConnectionById(serviceId);
+		checkState(existingConnection == null, "connection for service '%s' already exist", serviceId);
+		db.begin();
+		try {
+			db.insertConnection(serviceId);
+			db.commit();
+			return findConnectionById(serviceId);
+		} catch (Exception e) {
+			db.rollback();
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public Map<String, Object> findConnectionById(final long serviceId) {
+		return db.withHandle(new HandleCallback<Map<String, Object>>() {
+			@Override
+			public Map<String, Object> withHandle(Handle handle) throws Exception {
+				return handle.createQuery("SELECT * FROM connections WHERE service_id=:service_id")
+						.bind("service_id", serviceId)
+						.first();
+			}
+		});
+	}
+
 	public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe {
 
 		@SqlQuery("SELECT max(id) FROM customers")
@@ -201,5 +231,8 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		@SqlUpdate("INSERT INTO services_info (service_id, status, other_info) " +
 				"VALUES (:service_id, 'NEW', '{}')")
 		void insertServiceInfo(@Bind("service_id") long serviceId);
+
+		@SqlUpdate("INSERT INTO connections (service_id) VALUES (:service_id)")
+		void insertConnection(@Bind("service_id") long serviceId);
 	}
 }

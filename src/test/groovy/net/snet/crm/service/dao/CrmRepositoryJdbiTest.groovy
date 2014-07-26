@@ -119,4 +119,17 @@ class CrmRepositoryJdbiTest extends Specification {
       thrown RuntimeException
   }
 
+  def 'it should insert new service connection'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing customer, agreement and service'
+      def customer = repository.insertCustomer([name: 'existing customer'])
+      def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+      def service = repository.insertService(agreement.id as Long)
+    when: 'insert service connection'
+      def connection = repository.insertConnection(service.id as Long)
+    then: 'connection is inserted'
+      connection.service_id == service.id
+  }
+
 }
