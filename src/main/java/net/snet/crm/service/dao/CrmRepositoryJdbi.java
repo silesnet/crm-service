@@ -161,13 +161,13 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	public Map<String, Object> insertConnection(long serviceId) {
 		Map<String, Object> service = findServiceById(serviceId);
 		checkNotNull(service.get("id"), "service with id '%s' does not exist", serviceId);
-		Map<String, Object> existingConnection = findConnectionById(serviceId);
+		Map<String, Object> existingConnection = findConnectionByServiceId(serviceId);
 		checkState(existingConnection == null, "connection for service '%s' already exist", serviceId);
 		db.begin();
 		try {
 			db.insertConnection(serviceId);
 			db.commit();
-			return findConnectionById(serviceId);
+			return findConnectionByServiceId(serviceId);
 		} catch (Exception e) {
 			db.rollback();
 			throw new RuntimeException(e);
@@ -175,7 +175,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
-	public Map<String, Object> findConnectionById(final long serviceId) {
+	public Map<String, Object> findConnectionByServiceId(final long serviceId) {
 		return db.withHandle(new HandleCallback<Map<String, Object>>() {
 			@Override
 			public Map<String, Object> withHandle(Handle handle) throws Exception {

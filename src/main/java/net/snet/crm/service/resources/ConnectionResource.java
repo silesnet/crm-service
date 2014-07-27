@@ -1,7 +1,6 @@
 package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableMap;
 import net.snet.crm.service.dao.CrmRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.Map;
 
@@ -30,10 +28,10 @@ public class ConnectionResource {
 	}
 
 	@GET
-	@Path("/{connectionId}")
+	@Path("/{serviceId}")
 	@Timed(name = "get-requests")
-	public Map<String, Object> agreementById(@PathParam("connectionId") long connectionId) {
-		LOGGER.debug("fetching connection by id '{}'", connectionId);
-		return repository.findAgreementById(connectionId);
+	public Map<String, Object> connectionById(@PathParam("serviceId") long serviceId) {
+		LOGGER.debug("fetching connection by service id '{}'", serviceId);
+		return repository.findConnectionByServiceId(serviceId);
 	}
 }
