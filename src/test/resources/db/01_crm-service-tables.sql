@@ -291,6 +291,45 @@ CREATE TABLE users (
     key character varying(255)
 );
 
+CREATE TABLE services_info (
+  service_id bigint NOT NULL,
+  status character varying(8),
+  other_info character varying(1024)
+);
+
+CREATE TABLE connections (
+  service_id bigint NOT NULL,
+  auth_type character varying(10),
+  auth_name character varying(32),
+  auth_value character varying(32),
+  downlink smallint,
+  uplink smallint,
+  area character varying(32),
+  is_public_ip boolean,
+  ip character varying(15),
+  master_router character varying(32),
+  ssid character varying(32),
+  sa_mac character varying(30),
+  other_info character varying(1024)
+);
+
+
+CREATE TABLE audit_items (
+  id bigint NOT NULL,
+  history_id bigint NOT NULL,
+  history_type_label_id bigint,
+  user_id bigint,
+  time_stamp timestamp NOT NULL,
+  field_name character varying(255) NOT NULL,
+  old_value character varying(255),
+  new_value character varying(255)
+);
+
+CREATE TABLE agreements (
+  id bigint NOT NULL,
+  country character varying(2) NOT NULL,
+  customer_id bigint
+);
 
 --
 -- TOC entry 1964 (class 2604 OID 3424112)
