@@ -15,6 +15,7 @@ import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.skife.jdbi.v2.DBI;
 
 import javax.servlet.DispatcherType;
+import javax.servlet.FilterRegistration;
 import java.util.EnumSet;
 
 public class CrmService extends Application<CrmConfiguration> {
@@ -48,8 +49,10 @@ public class CrmService extends Application<CrmConfiguration> {
 			environment.getObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 		}
 
-		environment.servlets().addFilter("CORS", new CrossOriginFilter())
-				.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+        FilterRegistration.Dynamic filters = environment.servlets().addFilter("CORS", new CrossOriginFilter());
+        filters.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+        filters.setInitParameter("allowedMethods", "GET,PUT,POST,DELETE");
+
 		CrmRepositoryJdbi crmRepository = new CrmRepositoryJdbi(dbi);
 		environment.jersey().register(new CustomerResource(dbi, crmRepository));
 		environment.jersey().register(new AgreementResource(crmRepository));
