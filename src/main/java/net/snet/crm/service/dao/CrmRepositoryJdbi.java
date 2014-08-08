@@ -32,11 +32,17 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CrmRepositoryJdbi.class);
 
 	private final static Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
-	private final static Map<String, String> CONNECTION_FIELDS = ImmutableMap.of(
-			"auth_type", "auth_type",
-			"auth_name", "auth_name",
-			"auth_value", "auth_value"
-	);
+	private final static Map<String, String> CONNECTION_FIELDS;
+	static {
+		CONNECTION_FIELDS = Maps.newHashMap();
+		CONNECTION_FIELDS.put("auth_type", "auth_type");
+		CONNECTION_FIELDS.put("auth_name", "auth_name");
+		CONNECTION_FIELDS.put("auth_value", "auth_value");
+		CONNECTION_FIELDS.put("downlink", "downlink");
+		CONNECTION_FIELDS.put("uplink", "uplink");
+		CONNECTION_FIELDS.put("is_public_ip", "is_public_ip");
+		CONNECTION_FIELDS.put("ip", "ip");
+	};
 
 	private final CrmDatabase db;
 
@@ -214,7 +220,6 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		final HashMap<String, Object> updateMap = Maps.newHashMap();
 		List<String> fields = Lists.newArrayList();
 		for (Map.Entry<String, Object> update : updates) {
-			System.out.println(String.format("'%s': '%s'", update.getKey(), update.getValue().toString()));
 			updateMap.put(update.getKey(), update.getValue());
 			fields.add(update.getKey() + "=:" + update.getKey());
 		}
