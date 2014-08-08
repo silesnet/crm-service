@@ -1,6 +1,7 @@
 package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.service.dao.CrmRepository;
 import org.slf4j.Logger;
@@ -40,13 +41,18 @@ public class ServiceResource {
 	@POST
 	@Path("/{serviceId}/connections")
 	@Timed(name = "post-request")
-	public Response insertConnection(@PathParam("serviceId") long serviceId) {
+	public Response insertConnection(@PathParam("serviceId") long serviceId, Optional<Map<String, Object>> connectionData) {
 		LOGGER.debug("inserting new connection for service id '{}'", serviceId);
 		Map<String, Object> service = repository.findServiceById(serviceId);
 		checkNotNull(service.get("id"), "service with id '%s' does not exist", serviceId);
 		Map<String, Object> connection = repository.insertConnection(serviceId);
+		if (connectionData.isPresent()) {
+			@SuppressWarnings("unchecked")
+			Map<String, Object> connectionPrototype = (Map<String, Object>) connectionData.get().get("connections");
+			connection = repository.updateConnection(serviceId, connectionPrototype.entrySet());
+		}
 		return Response.created(uriInfo.getAbsolutePathBuilder()
-				.replacePath("/connections/" + connection.get("id")).build())
+				.replacePath("/connections/" + connection.get("service_id")).build())
 				.entity(ImmutableMap.of("connections", connection))
 				.build();
 	}

@@ -141,7 +141,8 @@ class CrmRepositoryJdbiTest extends Specification {
       def service = repository.insertService(agreement.id as Long)
       def connection = repository.insertConnection(service.id as Long)
     and: 'connection fields to update'
-      def update = [ auth_type : 'PPPoE', auth_name: 'joe', auth_value: 'password']
+      def update = [ auth_type : 'PPPoE', auth_name: 'joe', auth_value: 'password',
+                     downlink: 100, uplink: 50, is_public_ip: true, ip: '10.0.0.1' ]
     when: 'updated service connection'
       def updatedConnection = repository.updateConnection(service.id as Long, update.entrySet())
     then: 'service connection is updated'
@@ -149,6 +150,10 @@ class CrmRepositoryJdbiTest extends Specification {
       updatedConnection.auth_type == update.auth_type
       updatedConnection.auth_name == update.auth_name
       updatedConnection.auth_value == update.auth_value
+      updatedConnection.downlink == update.downlink
+      updatedConnection.uplink == update.uplink
+      updatedConnection.is_public_ip == update.is_public_ip
+      updatedConnection.ip == update.ip
   }
 
 }
