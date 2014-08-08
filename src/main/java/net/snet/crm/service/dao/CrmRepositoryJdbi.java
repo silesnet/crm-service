@@ -1,7 +1,12 @@
 package net.snet.crm.service.dao;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
@@ -12,17 +17,26 @@ import org.skife.jdbi.v2.sqlobject.mixins.CloseMe;
 import org.skife.jdbi.v2.sqlobject.mixins.GetHandle;
 import org.skife.jdbi.v2.sqlobject.mixins.Transactional;
 import org.skife.jdbi.v2.tweak.HandleCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.*;
 
 public class CrmRepositoryJdbi implements CrmRepository {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CrmRepositoryJdbi.class);
 
 	private final static Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
+	private final static Map<String, String> CONNECTION_FIELDS = ImmutableMap.of(
+			"auth_type", "auth_type",
+			"auth_name", "auth_name",
+			"auth_value", "auth_value"
+	);
 
 	private final CrmDatabase db;
 
@@ -184,6 +198,51 @@ public class CrmRepositoryJdbi implements CrmRepository {
 						.first();
 			}
 		});
+	}
+
+	@Override
+	public Map<String, Object> updateConnection(final long serviceId, Iterable<Map.Entry<String, Object>> rawUpdates) {
+		final Map<String, Object> connection = findConnectionByServiceId(serviceId);
+		checkNotNull(connection, "connection for service '%s' does not exist", serviceId);
+		Iterable<Map.Entry<String, Object>> updates = Iterables.filter(rawUpdates, new Predicate<Map.Entry<String, Object>>() {
+			@Override
+			public boolean apply(@Nullable Map.Entry<String, Object> update) {
+				return CONNECTION_FIELDS.containsKey(update.getKey())
+						&& !update.getValue().equals(connection.get(update.getKey()));
+			}
+		});
+		final HashMap<String, Object> updateMap = Maps.newHashMap();
+		List<String> fields = Lists.newArrayList();
+		for (Map.Entry<String, Object> update : updates) {
+			System.out.println(String.format("'%s': '%s'", update.getKey(), update.getValue().toString()));
+			updateMap.put(update.getKey(), update.getValue());
+			fields.add(update.getKey() + "=:" + update.getKey());
+		}
+		if (updateMap.size() == 0) {
+			LOGGER.debug("nothing to update returning original connection for service '{}'", serviceId);
+			return findConnectionByServiceId(serviceId);
+		}
+		final String sqlTemplate = "UPDATE connections SET " + Joiner.on(", ").join(fields) + " WHERE service_id=:service_id";
+		db.begin();
+		try {
+			Integer updated = db.withHandle(new HandleCallback<Integer>() {
+				@Override
+				public Integer withHandle(Handle handle) throws Exception {
+					return handle.createStatement(sqlTemplate)
+							.bind("service_id", serviceId)
+							.bindFromMap(updateMap)
+							.execute();
+				}
+			});
+			if (updated != 1) {
+				throw new IllegalStateException("failed to update connection for service '" + serviceId + "'");
+			}
+			db.commit();
+			return findConnectionByServiceId(serviceId);
+		} catch (Exception e) {
+			db.rollback();
+			throw new RuntimeException(e);
+		}
 	}
 
 	public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe {

@@ -19,5 +19,7 @@ public interface CrmRepository {
 
 	Map<String,Object> findConnectionByServiceId(long serviceId);
 
+	Map<String, Object> updateConnection(long serviceId, Iterable<Map.Entry<String, Object>> updates);
+
 
 }
