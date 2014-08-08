@@ -132,4 +132,23 @@ class CrmRepositoryJdbiTest extends Specification {
       connection.service_id == service.id
   }
 
+  def 'it should update service connection'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing customer, agreement, service and connection'
+      def customer = repository.insertCustomer([name: 'existing customer'])
+      def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+      def service = repository.insertService(agreement.id as Long)
+      def connection = repository.insertConnection(service.id as Long)
+    and: 'connection fields to update'
+      def update = [ auth_type : 'PPPoE', auth_name: 'joe', auth_value: 'password']
+    when: 'updated service connection'
+      def updatedConnection = repository.updateConnection(service.id as Long, update.entrySet())
+    then: 'service connection is updated'
+      connection.service_id == updatedConnection.service_id
+      updatedConnection.auth_type == update.auth_type
+      updatedConnection.auth_name == update.auth_name
+      updatedConnection.auth_value == update.auth_value
+  }
+
 }
