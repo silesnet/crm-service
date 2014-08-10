@@ -31,8 +31,9 @@ import static com.google.common.base.Preconditions.*;
 public class CrmRepositoryJdbi implements CrmRepository {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CrmRepositoryJdbi.class);
 
-	private final static Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
-	private final static Map<String, String> CONNECTION_FIELDS;
+	private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
+	private static final int SERVICE_COUNTRY_MULTIPLIER = 100000;
+	private static final Map<String, String> CONNECTION_FIELDS;
 	static {
 		CONNECTION_FIELDS = Maps.newHashMap();
 		CONNECTION_FIELDS.put("auth_type", "auth_type");
@@ -93,12 +94,12 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		try {
 			long lastAgreementId = db.lastAgreementIdByCountry(country);
 			if (lastAgreementId == 0) {
-				lastAgreementId = COUNTRIES.get(country) * 100000;
+				lastAgreementId = COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10);
 			}
 			long agreementId = lastAgreementId + 1;
-			checkState(agreementId > COUNTRIES.get(country) * 100000, "inconsistent agreement id '%s', check agreements table consistency", agreementId);
+			checkState(agreementId > COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10), "inconsistent agreement id '%s', check agreements table consistency", agreementId);
 			db.insertAgreement(agreementId, country, customerId);
-			long contractNumber = agreementId % 1000000;
+			long contractNumber = agreementId % SERVICE_COUNTRY_MULTIPLIER;
 			String agreements = "" + contractNumber;
 			Optional<Object> currentAgreements = Optional.fromNullable(customer.get("contract_no"));
 			if (currentAgreements.isPresent() && currentAgreements.get().toString().trim().length() > 0) {

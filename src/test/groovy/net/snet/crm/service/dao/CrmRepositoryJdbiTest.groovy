@@ -62,7 +62,7 @@ class CrmRepositoryJdbiTest extends Specification {
     when: 'insert customer agreement for country'
       def agreement = repository.insertAgreement(customer.id as Long, country)
     then: 'agreement is inserted'
-      agreement.id == 1000001
+      agreement.id == 100001
       agreement.country == 'CZ'
       agreement.customer_id == 1
     and: 'customer agreements are updated'
@@ -80,8 +80,8 @@ class CrmRepositoryJdbiTest extends Specification {
       def agreement1 = repository.insertAgreement(customer.id as Long, country)
       def agreement2 = repository.insertAgreement(customer.id as Long, country)
     then: 'agreement is inserted'
-      agreement1.id == 1000001
-      agreement2.id == 1000002
+      agreement1.id == 100001
+      agreement2.id == 100002
     and: 'customer agreements are updated'
       repository.findCustomerById(1).contract_no == '1, 2'
   }
