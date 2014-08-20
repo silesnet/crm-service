@@ -1,12 +1,14 @@
 package net.snet.crm.service
 
 import groovyx.net.http.RESTClient
+import spock.lang.Ignore
 import spock.lang.Specification
 
 /**
  * Created by admin on 5.7.14.
  */
 class ServicesATSpec extends Specification {
+	@Ignore
 	def 'AT2-1 test'() {
 		given:
 			println 'AT2 test 1...'
@@ -17,6 +19,7 @@ class ServicesATSpec extends Specification {
 			true
 	}
 
+	@Ignore
 	def 'AT2-2 test'() {
 		given:
 			println 'AT2 test 2...'
