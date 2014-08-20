@@ -23,7 +23,7 @@ import org.junit.runners.Suite
 class AcceptanceTestSuite {
 	public static final DW = [:]
 
-	@ClassRule
+//	@ClassRule
 	public static ExternalResource service = new ExternalResource() {
 		@Override
 		protected void before() throws Throwable {
