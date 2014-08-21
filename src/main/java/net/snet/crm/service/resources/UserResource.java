@@ -4,6 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import net.snet.crm.service.bo.User;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.UserDAO;
@@ -21,6 +22,7 @@ import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 @Path("/users")
 public class UserResource {
@@ -31,14 +33,16 @@ public class UserResource {
 
 	@SuppressWarnings("unused")
 	private final CrmRepository repository;
+	private final UserService userService;
 
 	private
 	@Context
 	UriInfo uriInfo;
 
-	public UserResource(DBI dbi, CrmRepository repository) {
+	public UserResource(DBI dbi, CrmRepository repository, UserService userService) {
 		this.userDAO = dbi.onDemand(UserDAO.class);
 		this.repository = repository;
+		this.userService = userService;
 	}
 
 	@GET
@@ -66,8 +70,16 @@ public class UserResource {
 				|| (key.isPresent() && "test".equals(key.get()))) {
 			Map<String, Object> user = Maps.newHashMap();
 			user.put("user", "test");
-			user.put("roles", "ANONYMOUS_USER");
+			user.put("roles", "ANONYMOUS_ROLE");
 			return Response.ok(ImmutableMap.of("users", user)).build();
+		}
+		if (session.isPresent()) {
+			final Map<String, Object> user = userService.authenticateUserBySessionId(session.get());
+			if (!user.isEmpty()) {
+				return Response.ok(ImmutableMap.of("users", user)).build();
+			} else {
+				return Response.status(Response.Status.NOT_FOUND).build();
+			}
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
 	}
