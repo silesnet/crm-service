@@ -1,5 +1,7 @@
 jsonPrettyPrint: true
 
+userServiceUri: https://localhost:8443/get_user
+
 database:
   driverClass: org.postgresql.Driver
   user: sisa

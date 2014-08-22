@@ -24,6 +24,7 @@ import org.skife.jdbi.v2.DBI;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
+import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -56,7 +57,7 @@ public class CrmService extends Application<CrmConfiguration> {
 	}
 
 	@Override
-	public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+	public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, URISyntaxException {
 		final DBIFactory dbiFactory = new DBIFactory();
 		final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
 		if (configuration.getJsonPrettyPrint()) {
@@ -82,7 +83,8 @@ public class CrmService extends Application<CrmConfiguration> {
 		environment.jersey().register(new DraftResource(dbi));
 		environment.jersey().register(new RouterResource(dbi));
 		environment.jersey().register(new NetworkResource(dbi));
-		environment.jersey().register(new UserResource(dbi, crmRepository, new DefaultUserService(httpClient)));
+		environment.jersey().register(new UserResource(dbi, crmRepository,
+				new DefaultUserService(httpClient, configuration.getUserServiceUri())));
 		environment.jersey().register(new ProductResource(dbi));
 		environment.jersey().register(new ContractResource(dbi));
 		environment.jersey().register(new BaseResource());
