@@ -99,13 +99,13 @@ public class CrmRepositoryJdbi implements CrmRepository {
 			long agreementId = lastAgreementId + 1;
 			checkState(agreementId > COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10), "inconsistent agreement id '%s', check agreements table consistency", agreementId);
 			db.insertAgreement(agreementId, country, customerId);
-			long contractNumber = agreementId % SERVICE_COUNTRY_MULTIPLIER;
-			String agreements = "" + contractNumber;
-			Optional<Object> currentAgreements = Optional.fromNullable(customer.get("contract_no"));
-			if (currentAgreements.isPresent() && currentAgreements.get().toString().trim().length() > 0) {
-				agreements = currentAgreements.get().toString().trim() + ", " + contractNumber;
-			}
-			db.setCustomerAgreements(customerId, agreements);
+//			long contractNumber = agreementId % SERVICE_COUNTRY_MULTIPLIER;
+//			String agreements = "" + contractNumber;
+//			Optional<Object> currentAgreements = Optional.fromNullable(customer.get("contract_no"));
+//			if (currentAgreements.isPresent() && currentAgreements.get().toString().trim().length() > 0) {
+//				agreements = currentAgreements.get().toString().trim() + ", " + contractNumber;
+//			}
+//			db.setCustomerAgreements(customerId, agreements);
 			db.commit();
 			return findAgreementById(agreementId);
 		} catch (Exception e) {
@@ -299,5 +299,8 @@ public class CrmRepositoryJdbi implements CrmRepository {
 
 		@SqlUpdate("INSERT INTO connections (service_id) VALUES (:service_id)")
 		void insertConnection(@Bind("service_id") long serviceId);
+
+		@SqlUpdate("UPDATE services_info SET status=:status WHERE service_id=:service_id")
+		void updateServiceStatus(@Bind("service_id") long serviceId, @Bind("status") String status);
 	}
 }
