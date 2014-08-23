@@ -66,7 +66,7 @@ class CrmRepositoryJdbiTest extends Specification {
       agreement.country == 'CZ'
       agreement.customer_id == 1
     and: 'customer agreements are updated'
-      repository.findCustomerById(1).contract_no == '1'
+//      repository.findCustomerById(1).contract_no == '1'
   }
 
   def 'it should properly calculate agreement id'() {
@@ -83,7 +83,7 @@ class CrmRepositoryJdbiTest extends Specification {
       agreement1.id == 100001
       agreement2.id == 100002
     and: 'customer agreements are updated'
-      repository.findCustomerById(1).contract_no == '1, 2'
+//      repository.findCustomerById(1).contract_no == '1, 2'
   }
 
   def 'it should insert new agreement service'() {
