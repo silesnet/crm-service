@@ -1034,16 +1034,17 @@ INSERT INTO customers VALUES (139, 2139, '9912310063', 'Irena Kodymová', '', '�
 INSERT INTO customers VALUES (64, 2064, '9912310027', 'Martin Vítek', '', 'Školní 709', 'Radnice u Rokycan', '338 28', 10, 'MartinVitek@superrito.com', '', '1780', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '373 288 271', true, 10, 255, 10, false, '4459', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.89', '', '', NULL);
 INSERT INTO customers VALUES (69, 2069, '9912310029', 'Stanislav Fencl', '', 'Dukelská 1220', 'Jistebník', '742 82', 10, 'StanislavFencl@armyspy.com', '', '1613', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '774 104 025', true, 10, 255, 10, false, '4465', '2013-10-16 12:41:11.4', '2013-10-16 12:41:51.531', '', '', NULL);
 INSERT INTO customers VALUES (70, 2070, '9912310030', 'Tomáš Marek', '', 'Nezvalova 232', 'Postupice', '257 01', 10, 'TomasMarek@superrito.com', '', '1735', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '313 572 703', true, 10, 255, 10, false, '4466', '2013-09-17 18:45:42.052', '2013-09-18 09:31:37.248', '', '', NULL);
-INSERT INTO customers VALUES (71, 2071, '9912310031', 'Robin Novák', '', 'Luční 1862', 'Nedvedice', '592 62', 10, 'RobinNovak@rhyta.com', '', '1392', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '734 016 973', true, 10, 255, 10, false, '4467', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.781', '', '', NULL);
-INSERT INTO customers VALUES (74, 2074, '9912310032', 'Marie Valentová', '', 'Masarykova 1669', 'Humpolec', '396 01', 10, 'MarieValentova@teleworm.us', '', '752', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '733 160 786', true, 10, 255, 10, false, '4473', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.796', '', '', NULL);
-INSERT INTO customers VALUES (79, 2079, '9912310034', 'Jana Mizerová', '', 'Bártova 74', 'Úsobrno', '679 39', 10, 'JanaMizerova@einrot.com', '', '490', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '538 969 700', true, 10, 255, 10, false, '4486', '2013-02-21 15:02:07.923843', '2013-02-21 15:02:10.422', '', '', NULL);
-INSERT INTO customers VALUES (85, 2085, '9912310038', 'Jaroslav Baloun', '', 'Tylova 1794', 'Jevícko', '569 43', 10, 'JaroslavBaloun@fleckens.hu', '', '1546', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '463 840 775', true, 10, 255, 10, false, '4520', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.687', '', '', NULL);
-INSERT INTO customers VALUES (87, 2087, '9912310039', 'Petr Kuča', '', 'U medvídků 267', 'Bohutín', '262 41', 10, 'PetrKuca@superrito.com', '', '837', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '738 769 967', true, 10, 255, 10, false, '4504', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.781', '', '', NULL);
-INSERT INTO customers VALUES (93, 2093, '9912310040', 'Marie Žižková', '', 'Strojírenská 731', 'Ždár nad Sázavou 1', '591 01', 10, 'MarieZizkova@gustr.com', '', '550', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '770 083 098', true, 10, 255, 10, false, '4511', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.671', '', '', NULL);
-INSERT INTO customers VALUES (769, 2769, '9912310349', 'Luděk Rosenberg', '', 'Velký průhon 401', 'Dymokury', '289 01', 10, 'LudekRosenberg@armyspy.com', '', '1307', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '317 350 034', true, 10, 255, 10, false, '6120', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:29.39', '', '', NULL);
-INSERT INTO customers VALUES (356, 2356, '9912310164', 'Alois Schwarz', '', 'Sokolovská 839', 'Mikulovice u Jeseníku 3', '790 83', 10, 'AloisSchwarz@fleckens.hu', '', '1504', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '771 187 817', true, 10, 255, 10, false, '5130', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:32.5', '', '', NULL);
-INSERT INTO customers VALUES (359, 2359, '9912310165', 'Milan Povolný', '', 'Poštovní 1787', 'Mohelnice nad Jizerou', '294 13', 10, 'MilanPovolny@cuvox.de', '', '558', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '320 343 202', true, 10, 255, 10, false, '5136', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:35.39', '', '', NULL);
-INSERT INTO customers VALUES (1528, 7681, '9912310683', 'Hynek Janků', '', 'Bedřicha Smetany 694', 'Jalubí', '687 05', 10, 'HynekJanku@fleckens.hu', '', '1893', '', '2006-03-22 10:05:31.316', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '771 743 620', true, 10, 254, 10, true, '5246', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:32.156', '', '', NULL);
+
+INSERT INTO customers VALUES (71, 2071, '9912310031', 'Robin Nowak', '', 'Kręta 1862', 'Rybnik', '592 62', 20, 'RobinNowak@rhyta.pl', '', '1392', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '734 016 973', true, 10, 255, 10, false, '4467', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.781', '', '', NULL);
+INSERT INTO customers VALUES (74, 2074, '9912310032', 'Maria Walek', '', 'Adama Mickiewicza 1669', 'Cieszyn', '396 01', 20, 'MariaWalek@teleworm.pl', '', '752', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '733 160 786', true, 10, 255, 10, false, '4473', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.796', '', '', NULL);
+INSERT INTO customers VALUES (79, 2079, '9912310034', 'Janina Michnik', '', 'Balicka 74', 'Cieszyn', '679 39', 20, 'JaninaMichnik@einrot.pl', '', '490', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '538 969 700', true, 10, 255, 10, false, '4486', '2013-02-21 15:02:07.923843', '2013-02-21 15:02:10.422', '', '', NULL);
+INSERT INTO customers VALUES (85, 2085, '9912310038', 'Jaroslaw Balicki', '', 'Tęczowa 1794', 'Jaworzynka', '569 43', 20, 'JaroslawBalicki@fleckens.pl', '', '1546', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '463 840 775', true, 10, 255, 10, false, '4520', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.687', '', '', NULL);
+INSERT INTO customers VALUES (87, 2087, '9912310039', 'Piotr Kowalski', '', 'Bracka 267', 'Ustroń', '262 41', 20, 'PiotrKowalski@superrito.com', '', '837', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '738 769 967', true, 10, 255, 10, false, '4504', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.781', '', '', NULL);
+INSERT INTO customers VALUES (93, 2093, '9912310040', 'Maria Kowalski', '', 'Mazowiecka 731', 'Rybnik', '591 01', 20, 'MariaKowalski@gustr.com', '', '550', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '770 083 098', true, 10, 255, 10, false, '4511', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:34.671', '', '', NULL);
+INSERT INTO customers VALUES (769, 2769, '9912310349', 'Leszek Rosenberg', '', 'Balicka 401', 'Cieszyn', '289 01', 20, 'LeszekRosenberg@armyspy.pl', '', '1307', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '317 350 034', true, 10, 255, 10, false, '6120', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:29.39', '', '', NULL);
+INSERT INTO customers VALUES (356, 2356, '9912310164', 'Antoni Schwarz', '', '1 Maja 839', 'Ustroń', '790 83', 20, 'AntoniSchwarz@fleckens.pl', '', '1504', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '771 187 817', true, 10, 255, 10, false, '5130', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:32.5', '', '', NULL);
+INSERT INTO customers VALUES (359, 2359, '9912310165', 'Marian Piwko', '', 'Towarowa 1787', 'Pszczyna', '294 13', 20, 'MarianPiwko@cuvox.pl', '', '558', '', '2006-01-24 00:00:00', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '320 343 202', true, 10, 255, 10, false, '5136', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:35.39', '', '', NULL);
+INSERT INTO customers VALUES (1528, 7681, '9912310683', 'Adam Jopek', '', 'Targowa 694', 'Tychy', '687 05', 20, 'AdamJopek@fleckens.pl', '', '1893', '', '2006-03-22 10:05:31.316', 40, '2013-12-31 00:00:00', false, true, '', false, true, '', '', '771 743 620', true, 10, 254, 10, true, '5246', '2012-02-24 09:44:25.526708', '2012-02-24 14:15:32.156', '', '', NULL);
 
 
 INSERT INTO services VALUES (10038401, 790, '2005-12-31 00:00:00', '2008-12-31 00:00:00', 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 7900);
@@ -1143,7 +1144,7 @@ INSERT INTO services VALUES (10047701, 1054, '2005-12-31 00:00:00', NULL, 'LANac
 INSERT INTO services VALUES (10048001, 102, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 1020);
 INSERT INTO services VALUES (10048002, 102, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 15430);
 INSERT INTO services VALUES (10048201, 66, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 660);
-INSERT INTO services VALUES (10049001, 79, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 790);
+INSERT INTO services VALUES (20049001, 79, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 790);
 INSERT INTO services VALUES (10049201, 967, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 9670);
 INSERT INTO services VALUES (10050001, 808, '2005-12-31 00:00:00', NULL, 'LANaccess', 310, 40, 20, 10, false, '', 0, '', 'M', 8080);
 INSERT INTO services VALUES (10050401, 1306, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 360, 40, 10, 5, false, '', 0, '', 'M', 13060);
@@ -1160,9 +1161,9 @@ INSERT INTO services VALUES (10054601, 1251, '2005-12-31 00:00:00', NULL, 'LANac
 INSERT INTO services VALUES (10054602, 1251, '2010-06-30 00:00:00', NULL, 'LANaccess', 1, 70, 4, 2, false, '', 0, '', 'M', 79280);
 INSERT INTO services VALUES (10054603, 1251, '2008-12-12 00:00:00', NULL, 'LANaccess', 1, 70, 4, 2, false, '', 0, '', 'M', 57180);
 INSERT INTO services VALUES (10054604, 1251, '2010-06-30 00:00:00', NULL, 'INTERNETdedicated', 1, 70, 4, 2, false, '', 0, '', 'M', 79290);
-INSERT INTO services VALUES (10055001, 93, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 930);
-INSERT INTO services VALUES (10055801, 359, '2011-08-01 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 99140);
-INSERT INTO services VALUES (10055802, 359, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 3590);
+INSERT INTO services VALUES (20055001, 93, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 930);
+INSERT INTO services VALUES (20055801, 359, '2011-08-01 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 99140);
+INSERT INTO services VALUES (20055802, 359, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 3590);
 INSERT INTO services VALUES (10056201, 748, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 2680, 40, 30, 15, false, '', 0, '', 'M', 14040);
 INSERT INTO services VALUES (10056202, 748, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 1960, 40, 20, 10, false, '', 0, '', 'M', 7480);
 INSERT INTO services VALUES (10056203, 748, '2005-12-31 00:00:00', '2009-04-30 00:00:00', 'INTERNETdedicated', 860, 40, 8, 2, false, '', 0, '', 'M', 14050);
@@ -1231,7 +1232,7 @@ INSERT INTO services VALUES (10074601, 100, '2005-12-31 00:00:00', NULL, 'WIRELE
 INSERT INTO services VALUES (10074701, 125, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 1250);
 INSERT INTO services VALUES (10074901, 1189, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 11890);
 INSERT INTO services VALUES (10075001, 1037, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 10370);
-INSERT INTO services VALUES (10075201, 74, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 740);
+INSERT INTO services VALUES (20075201, 74, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 740);
 INSERT INTO services VALUES (10075701, 398, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 198, 40, 10, 5, false, '', 0, '', 'M', 3980);
 INSERT INTO services VALUES (10076201, 924, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 9240);
 INSERT INTO services VALUES (10076301, 680, '2010-08-25 00:00:00', NULL, 'INTERNETdedicated', 1, 70, 10, 5, false, '', 0, '', 'M', 82150);
@@ -1252,7 +1253,7 @@ INSERT INTO services VALUES (10082901, 1239, '2005-12-31 00:00:00', NULL, 'LANac
 INSERT INTO services VALUES (10083201, 75, '2005-12-31 00:00:00', NULL, 'LANaccess', 310, 40, 20, 10, false, '', 0, '', 'M', 750);
 INSERT INTO services VALUES (10083301, 622, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 175, 40, 4, 2, false, '', 0, '', 'M', 6220);
 INSERT INTO services VALUES (10083401, 713, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 175, 40, 4, 2, false, '', 0, '', 'M', 7130);
-INSERT INTO services VALUES (10083701, 87, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 870);
+INSERT INTO services VALUES (20083701, 87, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 870);
 INSERT INTO services VALUES (10083801, 892, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, 'custcz076002', 'M', 8920);
 INSERT INTO services VALUES (10083802, 892, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, 'custcz076001', 'M', 15510);
 INSERT INTO services VALUES (10083901, 981, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, 'custcz083901', 'M', 9810);
@@ -1452,7 +1453,7 @@ INSERT INTO services VALUES (10130001, 1321, '2005-12-31 00:00:00', NULL, 'LANac
 INSERT INTO services VALUES (10130301, 1022, '2005-12-31 00:00:00', NULL, 'LANaccess', 0, 40, 10, 5, false, '', 0, '', 'M', 10220);
 INSERT INTO services VALUES (10130302, 1022, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 10230);
 INSERT INTO services VALUES (10130601, 151, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 1510);
-INSERT INTO services VALUES (10130701, 769, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 7690);
+INSERT INTO services VALUES (20130701, 769, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 7690);
 INSERT INTO services VALUES (10130801, 523, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 5230);
 INSERT INTO services VALUES (10131101, 3, '2005-12-11 00:00:00', NULL, 'LANaccess', 310, 40, 20, 10, false, '', 0, '', 'M', 30);
 INSERT INTO services VALUES (10131801, 1302, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 13020);
@@ -1486,7 +1487,7 @@ INSERT INTO services VALUES (10138401, 2, '2005-12-31 00:00:00', NULL, 'WIRELESS
 INSERT INTO services VALUES (10138501, 1099, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 10990);
 INSERT INTO services VALUES (10138801, 813, '2005-12-31 00:00:00', NULL, 'LANaccess', 310, 40, 20, 10, false, '', 0, '', 'M', 8130);
 INSERT INTO services VALUES (10139001, 574, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 560, 40, 20, 20, false, '', 0, '', 'M', 5740);
-INSERT INTO services VALUES (10139201, 71, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 125, 40, 20, 10, false, '', 0, '', 'M', 710);
+INSERT INTO services VALUES (20139201, 71, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 125, 40, 20, 10, false, '', 0, '', 'M', 710);
 INSERT INTO services VALUES (10139301, 392, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 3920);
 INSERT INTO services VALUES (10139401, 117, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 1170);
 INSERT INTO services VALUES (10139601, 1161, '2005-12-31 00:00:00', NULL, 'LANaccess', 310, 40, 20, 10, false, '', 0, '', 'M', 11610);
@@ -1550,7 +1551,7 @@ INSERT INTO services VALUES (10149801, 1371, '2005-12-31 00:00:00', NULL, 'LANfi
 INSERT INTO services VALUES (10150001, 1106, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 11060);
 INSERT INTO services VALUES (10150201, 850, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 251, 40, 4, 2, false, '', 0, '', 'M', 8500);
 INSERT INTO services VALUES (10150301, 232, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 167, 40, 4, 2, false, '', 0, '', 'M', 2320);
-INSERT INTO services VALUES (10150401, 356, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 251, 40, 4, 2, false, '', 0, '', 'M', 3560);
+INSERT INTO services VALUES (20150401, 356, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 251, 40, 4, 2, false, '', 0, '', 'M', 3560);
 INSERT INTO services VALUES (10150501, 388, '2005-12-31 00:00:00', NULL, 'LANfiber', 260, 40, 50, 50, false, '', 0, '', 'M', 3880);
 INSERT INTO services VALUES (10150601, 1150, '2011-08-24 00:00:00', NULL, 'LANfiber', 310, 40, 100, 100, false, '', 0, 'custcz150601', 'M', 99450);
 INSERT INTO services VALUES (10150602, 1150, '2005-12-31 00:00:00', NULL, 'LANfiber', 260, 40, 50, 50, false, '', 0, 'custcz150602', 'M', 11500);
@@ -1575,7 +1576,7 @@ INSERT INTO services VALUES (10153601, 215, '2005-12-31 00:00:00', NULL, 'WIRELE
 INSERT INTO services VALUES (10153602, 215, '2012-06-22 00:00:00', NULL, 'INTERNETdedicated', 250, 40, 10, 10, false, '', 0, '', 'M', 0);
 INSERT INTO services VALUES (10153801, 136, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 1360);
 INSERT INTO services VALUES (10154201, 1303, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, 'custcz154201', 'M', 13030);
-INSERT INTO services VALUES (10154601, 85, '2005-12-31 00:00:00', NULL, 'LANfiber', 260, 40, 50, 50, false, '', 0, '', 'M', 850);
+INSERT INTO services VALUES (20154601, 85, '2005-12-31 00:00:00', NULL, 'LANfiber', 260, 40, 50, 50, false, '', 0, '', 'M', 850);
 INSERT INTO services VALUES (10154701, 556, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 410, 40, 20, 10, false, '', 0, '', 'M', 5560);
 INSERT INTO services VALUES (10154801, 444, '2005-12-31 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 4440);
 INSERT INTO services VALUES (10154901, 374, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 260, 40, 10, 5, false, '', 0, '', 'M', 3740);
@@ -1784,7 +1785,7 @@ INSERT INTO services VALUES (10188501, 1520, '2006-03-01 00:00:00', NULL, 'WIREL
 INSERT INTO services VALUES (10188601, 1521, '2006-03-08 00:00:00', NULL, 'LANaccess', 260, 40, 10, 5, false, '', 0, '', 'M', 15310);
 INSERT INTO services VALUES (10189001, 1525, '2006-03-09 00:00:00', NULL, 'WIRELESSmax', 360, 40, 10, 5, false, '', 0, '', 'M', 15350);
 INSERT INTO services VALUES (10189201, 1527, '2006-03-14 00:00:00', NULL, 'WIRELESSmax', 360, 40, 10, 5, false, '', 0, '', 'M', 15370);
-INSERT INTO services VALUES (10189301, 1528, '2006-03-14 00:00:00', NULL, 'INTERNETdedicated', 960, 40, 10, 2, false, '', 0, '', 'M', 15380);
+INSERT INTO services VALUES (20189301, 1528, '2006-03-14 00:00:00', NULL, 'INTERNETdedicated', 960, 40, 10, 2, false, '', 0, '', 'M', 15380);
 INSERT INTO services VALUES (10189801, 1533, '2006-03-16 00:00:00', NULL, 'WIRELESSmax', 360, 40, 10, 5, false, '', 0, '', 'M', 15560);
 INSERT INTO services VALUES (10198701, 1103, '2005-12-31 00:00:00', NULL, 'WIRELESSmax', 360, 40, 10, 5, false, '', 0, 'custcz198701', 'M', 11030);
 INSERT INTO services VALUES (10198702, 1103, '2006-07-01 00:00:00', '2013-02-28 00:00:00', 'WIRELESSmax', 360, 40, 10, 5, false, '', 0, '', 'M', 17460);
