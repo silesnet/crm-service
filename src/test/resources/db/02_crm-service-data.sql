@@ -1536,6 +1536,10 @@ INSERT INTO services VALUES (10466503, 244, '2008-09-15 00:00:00', NULL, 'SERVER
 INSERT INTO services VALUES (10466504, 244, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 700, 40, 10, 10, false, '', 0, '', 'M', 15480);
 INSERT INTO services VALUES (10466505, 244, '2005-12-31 00:00:00', NULL, 'INTERNETdedicated', 7790, 40, 100, 50, false, '', 0, '', 'M', 2440);
 
+INSERT INTO services VALUES (110466501, 244, '2014-12-31 00:00:00', NULL, 'Aktivace', 300, 10, NULL, NULL, false, '', 0, '', 'M', NULL);
+INSERT INTO services VALUES (110188201, 1517, '2014-03-06 00:00:00', NULL, 'Odpočet', -200, 10, NULL, NULL, false, '', 0, '', 'M', NULL);
+INSERT INTO services VALUES (120055801, 359, '2014-08-01 00:00:00', NULL, 'Kredyt', -10, 10, NULL, NULL, false, '', 0, '', 'M', NULL);
+
 
 INSERT INTO network VALUES (1188, 'bes-koz-br', '5340, 5715, 5700', true, 30, 20, true, 5705, 'Ubiquiti', 'tyra', 'BES-KOZ', '30', 30, 10, '802.11n', 'beskydska', true, '20 MHz', '25', '5', 'beskydska', 'beskydska-br-dist', 'bes-koz-br-dist', true, '', '', '2014-05-21 01:34:33.601335', 'XM.ar7240.v5.5.6.17762.130528.1755', 'Rocket M5', '-55', '984', '130.0', '130.0', '97', '94', '100Mbps-Full', '10
 ', 'Ping', 'core20 => frydecka-br => fry-bes-br => bes-fry-br => beskydska-br => beskydska => beskydska-eth1 => beskydska-br-dist => bes-koz-br', '0.878', 5705);
