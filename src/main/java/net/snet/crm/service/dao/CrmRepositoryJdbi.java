@@ -289,12 +289,12 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		void setCustomerAgreements(@Bind("id") long customerId, @Bind("agreements") String agreements);
 
 		@SqlUpdate("INSERT INTO services (id, customer_id, period_from, name, price) " +
-				"VALUES (:service_id, :customer_id, :period_from, 'NEW', 0)")
+				"VALUES (:service_id, :customer_id, :period_from, 'DRAFT', 0)")
 		void insertService(@Bind("service_id") long serviceId, @Bind("customer_id") long customerId,
 		                   @Bind("period_from") Timestamp periodFrom);
 
 		@SqlUpdate("INSERT INTO services_info (service_id, status, other_info) " +
-				"VALUES (:service_id, 'NEW', '{}')")
+				"VALUES (:service_id, 'DRAFT', '{}')")
 		void insertServiceInfo(@Bind("service_id") long serviceId);
 
 		@SqlUpdate("INSERT INTO connections (service_id) VALUES (:service_id)")
