@@ -1,0 +1,1 @@
+ALTER TABLE drafts ADD COLUMN status character varying(16) NOT NULL DEFAULT 'DRAFT';

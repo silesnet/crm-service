@@ -1,9 +1,10 @@
 package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jersey.api.Responses;
 import net.snet.crm.service.bo.Draft;
+import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftDAO;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
@@ -21,12 +22,14 @@ public class DraftResource {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DraftResource.class);
 
-	private DraftDAO draftDAO;
+	private final DraftDAO draftDAO;
 	private final ObjectMapper objectMapper;
+	private final CrmRepository crmRepository;
 
-	public DraftResource(DBI dbi, ObjectMapper objectMapper) {
+	public DraftResource(DraftDAO draftDAO, ObjectMapper objectMapper, CrmRepository crmRepository) {
+		this.draftDAO = draftDAO;
 		this.objectMapper = objectMapper;
-		this.draftDAO = dbi.onDemand(DraftDAO.class);
+		this.crmRepository = crmRepository;
 	}
 
 	@GET
@@ -81,12 +84,30 @@ public class DraftResource {
 			if ("service".equals(draft.getType())) {
 				Map<String, Object> data = objectMapper.readValue(draft.getData(),
 						objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class));
-
+				final long serviceId = Long.valueOf(((Map<String, Object>) data.get("customer")).get("service_id").toString());
+				final Map<String, Object> service = crmRepository.findServiceById(serviceId);
+				if (service != null && "DRAFT".equals(service.get("status"))) {
+					crmRepository.deleteService(serviceId);
+					final Map<String, Object> connection = crmRepository.findConnectionByServiceId(serviceId);
+					if (connection != null) {
+						crmRepository.deleteConnection(serviceId);
+					}
+				}
+				final long customerId = Long.valueOf(((Map<String, Object>) data.get("customer")).get("id").toString());
+				final Map<String, Object> customer = crmRepository.findCustomerById(customerId);
+				if (customer != null && "DRAFT".equals(customer.get("customer_status"))) {
+					crmRepository.deleteCustomer(customerId);
+				}
+				final long agreementId = Long.valueOf(((Map<String, Object>) data.get("customer")).get("agreement_id").toString());
+				final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId);
+				if (agreement != null && "DRAFT".equals(agreement.get("status"))) {
+					crmRepository.updateAgreementStatus(agreementId, "AVAILABLE");
+				}
 			}
 			draftDAO.deleteDraftById(id);
 			return Response.noContent().build();
 		}
-		return Response.serverError().build();
+		return Responses.notFound().build();
 	}
 }
 

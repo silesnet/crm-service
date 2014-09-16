@@ -33,7 +33,8 @@ CREATE TABLE customers (
     synchronized timestamp,
     account_no character varying(26),
     bank_no character varying(4),
-    variable integer
+    variable integer,
+    customer_status character varying(16) NOT NULL DEFAULT 'DRAFT'
 );
 
 CREATE TABLE audit_items (
@@ -50,7 +51,8 @@ CREATE TABLE audit_items (
 CREATE TABLE agreements (
   id bigint NOT NULL,
   country character varying(2) NOT NULL,
-  customer_id bigint
+  customer_id bigint,
+  status character varying(16) NOT NULL DEFAULT 'DRAFT'
 );
 
 CREATE TABLE services (
@@ -73,7 +75,7 @@ CREATE TABLE services (
 
 CREATE TABLE services_info (
   service_id bigint NOT NULL,
-  status character varying(8),
+  status character varying(16) NOT NULL DEFAULT 'DRAFT',
   other_info character varying(1024)
 );
 
@@ -92,3 +94,12 @@ CREATE TABLE connections (
   sa_mac character varying(30),
   other_info character varying(1024)
 );
+
+CREATE TABLE drafts
+(
+  id serial NOT NULL,
+  type character varying(20),
+  user_id character varying(50),
+  data character varying(5000),
+  status character varying(16) NOT NULL DEFAULT 'DRAFT'
+)

@@ -13,7 +13,7 @@ class CrmRepositoryJdbiTest extends Specification {
 
   def setup() {
     handle = dbi.open()
-    handle.execute(Resources.getResource('db/crm-tables.sql').text)
+    handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
   }
 
   def cleanup() {
@@ -40,6 +40,11 @@ class CrmRepositoryJdbiTest extends Specification {
     and: 'customers table contains new row'
       handle.select('SELECT count(*) as cnt from customers').first().cnt == 1
   }
+
+	def 'it should delete customer'() {
+		expect:
+			false
+	}
 
   def 'it should roll back on error inserting customer'() {
     given: 'repository'
@@ -86,6 +91,11 @@ class CrmRepositoryJdbiTest extends Specification {
 //      repository.findCustomerById(1).contract_no == '1, 2'
   }
 
+	def 'it should update customer agreement status'() {
+		expect:
+			false
+	}
+
   def 'it should insert new agreement service'() {
     given: 'repository'
       def repository = new CrmRepositoryJdbi(dbi)
@@ -98,7 +108,7 @@ class CrmRepositoryJdbiTest extends Specification {
     then: 'service is inserted'
       service.id == (agreement.id * 100) + 1
       service.customer_id == customer.id
-      service.status == 'NEW'
+      service.status == 'DRAFT'
   }
 
   def 'it should fail inserting 100th service for agreement'() {
@@ -119,6 +129,11 @@ class CrmRepositoryJdbiTest extends Specification {
       thrown RuntimeException
   }
 
+	def 'it should delete service'() {
+		expect:
+			false
+	}
+
   def 'it should insert new service connection'() {
     given: 'repository'
       def repository = new CrmRepositoryJdbi(dbi)
@@ -131,6 +146,11 @@ class CrmRepositoryJdbiTest extends Specification {
     then: 'connection is inserted'
       connection.service_id == service.id
   }
+
+	def 'it should delete service connection'() {
+		expect:
+			false
+	}
 
   def 'it should update service connection'() {
     given: 'repository'
