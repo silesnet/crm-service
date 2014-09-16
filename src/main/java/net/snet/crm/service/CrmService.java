@@ -64,9 +64,9 @@ public class CrmService extends Application<CrmConfiguration> {
 			environment.getObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 		}
 
-        FilterRegistration.Dynamic filters = environment.servlets().addFilter("CORS", new CrossOriginFilter());
-        filters.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-        filters.setInitParameter("allowedMethods", "GET,PUT,POST,DELETE");
+		FilterRegistration.Dynamic filters = environment.servlets().addFilter("CORS", new CrossOriginFilter());
+		filters.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+		filters.setInitParameter("allowedMethods", "GET,PUT,POST,DELETE");
 
 		final Client httpClient =
 				new JerseyClientBuilder(environment)
@@ -80,7 +80,7 @@ public class CrmService extends Application<CrmConfiguration> {
 		environment.jersey().register(new AgreementResource(crmRepository));
 		environment.jersey().register(new ServiceResource(crmRepository));
 		environment.jersey().register(new ConnectionResource(crmRepository));
-		environment.jersey().register(new DraftResource(dbi));
+		environment.jersey().register(new DraftResource(dbi, environment.getObjectMapper()));
 		environment.jersey().register(new RouterResource(dbi));
 		environment.jersey().register(new NetworkResource(dbi));
 		environment.jersey().register(new UserResource(dbi, crmRepository,
