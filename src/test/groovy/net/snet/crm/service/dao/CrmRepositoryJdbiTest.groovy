@@ -18,6 +18,10 @@ class CrmRepositoryJdbiTest extends Specification {
 
   def cleanup() {
     handle.execute('DROP TABLE customers')
+    handle.execute('DROP TABLE agreements')
+    handle.execute('DROP TABLE services_info')
+    handle.execute('DROP TABLE services')
+    handle.execute('DROP TABLE connections')
     handle.close()
   }
 
@@ -36,14 +40,22 @@ class CrmRepositoryJdbiTest extends Specification {
       insertedCustomer.name == customerName
       insertedCustomer.public_id == '9999999'
       insertedCustomer.is_active == false
+      insertedCustomer.customer_status == 'DRAFT'
       new DateTime().isAfter(insertedCustomer.inserted_on.getTime())
     and: 'customers table contains new row'
-      handle.select('SELECT count(*) as cnt from customers').first().cnt == 1
+      handle.select('SELECT count(*) AS cnt FROM customers').first().cnt == 1
   }
 
 	def 'it should delete customer'() {
-		expect:
-			false
+		given: 'repository'
+			def repository = new CrmRepositoryJdbi(dbi)
+		and: 'existing customer'
+			def customer = repository.insertCustomer([name: 'test'])
+		  assert customer != null
+		when: 'customer is deleted'
+			repository.deleteCustomer(customer.id as Long)
+		then: 'customer does not exist in the table'
+			handle.select('SELECT count(*) AS cnt FROM customers WHERE id=' + customer.id).first().cnt == 0
 	}
 
   def 'it should roll back on error inserting customer'() {
@@ -54,7 +66,7 @@ class CrmRepositoryJdbiTest extends Specification {
     then:
       thrown RuntimeException
     and:
-      handle.select('SELECT count(*) as cnt from customers').first().cnt == 0
+      handle.select('SELECT count(*) as cnt FROM customers').first().cnt == 0
   }
 
   def 'it should insert new customer agreement'() {
@@ -70,6 +82,9 @@ class CrmRepositoryJdbiTest extends Specification {
       agreement.id == 100001
       agreement.country == 'CZ'
       agreement.customer_id == 1
+	    agreement.status == 'DRAFT'
+	  and: 'agreements table contains new row'
+		  handle.select('SELECT count(*) AS cnt FROM agreements').first().cnt == 1
     and: 'customer agreements are updated'
 //      repository.findCustomerById(1).contract_no == '1'
   }
