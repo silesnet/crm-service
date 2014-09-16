@@ -12,6 +12,7 @@ import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.snet.crm.service.dao.CrmRepositoryJdbi;
+import net.snet.crm.service.dao.DraftDAO;
 import net.snet.crm.service.resources.*;
 
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -80,7 +81,7 @@ public class CrmService extends Application<CrmConfiguration> {
 		environment.jersey().register(new AgreementResource(crmRepository));
 		environment.jersey().register(new ServiceResource(crmRepository));
 		environment.jersey().register(new ConnectionResource(crmRepository));
-		environment.jersey().register(new DraftResource(dbi, environment.getObjectMapper()));
+		environment.jersey().register(new DraftResource(dbi.onDemand(DraftDAO.class), environment.getObjectMapper(), crmRepository));
 		environment.jersey().register(new RouterResource(dbi));
 		environment.jersey().register(new NetworkResource(dbi));
 		environment.jersey().register(new UserResource(dbi, crmRepository,

@@ -86,6 +86,11 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
+	public void deleteCustomer(long customerId) {
+
+	}
+
+	@Override
 	public Map<String, Object> insertAgreement(long customerId, String country) {
 		checkArgument(COUNTRIES.keySet().contains(country), "unknown country '%s'", country);
 		Map<String, Object> customer = findCustomerById(customerId);
@@ -124,6 +129,11 @@ public class CrmRepositoryJdbi implements CrmRepository {
 						.first();
 			}
 		});
+	}
+
+	@Override
+	public Map<String, Object> updateAgreementStatus(long agreementId, String status) {
+		return null;
 	}
 
 	@Override
@@ -176,6 +186,11 @@ public class CrmRepositoryJdbi implements CrmRepository {
 			lastUsed = first;
 		}
 		return lastUsed;
+	}
+
+	@Override
+	public void deleteService(long serviceId) {
+
 	}
 
 	@Override
@@ -249,6 +264,11 @@ public class CrmRepositoryJdbi implements CrmRepository {
 			db.rollback();
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public void deleteConnection(long serviceId) {
+
 	}
 
 	public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe {
