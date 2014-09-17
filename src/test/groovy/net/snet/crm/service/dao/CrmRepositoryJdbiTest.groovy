@@ -102,8 +102,29 @@ class CrmRepositoryJdbiTest extends Specification {
     then: 'agreement is inserted'
       agreement1.id == 100001
       agreement2.id == 100002
+    and: 'there are two agreements in the agreements table'
+      handle.select('SELECT count(*) AS cnt FROM agreements').first().cnt == 2
     and: 'customer agreements are updated'
 //      repository.findCustomerById(1).contract_no == '1, 2'
+  }
+
+  def 'it should reuse available agreement id'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing existing agreement with AVAILABLE status'
+      def customer = repository.insertCustomer([name: 'Test'])
+      def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+      def availableAgreement = repository.updateAgreementStatus(agreement.id as Long, 'AVAILABLE')
+      assert availableAgreement.status.equals('AVAILABLE')
+    when: 'adding new agreement'
+      def newCustomer = repository.insertCustomer([name: 'Test2'])
+      def reusedAgreement = repository.insertAgreement(newCustomer.id as Long, 'CZ')
+    then: 'agreement id is reused'
+      reusedAgreement.id == availableAgreement.id
+    and: 'customer id is populated'
+      reusedAgreement.customer_id == newCustomer.id
+    and: 'there is only one agreement in the agreements table'
+      handle.select('SELECT count(*) AS cnt FROM agreements').first().cnt == 1
   }
 
 	def 'it should update customer agreement status'() {
@@ -114,9 +135,9 @@ class CrmRepositoryJdbiTest extends Specification {
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       assert agreement != null
     when: 'agreement status is updated'
-      repository.updateAgreementStatus(agreement.id as Long, 'NEW_STATUS')
+      def updatedAgreement = repository.updateAgreementStatus(agreement.id as Long, 'NEW_STATUS')
     then: 'new agreement status can be fetched'
-      repository.findAgreementById(agreement.id as Long).status == 'NEW_STATUS'
+      updatedAgreement.status == 'NEW_STATUS'
   }
 
   def 'it should insert new agreement service'() {

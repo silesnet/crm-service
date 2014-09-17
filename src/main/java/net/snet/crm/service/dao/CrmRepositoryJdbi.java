@@ -1,7 +1,6 @@
 package net.snet.crm.service.dao;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -105,13 +104,10 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		checkNotNull(customer, "customer with id '%s' does not exist", customerId);
 		db.begin();
 		try {
-			long lastAgreementId = db.lastAgreementIdByCountry(country);
-			if (lastAgreementId == 0) {
-				lastAgreementId = COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10);
-			}
-			long agreementId = lastAgreementId + 1;
-			checkState(agreementId > COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10), "inconsistent agreement id '%s', check agreements table consistency", agreementId);
-			db.insertAgreement(agreementId, country, customerId);
+			long agreementId = db.reusableAgreementIdByCountry(country);
+			if (agreementId == 0) {
+				agreementId = nextAgreementId(country);
+				db.insertAgreement(agreementId, country, customerId);
 //			long contractNumber = agreementId % SERVICE_COUNTRY_MULTIPLIER;
 //			String agreements = "" + contractNumber;
 //			Optional<Object> currentAgreements = Optional.fromNullable(customer.get("contract_no"));
@@ -119,12 +115,28 @@ public class CrmRepositoryJdbi implements CrmRepository {
 //				agreements = currentAgreements.get().toString().trim() + ", " + contractNumber;
 //			}
 //			db.setCustomerAgreements(customerId, agreements);
+			} else {
+				int changes = 0;
+				changes += db.updateAgreementCustomer(agreementId, customerId);
+				changes += db.updateAgreementStatus(agreementId, "DRAFT");
+				checkState(changes == 2, "failed to reuse agreement '%d' for customer '%d'", agreementId, customer);
+			}
 			db.commit();
 			return findAgreementById(agreementId);
 		} catch (Exception e) {
 			db.rollback();
 			throw new RuntimeException(e);
 		}
+	}
+
+	private long nextAgreementId(String country) {
+		long lastAgreementId = db.lastAgreementIdByCountry(country);
+		if (lastAgreementId == 0) {
+			lastAgreementId = COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10);
+		}
+		long agreementId = lastAgreementId + 1;
+		checkState(agreementId > COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10), "inconsistent agreement id '%s', check agreements table consistency", agreementId);
+		return agreementId;
 	}
 
 	@Override
@@ -141,15 +153,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 
 	@Override
 	public Map<String, Object> updateAgreementStatus(final long agreementId, final String status) {
-		int rowsChanged = db.withHandle(new HandleCallback<Integer>() {
-			@Override
-			public Integer withHandle(Handle handle) throws Exception {
-				return handle.createStatement("UPDATE agreements SET status=:status WHERE id=:id")
-						.bind("id", agreementId)
-						.bind("status", status)
-						.execute();
-			}
-		});
+		int rowsChanged = db.updateAgreementStatus(agreementId, status);
 		checkState(rowsChanged == 1, "agreement with id '%s' does not exist or cannot be changed", agreementId);
 		return findAgreementById(agreementId);
 	}
@@ -330,6 +334,9 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		@SqlQuery("SELECT max(id) FROM agreements WHERE country=:country")
 		long lastAgreementIdByCountry(@Bind("country") String country);
 
+		@SqlQuery("SELECT id FROM agreements WHERE country=:country AND status='AVAILABLE' ORDER BY id LIMIT 1")
+		long reusableAgreementIdByCountry(@Bind("country") String country);
+
 		@SqlQuery("SELECT max(id) FROM services WHERE :first < id AND id < :last ")
 		long lastServiceIdInRange(@Bind("first") long fist, @Bind("last") long last);
 
@@ -349,6 +356,12 @@ public class CrmRepositoryJdbi implements CrmRepository {
 				"VALUES (:id, :country, :customer_id)")
 		void insertAgreement(@Bind("id") long id, @Bind("country") String country,
 		                                     @Bind("customer_id") long customerId);
+
+		@SqlUpdate("UPDATE agreements SET customer_id=:customer_id WHERE id=:agreement_id")
+		int updateAgreementCustomer(@Bind("agreement_id") long agreementId, @Bind("customer_id") long customerId);
+
+		@SqlUpdate("UPDATE agreements SET status=:status WHERE id=:agreement_id")
+		int updateAgreementStatus(@Bind("agreement_id") long agreementId, @Bind("status") String status);
 
 		@SqlUpdate("UPDATE customers SET contract_no=:agreements WHERE id=:id")
 		void setCustomerAgreements(@Bind("id") long customerId, @Bind("agreements") String agreements);
