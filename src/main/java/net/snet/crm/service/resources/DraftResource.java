@@ -2,11 +2,11 @@ package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Splitter;
 import com.sun.jersey.api.Responses;
 import net.snet.crm.service.bo.Draft;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftDAO;
-import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,9 +82,9 @@ public class DraftResource {
 		Draft draft = draftDAO.findDraftById(id);
 		if (draft != null) {
 			if ("service".equals(draft.getType())) {
-				Map<String, Object> data = objectMapper.readValue(draft.getData(),
+				Map<String, Object> draftData = objectMapper.readValue(draft.getData(),
 						objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class));
-				final long serviceId = Long.valueOf(((Map<String, Object>) data.get("customer")).get("service_id").toString());
+				final long serviceId = getNestedLong("customer.service_id", draftData);
 				final Map<String, Object> service = crmRepository.findServiceById(serviceId);
 				if (service != null && "DRAFT".equals(service.get("status"))) {
 					crmRepository.deleteService(serviceId);
@@ -93,12 +93,12 @@ public class DraftResource {
 						crmRepository.deleteConnection(serviceId);
 					}
 				}
-				final long customerId = Long.valueOf(((Map<String, Object>) data.get("customer")).get("id").toString());
+				final long customerId = getNestedLong("customer.id", draftData);
 				final Map<String, Object> customer = crmRepository.findCustomerById(customerId);
 				if (customer != null && "DRAFT".equals(customer.get("customer_status"))) {
 					crmRepository.deleteCustomer(customerId);
 				}
-				final long agreementId = Long.valueOf(((Map<String, Object>) data.get("customer")).get("agreement_id").toString());
+				final long agreementId = getNestedLong("customer.agreement_id", draftData);
 				final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId);
 				if (agreement != null && "DRAFT".equals(agreement.get("status"))) {
 					crmRepository.updateAgreementStatus(agreementId, "AVAILABLE");
@@ -108,6 +108,19 @@ public class DraftResource {
 			return Response.noContent().build();
 		}
 		return Responses.notFound().build();
+	}
+
+	@SuppressWarnings("unchecked")
+	private Object getNested(String path, Map<String, Object> map) {
+		Object value = map;
+		for (String key : Splitter.on('.').split(path)) {
+			value = ((Map<String, Object>) value).get(key);
+		}
+		return value;
+	}
+
+	private long getNestedLong(String path, Map<String, Object> map) {
+		return Long.valueOf(getNested(path, map).toString());
 	}
 }
 
