@@ -107,9 +107,17 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
 	def 'it should update customer agreement status'() {
-		expect:
-			false
-	}
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing agreement'
+      def customer = repository.insertCustomer([name: 'John'])
+      def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+      assert agreement != null
+    when: 'agreement status is updated'
+      repository.updateAgreementStatus(agreement.id as Long, 'NEW_STATUS')
+    then: 'new agreement status can be fetched'
+      repository.findAgreementById(agreement.id as Long).status == 'NEW_STATUS'
+  }
 
   def 'it should insert new agreement service'() {
     given: 'repository'
@@ -145,8 +153,18 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
 	def 'it should delete service'() {
-		expect:
-			false
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing service'
+      def customer = repository.insertCustomer([name: 'John'])
+      def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+      def service = repository.insertService(agreement.id as Long)
+      assert service != null
+    when: 'service is deleted'
+      repository.deleteService(service.id as Long)
+    then: 'service does not exist in the tables'
+      handle.select('SELECT count(*) AS cnt FROM services WHERE id=' + service.id).first().cnt == 0
+      handle.select('SELECT count(*) AS cnt FROM services_info WHERE service_id=' + service.id).first().cnt == 0
 	}
 
   def 'it should insert new service connection'() {
@@ -163,8 +181,18 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
 	def 'it should delete service connection'() {
-		expect:
-			false
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'existing service connection'
+      def customer = repository.insertCustomer([name: 'John'])
+      def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+      def service = repository.insertService(agreement.id as Long)
+      def connection = repository.insertConnection(service.id as Long)
+      assert connection != null
+    when: 'service connection is deleted'
+      repository.deleteConnection(service.id as Long)
+    then: 'service connection does not exist in the table'
+      handle.select('SELECT count(*) AS cnt FROM connections WHERE service_id=' + service.id).first().cnt == 0
 	}
 
   def 'it should update service connection'() {

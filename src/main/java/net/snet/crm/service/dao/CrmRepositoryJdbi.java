@@ -86,8 +86,16 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
-	public void deleteCustomer(long customerId) {
-
+	public void deleteCustomer(final long customerId) {
+		db.withHandle(new HandleCallback<Object>() {
+			@Override
+			public Object withHandle(Handle handle) throws Exception {
+				handle.createStatement("DELETE from customers WHERE id=:id")
+						.bind("id", customerId)
+						.execute();
+				return null;
+			}
+		});
 	}
 
 	@Override
@@ -132,8 +140,18 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
-	public Map<String, Object> updateAgreementStatus(long agreementId, String status) {
-		return null;
+	public Map<String, Object> updateAgreementStatus(final long agreementId, final String status) {
+		int rowsChanged = db.withHandle(new HandleCallback<Integer>() {
+			@Override
+			public Integer withHandle(Handle handle) throws Exception {
+				return handle.createStatement("UPDATE agreements SET status=:status WHERE id=:id")
+						.bind("id", agreementId)
+						.bind("status", status)
+						.execute();
+			}
+		});
+		checkState(rowsChanged == 1, "agreement with id '%s' does not exist or cannot be changed", agreementId);
+		return findAgreementById(agreementId);
 	}
 
 	@Override
@@ -189,8 +207,27 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
-	public void deleteService(long serviceId) {
-
+	public void deleteService(final long serviceId) {
+		db.withHandle(new HandleCallback<Object>() {
+			@Override
+			public Object withHandle(Handle handle) throws Exception {
+				handle.begin();
+				try {
+					handle.createStatement("DELETE from services WHERE id=:id")
+							.bind("id", serviceId)
+							.execute();
+					handle.createStatement("DELETE from services_info WHERE service_id=:service_id")
+							.bind("service_" +
+									"id", serviceId)
+							.execute();
+					handle.commit();
+				} catch (Exception e) {
+					handle.rollback();
+					throw new RuntimeException(e);
+				}
+				return null;
+			}
+		});
 	}
 
 	@Override
@@ -267,8 +304,16 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
-	public void deleteConnection(long serviceId) {
-
+	public void deleteConnection(final long serviceId) {
+		db.withHandle(new HandleCallback<Object>() {
+			@Override
+			public Object withHandle(Handle handle) throws Exception {
+				handle.createStatement("DELETE from connections WHERE service_id=:service_id")
+						.bind("service_id", serviceId)
+						.execute();
+				return null;
+			}
+		});
 	}
 
 	public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe {
