@@ -14,6 +14,7 @@ public class DraftMapper implements ResultSetMapper<Draft> {
         return new Draft(r.getLong("id"),
                 r.getString("type"),
                 r.getString("user_id"),
-                r.getString("data"));
+                r.getString("data"),
+								r.getString("status"));
     }
 }
