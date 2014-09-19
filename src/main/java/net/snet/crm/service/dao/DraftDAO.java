@@ -10,8 +10,11 @@ import java.util.Iterator;
 @RegisterMapper(DraftMapper.class)
 public interface DraftDAO {
 
-    @SqlQuery("SELECT * FROM drafts WHERE user_id = :user_id and type = 'service' ORDER BY id DESC")
-    Iterator<Draft> findDraftsByUserId(@Bind("user_id") String user_id);
+    @SqlQuery("SELECT * FROM drafts WHERE user_id = :user_id and status = :status and type = 'service' ORDER BY id DESC")
+    Iterator<Draft> findDraftsByUserId(@Bind("user_id") String user_id, @Bind("status") String status);
+
+    @SqlQuery("SELECT * FROM drafts WHERE status = :status and type = 'service' ORDER BY id")
+    Iterator<Draft> findDraftsByStatus(@Bind("status") String status);
 
     @SqlQuery("SELECT * FROM drafts WHERE id = :id")
     Draft findDraftById(@Bind("id") long id);
@@ -19,7 +22,7 @@ public interface DraftDAO {
     @SqlUpdate("DELETE FROM drafts WHERE id = :id")
     void deleteDraftById(@Bind("id") long id);
 
-    @SqlUpdate("INSERT INTO drafts (type, user_id, data) values (:type, :userId, :data)")
+    @SqlUpdate("INSERT INTO drafts (type, user_id, data, status) values (:type, :userId, :data, :status)")
     @GetGeneratedKeys
     Integer insertDraft(@BindBean Draft draft);
 
