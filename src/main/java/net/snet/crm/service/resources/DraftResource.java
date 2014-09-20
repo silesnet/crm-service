@@ -2,11 +2,12 @@ package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.Responses;
 import net.snet.crm.service.bo.Draft;
@@ -30,11 +31,13 @@ public class DraftResource {
 	private final DraftDAO draftDAO;
 	private final ObjectMapper objectMapper;
 	private final CrmRepository crmRepository;
+	private MapType entityMapType;
 
 	public DraftResource(DraftDAO draftDAO, ObjectMapper objectMapper, CrmRepository crmRepository) {
 		this.draftDAO = draftDAO;
 		this.objectMapper = objectMapper;
 		this.crmRepository = crmRepository;
+		entityMapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
 	}
 
 	@GET
@@ -67,7 +70,7 @@ public class DraftResource {
 	@Timed(name = "post-requests")
 	public String insertDraft(@QueryParam("user_id") String userId, String body) {
 		logger.debug("drafts called");
-		return draftDAO.insertDraft(new Draft(null, "service", userId, body, "DRAFT")).toString();
+		return draftDAO.insertDraft(new Draft(0L, "service", userId, body, "DRAFT")).toString();
 	}
 
 	@PUT
@@ -85,30 +88,34 @@ public class DraftResource {
 	@Path("/{id}")
 	@Timed(name = "delete-requests")
 	public Response deleteDraft(@PathParam("id") long id) throws IOException {
-		logger.debug("drafts called");
 		Draft draft = draftDAO.findDraftById(id);
 		if (draft != null) {
 			if ("service".equals(draft.getType())) {
-				Map<String, Object> draftData = objectMapper.readValue(draft.getData(),
-						objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class));
-				final long serviceId = getNestedLong("customer.service_id", draftData);
-				final Map<String, Object> service = crmRepository.findServiceById(serviceId);
-				if (service != null && "DRAFT".equals(service.get("status"))) {
-					crmRepository.deleteService(serviceId);
-					final Map<String, Object> connection = crmRepository.findConnectionByServiceId(serviceId);
-					if (connection != null) {
-						crmRepository.deleteConnection(serviceId);
+				Map<String, Object> draftData = objectMapper.readValue(draft.getData(), entityMapType);
+				final Optional<Long> serviceId = getSafeLong("customer.service_id", draftData);
+				if (serviceId.isPresent()) {
+					final Map<String, Object> service = crmRepository.findServiceById(serviceId.get());
+					if (service != null && "DRAFT".equals(service.get("status"))) {
+						crmRepository.deleteService(serviceId.get());
+						final Map<String, Object> connection = crmRepository.findConnectionByServiceId(serviceId.get());
+						if (connection != null) {
+							crmRepository.deleteConnection(serviceId.get());
+						}
 					}
 				}
-				final long customerId = getNestedLong("customer.id", draftData);
-				final Map<String, Object> customer = crmRepository.findCustomerById(customerId);
-				if (customer != null && "DRAFT".equals(customer.get("customer_status"))) {
-					crmRepository.deleteCustomer(customerId);
+				final Optional<Long> customerId = getSafeLong("customer.id", draftData);
+				if (customerId.isPresent()) {
+					final Map<String, Object> customer = crmRepository.findCustomerById(customerId.get());
+					if (customer != null && "DRAFT".equals(customer.get("customer_status"))) {
+						crmRepository.deleteCustomer(customerId.get());
+					}
 				}
-				final long agreementId = getNestedLong("customer.agreement_id", draftData);
-				final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId);
-				if (agreement != null && "DRAFT".equals(agreement.get("status"))) {
-					crmRepository.updateAgreementStatus(agreementId, "AVAILABLE");
+				final Optional<Long> agreementId = getSafeLong("customer.agreement_id", draftData);
+				if (agreementId.isPresent()) {
+					final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId.get());
+					if (agreement != null && "DRAFT".equals(agreement.get("status"))) {
+						crmRepository.updateAgreementStatus(agreementId.get(), "AVAILABLE");
+					}
 				}
 			}
 			draftDAO.deleteDraftById(id);
@@ -129,5 +136,15 @@ public class DraftResource {
 	private long getNestedLong(String path, Map<String, Object> map) {
 		return Long.valueOf(getNested(path, map).toString());
 	}
+
+	private Optional<Long> getSafeLong(String path, Map<String, Object> map) {
+		try {
+			return Optional.of(getNestedLong(path, map));
+		} catch (Exception e) {
+			return Optional.absent();
+		}
+	}
+
+
 }
 
