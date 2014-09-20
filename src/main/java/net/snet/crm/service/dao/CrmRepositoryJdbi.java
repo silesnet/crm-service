@@ -196,7 +196,9 @@ public class CrmRepositoryJdbi implements CrmRepository {
 						.first();
 			}
 		});
-		service.put("status", serviceInfo.get("status"));
+		if (service != null && serviceInfo != null) {
+			service.put("status", serviceInfo.get("status"));
+		}
 		return service;
 	}
 
