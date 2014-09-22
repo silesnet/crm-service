@@ -31,16 +31,69 @@ class DraftResourceTest extends Specification {
 			.addResource(new DraftResource(DRAFT_DAO_DELEGATE, OBJECT_MAPPER, CUSTOMER_REPO_DELEGATE))
 			.build()
 
+	def draftData
+
 	def setup() {
 		crmRepository = Mock(CrmRepository)
 		CUSTOMER_REPO_DELEGATE.setRepository(crmRepository)
 		draftDAO = Mock(DraftDAO)
 		DRAFT_DAO_DELEGATE.setDao(draftDAO)
+		draftData = null
 	}
 
 	def cleanup() {
 		CUSTOMER_REPO_DELEGATE.setRepository(null)
 	}
+
+	def 'it should insert new draft and new service'() {
+		given: 'service draft creation data'
+			def createDraft = '''
+{
+	"drafts": {
+	  "type": "service",
+	  "userId": "test",
+	  "data": {
+			"customer": { "id": 1234 },
+			"agreement": { "id": 101234}
+		}
+	}
+}
+'''
+		when: 'POST draft creation data'
+			def response = resources.client().resource('/drafts/new')
+					.type('application/json').post(ClientResponse.class, createDraft)
+			def draft = response.getEntity(Map.class).drafts
+		then: 'response has correct headers'
+			response.status == 201
+			response.location.toString() ==~ /.*\/drafts\/\d+$/
+			response.type.toString().startsWith('application/json')
+		and: 'find customer was called'
+			1 * crmRepository.findCustomerById(1234L) >> [id: 1234, name: 'Existing Customer']
+		and: 'find agreement was called'
+			1 * crmRepository.findAgreementById(101234) >> [id: 101234, customer_id: 1234]
+		and: 'create service was called'
+			1 * crmRepository.insertService(101234) >> [id: 10123401]
+		and: 'draft creating and fetching calls were made'
+			1 * draftDAO.insertDraft({ Draft d ->
+				d.id == 0
+				d.type == 'service'
+				d.userId == 'test'
+				d.data != null
+				draftData = d.data
+			} as Draft) >> 2345
+			1 * draftDAO.findDraftById(2345) >> { new Draft(2345, 'service', 'test', draftData as String, 'DRAFT') }
+		and: 'response body contains new draft'
+			draft.id == 2345
+			draft.type == 'service'
+			draft.user_id == 'test'
+		  draft.status == 'DRAFT'
+			draft.data != null
+			def draftDataMap = resources.objectMapper.readValue(draft.data as String, Map.class)
+			draftDataMap.customer.id == 1234
+			draftDataMap.agreement.id == 101234
+			draftDataMap.service.id == 10123401
+	}
+
 
 	def 'it should delete draft with new customer and new agreement'() {
 		given: 'service draft of draft customer and draft agreement'
