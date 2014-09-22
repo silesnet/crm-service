@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
@@ -32,7 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 @Path("/drafts")
 public class DraftResource {
-
+	private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
 	private static final Logger logger = LoggerFactory.getLogger(DraftResource.class);
 
 	private @Context
@@ -94,32 +93,35 @@ public class DraftResource {
 		final String draftType = draftRequest.get("type").toString();
 		final String userId = draftRequest.get("userId").toString();
 		Map<String, Object> draftData = Maps.newLinkedHashMap();
-
 		if ("service".equals(draftType)) {
-			// create customer, agreement and service if needed
 			Map<String, Object> customer;
-			final Optional<Long> customerId = getSafeLong("drafts.data.customer.id", draftRequestData);
+			final Optional<Long> customerId = getSafeLong("data.customer.id", draftRequest);
 			if (customerId.isPresent()) {
 				customer = crmRepository.findCustomerById(customerId.get());
 			} else {
-				customer = null;
+				final Optional<String> customerName = getSafe("data.customer.name", draftRequest);
+				final Optional<String> customerCountry = getSafe("data.customer.country", draftRequest);
+				checkState(customerName.isPresent() && customerCountry.isPresent(),
+						"trying to create a new customer for a service draft, but customer name and/or country are not provided");
+				customer = crmRepository.insertCustomer(ImmutableMap.of(
+						"name", customerName.get(),
+						"country", (Object) COUNTRIES.get(customerCountry.get())
+				));
 			}
 			Map<String, Object> agreement;
-			final Optional<Long> agreementId = getSafeLong("drafts.data.agreement.id", draftRequestData);
+			final Optional<Long> agreementId = getSafeLong("data.agreement.id", draftRequest);
 			if (agreementId.isPresent()) {
 				agreement = crmRepository.findAgreementById(agreementId.get());
 				checkState(getNestedLong("id", customer) == getNestedLong("customer_id", agreement),
 						"trying to create service draft where customer '%s' and agreement customer '%s' does not match",
 						getNestedLong("id", customer), getNestedLong("customer_id", agreement));
 			} else {
-				agreement = null;
+				final Optional<String> agreementCountry = getSafe("data.agreement.country", draftRequest);
+				checkState(agreementCountry.isPresent(), "trying to create new customer agreement for a service draft {customer.id: %s}, but country is not specified",
+						getNestedLong("id", customer));
+				agreement = crmRepository.insertAgreement(getNestedLong("id", customer), agreementCountry.get());
 			}
-			Map<String, Object> service;
-			if (agreementId.isPresent()) {
-				service = crmRepository.insertService(agreementId.get());
-			} else {
-				service = null;
-			}
+			Map<String, Object> service = crmRepository.insertService(getNestedLong("id", agreement));
 			draftData.put("customer", customer);
 			draftData.put("agreement", agreement);
 			draftData.put("service", service);
@@ -198,6 +200,14 @@ public class DraftResource {
 	private Optional<Long> getSafeLong(String path, Map<String, Object> map) {
 		try {
 			return Optional.of(getNestedLong(path, map));
+		} catch (Exception e) {
+			return Optional.absent();
+		}
+	}
+
+	private Optional<String> getSafe(String path, Map<String, Object> map) {
+		try {
+			return Optional.of(getNested(path, map).toString());
 		} catch (Exception e) {
 			return Optional.absent();
 		}
