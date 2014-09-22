@@ -45,7 +45,7 @@ class DraftResourceTest extends Specification {
 		CUSTOMER_REPO_DELEGATE.setRepository(null)
 	}
 
-	def 'it should insert new draft and new service'() {
+	def 'it should insert new service draft when customer and agreement are given'() {
 		given: 'service draft creation data'
 			def createDraft = '''
 {
@@ -94,6 +94,103 @@ class DraftResourceTest extends Specification {
 			draftDataMap.service.id == 10123401
 	}
 
+	def 'it should insert new service draft when customer is given'() {
+		given: 'service draft creation data'
+			def createDraft = '''
+{
+	"drafts": {
+	  "type": "service",
+	  "userId": "test",
+	  "data": {
+			"customer": { "id": 1234 },
+			"agreement": { "country": "CZ" }
+		}
+	}
+}
+'''
+		when: 'POST draft creation data'
+			def response = resources.client().resource('/drafts/new')
+					.type('application/json').post(ClientResponse.class, createDraft)
+			def draft = response.getEntity(Map.class).drafts
+		then: 'response has correct headers'
+			response.status == 201
+			response.location.toString() ==~ /.*\/drafts\/\d+$/
+			response.type.toString().startsWith('application/json')
+		and: 'find customer was called'
+			1 * crmRepository.findCustomerById(1234L) >> [id: 1234, name: 'Existing Customer']
+		and: 'create agreement was called'
+			1 * crmRepository.insertAgreement(1234, 'CZ') >> [id: 101234, customer_id: 1234]
+		and: 'create service was called'
+			1 * crmRepository.insertService(101234) >> [id: 10123401]
+		and: 'draft creating and fetching calls were made'
+			1 * draftDAO.insertDraft({ Draft d ->
+				d.id == 0
+				d.type == 'service'
+				d.userId == 'test'
+				d.data != null
+				draftData = d.data
+			} as Draft) >> 2345
+			1 * draftDAO.findDraftById(2345) >> { new Draft(2345, 'service', 'test', draftData as String, 'DRAFT') }
+		and: 'response body contains new draft'
+			draft.id == 2345
+			draft.type == 'service'
+			draft.user_id == 'test'
+			draft.status == 'DRAFT'
+			draft.data != null
+			def draftDataMap = resources.objectMapper.readValue(draft.data as String, Map.class)
+			draftDataMap.customer.id == 1234
+			draftDataMap.agreement.id == 101234
+			draftDataMap.service.id == 10123401
+	}
+
+	def 'it should insert new service draft when nor customer nor agreement are given'() {
+		given: 'service draft creation data'
+			def createDraft = '''
+{
+	"drafts": {
+	  "type": "service",
+	  "userId": "test",
+	  "data": {
+			"customer": { "name": "New Customer", "country": "CZ" },
+			"agreement": { "country": "CZ" }
+		}
+	}
+}
+'''
+		when: 'POST draft creation data'
+			def response = resources.client().resource('/drafts/new')
+					.type('application/json').post(ClientResponse.class, createDraft)
+			def draft = response.getEntity(Map.class).drafts
+		then: 'response has correct headers'
+			response.status == 201
+			response.location.toString() ==~ /.*\/drafts\/\d+$/
+			response.type.toString().startsWith('application/json')
+		and: 'create customer was called'
+			1 * crmRepository.insertCustomer([name: 'New Customer', country: 10]) >> [id: 1234, name: 'New Customer']
+		and: 'create agreement was called'
+			1 * crmRepository.insertAgreement(1234, 'CZ') >> [id: 101234, customer_id: 1234]
+		and: 'create service was called'
+			1 * crmRepository.insertService(101234) >> [id: 10123401]
+		and: 'draft creating and fetching calls were made'
+			1 * draftDAO.insertDraft({ Draft d ->
+				d.id == 0
+				d.type == 'service'
+				d.userId == 'test'
+				d.data != null
+				draftData = d.data
+			} as Draft) >> 2345
+			1 * draftDAO.findDraftById(2345) >> { new Draft(2345, 'service', 'test', draftData as String, 'DRAFT') }
+		and: 'response body contains new draft'
+			draft.id == 2345
+			draft.type == 'service'
+			draft.user_id == 'test'
+			draft.status == 'DRAFT'
+			draft.data != null
+			def draftDataMap = resources.objectMapper.readValue(draft.data as String, Map.class)
+			draftDataMap.customer.id == 1234
+			draftDataMap.agreement.id == 101234
+			draftDataMap.service.id == 10123401
+	}
 
 	def 'it should delete draft with new customer and new agreement'() {
 		given: 'service draft of draft customer and draft agreement'
