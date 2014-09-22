@@ -1,13 +1,15 @@
 package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.Responses;
 import net.snet.crm.service.bo.Draft;
@@ -17,16 +19,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import static com.google.common.base.Preconditions.checkState;
+
 @Path("/drafts")
 public class DraftResource {
 
 	private static final Logger logger = LoggerFactory.getLogger(DraftResource.class);
+
+	private @Context
+	UriInfo uriInfo;
 
 	private final DraftDAO draftDAO;
 	private final ObjectMapper objectMapper;
@@ -73,14 +83,62 @@ public class DraftResource {
 		return draftDAO.insertDraft(new Draft(0L, "service", userId, body, "DRAFT")).toString();
 	}
 
+	@POST
+	@Path("/new")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Timed(name = "post-requests")
+	@SuppressWarnings("unchecked")
+	public Response insertDraft(Map<String, Object> draftRequestData) throws JsonProcessingException {
+		Map<String, Object> draftRequest = (Map<String, Object>) draftRequestData.get("drafts");
+		final String draftType = draftRequest.get("type").toString();
+		final String userId = draftRequest.get("userId").toString();
+		Map<String, Object> draftData = Maps.newLinkedHashMap();
+
+		if ("service".equals(draftType)) {
+			// create customer, agreement and service if needed
+			Map<String, Object> customer;
+			final Optional<Long> customerId = getSafeLong("drafts.data.customer.id", draftRequestData);
+			if (customerId.isPresent()) {
+				customer = crmRepository.findCustomerById(customerId.get());
+			} else {
+				customer = null;
+			}
+			Map<String, Object> agreement;
+			final Optional<Long> agreementId = getSafeLong("drafts.data.agreement.id", draftRequestData);
+			if (agreementId.isPresent()) {
+				agreement = crmRepository.findAgreementById(agreementId.get());
+				checkState(getNestedLong("id", customer) == getNestedLong("customer_id", agreement),
+						"trying to create service draft where customer '%s' and agreement customer '%s' does not match",
+						getNestedLong("id", customer), getNestedLong("customer_id", agreement));
+			} else {
+				agreement = null;
+			}
+			Map<String, Object> service;
+			if (agreementId.isPresent()) {
+				service = crmRepository.insertService(agreementId.get());
+			} else {
+				service = null;
+			}
+			draftData.put("customer", customer);
+			draftData.put("agreement", agreement);
+			draftData.put("service", service);
+		}
+		final String draftDataString = objectMapper.writeValueAsString(draftData);
+		final Integer draftId = draftDAO.insertDraft(new Draft(0L, draftType, userId, draftDataString, "DRAFT"));
+		final Draft draft = draftDAO.findDraftById(draftId);
+		return Response.created(uriInfo.getAbsolutePathBuilder()
+				.replacePath("/drafts/{draftId}").build(draft.getId()))
+				.entity(ImmutableMap.of("drafts", draft))
+				.build();
+	}
+
 	@PUT
 	@Path("/{draftId}")
 	@Timed(name = "put-requests")
 	public Response updateDraft(@PathParam("draftId") Integer draftId, String body) {
 		logger.debug("drafts called");
-
 		draftDAO.updateDraft(body, draftId);
-
 		return Response.ok().build();
 	}
 
