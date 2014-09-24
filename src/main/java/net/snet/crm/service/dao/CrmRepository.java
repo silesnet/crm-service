@@ -31,4 +31,8 @@ public interface CrmRepository {
 	Map<String, Object> updateConnection(long serviceId, Iterable<Map.Entry<String, Object>> updates);
 
 	void deleteConnection(long serviceId);
+
+	List<Map<String, Object>> findUserSubordinates(String login);
+
+	Map<String, Object> findUserByLogin(String login);
 }

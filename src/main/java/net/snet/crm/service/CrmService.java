@@ -85,7 +85,7 @@ public class CrmService extends Application<CrmConfiguration> {
 		environment.jersey().register(new RouterResource(dbi));
 		environment.jersey().register(new NetworkResource(dbi));
 		environment.jersey().register(new UserResource(dbi, crmRepository,
-				new DefaultUserService(httpClient, configuration.getUserServiceUri())));
+				new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository)));
 		environment.jersey().register(new ProductResource(dbi));
 		environment.jersey().register(new ContractResource(dbi));
 		environment.jersey().register(new BaseResource());
