@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
 @Produces(MediaType.APPLICATION_JSON)
 public class CustomerResource {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CustomerResource.class);
+	private static final Logger logger = LoggerFactory.getLogger(CustomerResource.class);
 
 	private final String FROM_CHARS = "ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź.-,;:&+? ";
 	private final String TO_CHARS = "aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz";
@@ -52,7 +52,7 @@ public class CustomerResource {
 	@Path("/{customerId}")
 	@Timed(name = "get-requests")
 	public Map<String, Object> getCustomerById(@PathParam("customerId") long id) {
-		LOGGER.debug("customers called");
+		logger.debug("customers called");
 
 		final HashMap<String, Object> customersMap = new HashMap<String, Object>();
 
@@ -65,20 +65,20 @@ public class CustomerResource {
 	@Produces({"application/json; charset=UTF-8"})
 	@Timed(name = "get-requests")
 	public Map<String, Object> getCustomersByQuery(@QueryParam("qn") Optional<String> queryName, @QueryParam("q") Optional<String> name) {
-		LOGGER.debug("customers called");
+		logger.debug("customers called");
 
 		final HashMap<String, Object> customersMap = new HashMap<String, Object>();
 		customersMap.put("customers", Lists.newArrayList());
 		if (queryName.isPresent()) {
 			String query = queryName.get().toLowerCase();
-			LOGGER.debug("querying customers for named query '{}'", query);
+			logger.debug("querying customers for named query '{}'", query);
 			Iterator<Map<String, Object>> customers = Iterators.emptyIterator();
 			Matcher ledgerMatcher = LEDGER_IMPORT.matcher(query);
 			if (ledgerMatcher.matches()) {
 				String country = ledgerMatcher.group(1);
 				final long countryId = country.equals("cs") ? 10 : (country.equals("pl") ? 20: 0);
 				if (countryId > 0) {
-					LOGGER.debug("customers import query for country '{}:{}'", country, countryId);
+					logger.debug("customers import query for country '{}:{}'", country, countryId);
 					customers = dbi.withHandle(new HandleCallback<Iterator<Map<String, Object>>>() {
 						@Override
 						public Iterator<Map<String, Object>> withHandle(Handle handle) throws Exception {
@@ -97,37 +97,44 @@ public class CustomerResource {
 						}
 					});
 				} else {
-					LOGGER.debug("customers import query for unknown country '{}:{}'", country, countryId );
+					logger.debug("customers import query for unknown country '{}:{}'", country, countryId);
 				}
 			}
 			customersMap.put("customers", Lists.newArrayList(customers));
 		} else {
 			if (name.isPresent()) {
 				Iterator<CustomerSearch> customers = customerDAO.getCustomersByName("%" + Utils.replaceChars(name.get(), FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
-
-				List<CustomerSearch> retCustomers = new ArrayList<CustomerSearch>();
-
+				List<Map<String, Object>> retCustomers = new ArrayList<Map<String, Object>>();
 				while (customers.hasNext()) {
-					retCustomers.add(customers.next());
+					CustomerSearch customer = customers.next();
+					Map<String, Object> customerMap = Maps.newLinkedHashMap();
+					customerMap.put("id", customer.getId());
+					customerMap.put("name", customer.getName());
+					List<Long> agreementIds = Lists.newArrayList();
+					List<Map<String, Object>> agreements = repository.findAgreementsByCustomerId(customer.getId());
+					for (Map<String, Object> agreement : agreements) {
+						agreementIds.add(Long.valueOf(agreement.get("id").toString()));
+					}
+					customerMap.put("agreements", agreementIds);
+					retCustomers.add(customerMap);
 				}
 				customersMap.put("customers", retCustomers);
 			}
 		}
-
 		return customersMap;
 	}
 
 	@PUT
 	@Timed(name = "put-requests")
 	public Response updateCustomers(Map<String, Object> updates) {
-		LOGGER.debug("update customers called");
+		logger.debug("update customers called");
 		HashMap<String, Object> response = Maps.newHashMap();
 		List<Map<String, Object>> updated = Lists.newArrayList();
 		try {
 			@SuppressWarnings("unchecked")
 			List<Map<String, Object>> customerUpdates = (List<Map<String, Object>>) updates.get("customers");
 			for (Map<String, Object> customerUpdate : customerUpdates) {
-				LOGGER.debug("updating customer with '{}'", customerUpdate);
+				logger.debug("updating customer with '{}'", customerUpdate);
 				try {
 					final long id = Long.valueOf(customerUpdate.get("id").toString());
 					if (customerUpdate.containsKey("synchronized")) {
@@ -146,7 +153,7 @@ public class CustomerResource {
 									if (changed != 1) {
 										throw new RuntimeException("customer with id '" + id + "' not found, cannot update");
 									}
-									LOGGER.debug("customer with id '{}' was synchronized on '{}'", id, synchronizedOn);
+									logger.debug("customer with id '{}' was synchronized on '{}'", id, synchronizedOn);
 									return null;
 								}
 							});
@@ -163,14 +170,14 @@ public class CustomerResource {
 									if (changed != 1) {
 										throw new RuntimeException("customer with id '" + id + "' not found, cannot update");
 									}
-									LOGGER.debug("customer with id '{}' was NOT synchronized", id);
+									logger.debug("customer with id '{}' was NOT synchronized", id);
 									return null;
 								}
 							});
 						}
 					}
 				} catch (Exception e) {
-					LOGGER.error(e.getMessage());
+					logger.error(e.getMessage());
 					customerUpdate.put("errors", ImmutableList.of(ImmutableMap.of("message", "" + e.getMessage())));
 				}
 				updated.add(customerUpdate);
@@ -189,7 +196,7 @@ public class CustomerResource {
 	@POST
 	@Timed(name = "post-requests")
 	public Response createCustomer(Map<String, Object> customerData) {
-		LOGGER.debug("creating new customer");
+		logger.debug("creating new customer");
 		@SuppressWarnings("unchecked")
 		Map<String, Object> customer = (Map<String, Object>) customerData.get("customers");
 		final Map<String, Object> customersMap = repository.insertCustomer(customer);
@@ -206,7 +213,7 @@ public class CustomerResource {
 		@SuppressWarnings("unchecked")
 		Map<String, Object> agreementPrototype = (Map<String, Object>) agreementData.get("agreements");
 		String country = agreementPrototype.get("country").toString();
-		LOGGER.debug("creating new agreement for customer id '{}' in country '{}'", customerId, country);
+		logger.debug("creating new agreement for customer id '{}' in country '{}'", customerId, country);
 		Map<String, Object> customer = repository.findCustomerById(customerId);
 		final Map<String, Object> agreement = repository.insertAgreement((Long) customer.get("id"), country);
 		return Response.created(uriInfo.getAbsolutePathBuilder()

@@ -152,6 +152,18 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
+	public List<Map<String, Object>> findAgreementsByCustomerId(final long customerId) {
+		return db.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+			@Override
+			public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+				return handle.createQuery("SELECT * FROM agreements WHERE customer_id=:customer_id")
+						.bind("customer_id", customerId)
+						.list();
+			}
+		});
+	}
+
+	@Override
 	public Map<String, Object> updateAgreementStatus(final long agreementId, final String status) {
 		int rowsChanged = db.updateAgreementStatus(agreementId, status);
 		checkState(rowsChanged == 1, "agreement with id '%s' does not exist or cannot be changed", agreementId);
