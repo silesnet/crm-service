@@ -58,6 +58,24 @@ class CrmRepositoryJdbiTest extends Specification {
 			handle.select('SELECT count(*) AS cnt FROM customers WHERE id=' + customer.id).first().cnt == 0
 	}
 
+  def 'it should find agreements by customer id'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'customers'
+      def customer = repository.insertCustomer([name: 'Existing Customer'])
+    and: 'agreements'
+      def agreement1 = repository.insertAgreement(customer.id as Long, 'CZ')
+      def agreement2 = repository.insertAgreement(customer.id as Long, 'CZ')
+    when: 'searching for agreements by customer id'
+      def agreements = repository.findAgreementsByCustomerId(customer.id as Long)
+    then: 'agreements are found'
+      agreements.size() == 2
+      agreements[0].id == agreement1.id
+      agreements[0].customer_id == customer.id
+      agreements[1].id == agreement2.id
+      agreements[1].customer_id == customer.id
+  }
+
   def 'it should roll back on error inserting customer'() {
     given: 'repository'
       def repository = new CrmRepositoryJdbi(dbi)
@@ -148,7 +166,6 @@ class CrmRepositoryJdbiTest extends Specification {
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
     when: 'insert agreement service'
       def service = repository.insertService(agreement.id as Long)
-      println service
     then: 'service is inserted'
       service.id == (agreement.id * 100) + 1
       service.customer_id == customer.id
