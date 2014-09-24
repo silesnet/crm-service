@@ -102,4 +102,16 @@ CREATE TABLE drafts
   user_id character varying(50),
   data character varying(5000),
   status character varying(16) NOT NULL DEFAULT 'DRAFT'
-)
+);
+
+CREATE TABLE users
+(
+  id bigint NOT NULL,
+  login character varying(255) NOT NULL,
+  passwd character varying(255),
+  name character varying(255) NOT NULL,
+  roles character varying(255),
+  key character varying(255),
+  reports_to bigint NOT NULL DEFAULT 0,
+  operation_country character(2) NOT NULL DEFAULT 'CZ'
+);

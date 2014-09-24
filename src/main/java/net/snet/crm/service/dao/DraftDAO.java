@@ -26,8 +26,8 @@ public interface DraftDAO {
     @GetGeneratedKeys
     Integer insertDraft(@BindBean Draft draft);
 
-    @SqlUpdate("UPDATE drafts set data = :data WHERE id = :id")
-    void updateDraft(@Bind("data") String data, @Bind("id") long id);
+    @SqlUpdate("UPDATE drafts set data = :data, status = :status WHERE id = :id")
+    void updateDraft(@Bind("data") String data, @Bind("id") long id, @Bind("status") String status);
 
     void close();
 }

@@ -22,6 +22,7 @@ class CrmRepositoryJdbiTest extends Specification {
     handle.execute('DROP TABLE services_info')
     handle.execute('DROP TABLE services')
     handle.execute('DROP TABLE connections')
+    handle.execute('DROP TABLE users')
     handle.close()
   }
 
@@ -41,7 +42,7 @@ class CrmRepositoryJdbiTest extends Specification {
       insertedCustomer.public_id == '9999999'
       insertedCustomer.is_active == false
       insertedCustomer.customer_status == 'DRAFT'
-      new DateTime().isAfter(insertedCustomer.inserted_on.getTime())
+      new DateTime().isAfter(insertedCustomer.inserted_on.getTime() as Long)
     and: 'customers table contains new row'
       handle.select('SELECT count(*) AS cnt FROM customers').first().cnt == 1
   }
@@ -255,6 +256,43 @@ class CrmRepositoryJdbiTest extends Specification {
       updatedConnection.uplink == update.uplink
       updatedConnection.is_public_ip == update.is_public_ip
       updatedConnection.ip == update.ip
+  }
+
+  def 'it should find user subordinates'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'manager'
+      handle.insert("INSERT INTO users(id, login, name, reports_to) VALUES (1, 'manager', 'Manager', 0)")
+    and: 'subordinate'
+      handle.insert("INSERT INTO users(id, login, name, reports_to) VALUES (2, 'operator', 'Operator', 1)")
+    when: 'searching for manager subordinates'
+      def subordinates = repository.findUserSubordinates('manager')
+      println subordinates
+    then: 'subordinate is found'
+      subordinates.size() == 1
+      subordinates[0].id == 2
+      subordinates[0].login == 'operator'
+      subordinates[0].passwd == null
+      subordinates[0].key == null
+      subordinates[0].reports_to == null
+      subordinates[0].operation_country == 'CZ'
+  }
+
+  def 'it should find user by login'() {
+    given: 'repository'
+      def repository = new CrmRepositoryJdbi(dbi)
+    and: 'user'
+      handle.insert("INSERT INTO users(id, login, name, reports_to) VALUES (1, 'manager', 'Manager', 0)")
+    when: 'searching for user by login name'
+      def user = repository.findUserByLogin('manager')
+    then: 'user is found'
+      user != null
+      user.id == 1
+      user.login == 'manager'
+      user.passwd == null
+      user.key == null
+      user.reports_to == null
+      user.operation_country == 'CZ'
   }
 
 }
