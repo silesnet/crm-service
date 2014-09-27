@@ -27,7 +27,10 @@ public interface DraftDAO {
     Integer insertDraft(@BindBean Draft draft);
 
     @SqlUpdate("UPDATE drafts set data = :data WHERE id = :id")
-    void updateDraft(@Bind("data") String data, @Bind("id") long id);
+    void updateDraftData(@Bind("data") String data, @Bind("id") long id);
+
+    @SqlUpdate("UPDATE drafts set status = :status WHERE id = :id")
+    void updateDraftStatus(@Bind("status") String status, @Bind("id") long id);
 
     void close();
 }

@@ -260,6 +260,49 @@ class DraftResourceTest extends Specification {
 			0 * crmRepository.updateAgreementStatus(AGREEMENT_ID, 'AVAILABLE')
 	}
 
+	def 'it should update draft status'() {
+		given: 'existing draft'
+		and: 'service draft update data'
+			def updateDraft = '''
+{
+	"drafts": {
+		"status": "ACCEPTED"
+	}
+}
+'''
+		when: 'POST draft creation data'
+			def response = resources.client().resource('/drafts/new/12')
+					.type('application/json').put(ClientResponse.class, updateDraft)
+		then: 'response has correct headers'
+			response.status == 204
+		and: 'find current draft was called'
+			1 * draftDAO.findDraftById(12L) >> new Draft(12L, 'service', 'test', '', 'DRAFT')
+		and: 'update draft was called'
+			1 * draftDAO.updateDraftStatus('ACCEPTED', 12L)
+	}
+
+	def 'it should update draft data'() {
+		given: 'existing draft'
+		and: 'service draft update data'
+			def updateDraft = '''
+{
+	"drafts": {
+		"data": "{}"
+	}
+}
+'''
+		when: 'POST draft creation data'
+			def response = resources.client().resource('/drafts/new/12')
+					.type('application/json').put(ClientResponse.class, updateDraft)
+		then: 'response has correct headers'
+			response.status == 204
+		and: 'find current draft was called'
+			1 * draftDAO.findDraftById(12L) >> new Draft(12L, 'service', 'test', '', 'DRAFT')
+		and: 'update draft was called'
+			1 * draftDAO.updateDraftData('{}', 12L)
+	}
+
+
 	static class CrmRepositoryDelegate implements CrmRepository {
 		@Delegate
 		CrmRepository repository;
