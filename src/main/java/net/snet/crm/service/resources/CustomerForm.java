@@ -1,6 +1,5 @@
 package net.snet.crm.service.resources;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import java.util.Map;

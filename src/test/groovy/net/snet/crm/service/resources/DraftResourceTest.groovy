@@ -1,7 +1,6 @@
 package net.snet.crm.service.resources
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.google.common.base.Charsets
 import com.google.common.io.Resources
 import com.sun.jersey.api.client.ClientResponse
 import io.dropwizard.testing.junit.ResourceTestRule
