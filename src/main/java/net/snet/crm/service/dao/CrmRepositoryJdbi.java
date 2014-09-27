@@ -16,6 +16,7 @@ import org.skife.jdbi.v2.sqlobject.mixins.CloseMe;
 import org.skife.jdbi.v2.sqlobject.mixins.GetHandle;
 import org.skife.jdbi.v2.sqlobject.mixins.Transactional;
 import org.skife.jdbi.v2.tweak.HandleCallback;
+import org.skife.jdbi.v2.util.LongMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +34,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
 	private static final int SERVICE_COUNTRY_MULTIPLIER = 100000;
 	private static final Map<String, String> CONNECTION_FIELDS;
+
 	static {
 		CONNECTION_FIELDS = Maps.newHashMap();
 		CONNECTION_FIELDS.put("auth_type", "auth_type");
@@ -42,7 +44,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		CONNECTION_FIELDS.put("uplink", "uplink");
 		CONNECTION_FIELDS.put("is_public_ip", "is_public_ip");
 		CONNECTION_FIELDS.put("ip", "ip");
-	};
+	}
 
 	private final CrmDatabase db;
 
@@ -147,6 +149,18 @@ public class CrmRepositoryJdbi implements CrmRepository {
 				return handle.createQuery("SELECT * FROM agreements WHERE id=:id")
 						.bind("id", agreementId)
 						.first();
+			}
+		});
+	}
+
+	@Override
+	public List<Map<String, Object>> findAgreementsByCustomerId(final long customerId) {
+		return db.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+			@Override
+			public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+				return handle.createQuery("SELECT * FROM agreements WHERE customer_id=:customer_id")
+						.bind("customer_id", customerId)
+						.list();
 			}
 		});
 	}
@@ -322,65 +336,93 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		});
 	}
 
-	public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe {
-
-		@SqlQuery("SELECT max(id) FROM customers")
-		long lastCustomerId();
-
-		@SqlQuery("SELECT max(history_id) FROM audit_items")
-		long lastAuditId();
-
-		@SqlQuery("SELECT max(id) FROM audit_items")
-		long lastAuditItemId();
-
-		@SqlQuery("SELECT max(id) FROM agreements WHERE country=:country")
-		long lastAgreementIdByCountry(@Bind("country") String country);
-
-		@SqlQuery("SELECT id FROM agreements WHERE country=:country AND status='AVAILABLE' ORDER BY id LIMIT 1")
-		long reusableAgreementIdByCountry(@Bind("country") String country);
-
-		@SqlQuery("SELECT max(id) FROM services WHERE :first < id AND id < :last ")
-		long lastServiceIdInRange(@Bind("first") long fist, @Bind("last") long last);
-
-		@SqlUpdate("INSERT INTO customers (id, history_id, name, public_id, inserted_on, is_active) " +
-				"VALUES (:id, :history_id, :name, '9999999', :inserted_on, false)")
-		void insertCustomer(@Bind("id") long id, @Bind("history_id") long auditId,
-		                                    @Bind("name") String name, @Bind("inserted_on") Timestamp insertedOn);
-
-		@SqlUpdate("INSERT INTO audit_items (id, history_id, history_type_label_id, user_id, time_stamp, field_name, old_value, new_value) " +
-				"VALUES (:id, :history_id, :history_type_label_id, :user_id, :time_stamp, :field_name, :old_value, :new_value)")
-		void insertAudit(@Bind("id") long id, @Bind("history_id") long auditId,
-                     @Bind("history_type_label_id") long auditType, @Bind("user_id") long userId,
-                     @Bind("time_stamp") Timestamp stamp, @Bind("field_name") String field,
-                     @Bind("old_value") String oldValue, @Bind("new_value") String newValue);
-
-		@SqlUpdate("INSERT INTO agreements (id, country, customer_id) " +
-				"VALUES (:id, :country, :customer_id)")
-		void insertAgreement(@Bind("id") long id, @Bind("country") String country,
-		                                     @Bind("customer_id") long customerId);
-
-		@SqlUpdate("UPDATE agreements SET customer_id=:customer_id WHERE id=:agreement_id")
-		int updateAgreementCustomer(@Bind("agreement_id") long agreementId, @Bind("customer_id") long customerId);
-
-		@SqlUpdate("UPDATE agreements SET status=:status WHERE id=:agreement_id")
-		int updateAgreementStatus(@Bind("agreement_id") long agreementId, @Bind("status") String status);
-
-		@SqlUpdate("UPDATE customers SET contract_no=:agreements WHERE id=:id")
-		void setCustomerAgreements(@Bind("id") long customerId, @Bind("agreements") String agreements);
-
-		@SqlUpdate("INSERT INTO services (id, customer_id, period_from, name, price) " +
-				"VALUES (:service_id, :customer_id, :period_from, 'DRAFT', 0)")
-		void insertService(@Bind("service_id") long serviceId, @Bind("customer_id") long customerId,
-		                   @Bind("period_from") Timestamp periodFrom);
-
-		@SqlUpdate("INSERT INTO services_info (service_id, status, other_info) " +
-				"VALUES (:service_id, 'DRAFT', '{}')")
-		void insertServiceInfo(@Bind("service_id") long serviceId);
-
-		@SqlUpdate("INSERT INTO connections (service_id) VALUES (:service_id)")
-		void insertConnection(@Bind("service_id") long serviceId);
-
-		@SqlUpdate("UPDATE services_info SET status=:status WHERE service_id=:service_id")
-		void updateServiceStatus(@Bind("service_id") long serviceId, @Bind("status") String status);
+	@Override
+	public List<Map<String, Object>> findUserSubordinates(final String login) {
+		return db.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+			@Override
+			public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+				Long managerId = handle.createQuery("SELECT id FROM users where login=:login")
+						.bind("login", login)
+						.map(LongMapper.FIRST)
+						.first();
+				return handle.createQuery("SELECT id, login, name, roles, operation_country FROM users WHERE reports_to=:manager_id")
+						.bind("manager_id", managerId)
+						.list();
+			}
+		});
 	}
+
+	@Override
+	public Map<String, Object> findUserByLogin(final String login) {
+		return db.withHandle(new HandleCallback<Map<String, Object>>() {
+			@Override
+			public Map<String, Object> withHandle(Handle handle) throws Exception {
+				return handle.createQuery("SELECT id, login, name, roles, operation_country FROM users where login=:login")
+						.bind("login", login)
+						.first();
+			}
+		});
+	}
+
+public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe {
+
+	@SqlQuery("SELECT max(id) FROM customers")
+	long lastCustomerId();
+
+	@SqlQuery("SELECT max(history_id) FROM audit_items")
+	long lastAuditId();
+
+	@SqlQuery("SELECT max(id) FROM audit_items")
+	long lastAuditItemId();
+
+	@SqlQuery("SELECT max(id) FROM agreements WHERE country=:country")
+	long lastAgreementIdByCountry(@Bind("country") String country);
+
+	@SqlQuery("SELECT id FROM agreements WHERE country=:country AND status='AVAILABLE' ORDER BY id LIMIT 1")
+	long reusableAgreementIdByCountry(@Bind("country") String country);
+
+	@SqlQuery("SELECT max(id) FROM services WHERE :first < id AND id < :last ")
+	long lastServiceIdInRange(@Bind("first") long fist, @Bind("last") long last);
+
+	@SqlUpdate("INSERT INTO customers (id, history_id, name, public_id, inserted_on, is_active) " +
+			"VALUES (:id, :history_id, :name, '9999999', :inserted_on, false)")
+	void insertCustomer(@Bind("id") long id, @Bind("history_id") long auditId,
+	                    @Bind("name") String name, @Bind("inserted_on") Timestamp insertedOn);
+
+	@SqlUpdate("INSERT INTO audit_items (id, history_id, history_type_label_id, user_id, time_stamp, field_name, old_value, new_value) " +
+			"VALUES (:id, :history_id, :history_type_label_id, :user_id, :time_stamp, :field_name, :old_value, :new_value)")
+	void insertAudit(@Bind("id") long id, @Bind("history_id") long auditId,
+	                 @Bind("history_type_label_id") long auditType, @Bind("user_id") long userId,
+	                 @Bind("time_stamp") Timestamp stamp, @Bind("field_name") String field,
+	                 @Bind("old_value") String oldValue, @Bind("new_value") String newValue);
+
+	@SqlUpdate("INSERT INTO agreements (id, country, customer_id) " +
+			"VALUES (:id, :country, :customer_id)")
+	void insertAgreement(@Bind("id") long id, @Bind("country") String country,
+	                     @Bind("customer_id") long customerId);
+
+	@SqlUpdate("UPDATE agreements SET customer_id=:customer_id WHERE id=:agreement_id")
+	int updateAgreementCustomer(@Bind("agreement_id") long agreementId, @Bind("customer_id") long customerId);
+
+	@SqlUpdate("UPDATE agreements SET status=:status WHERE id=:agreement_id")
+	int updateAgreementStatus(@Bind("agreement_id") long agreementId, @Bind("status") String status);
+
+	@SqlUpdate("UPDATE customers SET contract_no=:agreements WHERE id=:id")
+	void setCustomerAgreements(@Bind("id") long customerId, @Bind("agreements") String agreements);
+
+	@SqlUpdate("INSERT INTO services (id, customer_id, period_from, name, price) " +
+			"VALUES (:service_id, :customer_id, :period_from, 'DRAFT', 0)")
+	void insertService(@Bind("service_id") long serviceId, @Bind("customer_id") long customerId,
+	                   @Bind("period_from") Timestamp periodFrom);
+
+	@SqlUpdate("INSERT INTO services_info (service_id, status, other_info) " +
+			"VALUES (:service_id, 'DRAFT', '{}')")
+	void insertServiceInfo(@Bind("service_id") long serviceId);
+
+	@SqlUpdate("INSERT INTO connections (service_id) VALUES (:service_id)")
+	void insertConnection(@Bind("service_id") long serviceId);
+
+	@SqlUpdate("UPDATE services_info SET status=:status WHERE service_id=:service_id")
+	void updateServiceStatus(@Bind("service_id") long serviceId, @Bind("status") String status);
+}
 }

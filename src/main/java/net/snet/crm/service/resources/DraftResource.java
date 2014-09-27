@@ -6,10 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.*;
 import com.sun.jersey.api.Responses;
 import net.snet.crm.service.bo.Draft;
 import net.snet.crm.service.dao.CrmRepository;
@@ -23,9 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -40,28 +35,45 @@ public class DraftResource {
 	private final DraftDAO draftDAO;
 	private final ObjectMapper objectMapper;
 	private final CrmRepository crmRepository;
-	private MapType entityMapType;
+	private final MapType entityMapType;
 
 	public DraftResource(DraftDAO draftDAO, ObjectMapper objectMapper, CrmRepository crmRepository) {
 		this.draftDAO = draftDAO;
 		this.objectMapper = objectMapper;
 		this.crmRepository = crmRepository;
-		entityMapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
+		this.entityMapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
 	}
 
 	@GET
 	@Produces({"application/json; charset=UTF-8"})
 	@Timed(name = "get-requests")
-	public Map<String, Object> getDraftsByUserId(@QueryParam("user_id") Optional<String> userId, @QueryParam("status") Optional<String> status) {
+	public Map<String, Object> getDraftsByUserId(@QueryParam("user_id") String userId) {
 		logger.debug("drafts called");
 		final Set<Draft> drafts = Sets.newLinkedHashSet();
-		if (userId.isPresent()) {
-			Iterator<Draft> userDrafts = draftDAO.findDraftsByUserId(userId.get(), "DRAFT");
-			Iterators.addAll(drafts, userDrafts);
-		}
-		if (status.isPresent()) {
-			final Iterator<Draft> draftsWithStatus = draftDAO.findDraftsByStatus(status.get());
-			Iterators.addAll(drafts, draftsWithStatus);
+		Iterator<Draft> userDrafts = draftDAO.findDraftsByUserId(userId, "DRAFT");
+		Iterators.addAll(drafts, userDrafts);
+		Map<String, Object> user = crmRepository.findUserByLogin(userId);
+		checkState(user != null, "unknown user '%s'", userId);
+		String rawRoles = user.get("roles").toString();
+		Iterable<String> roles = Splitter.on(',').trimResults().split(rawRoles);
+		for (String role : roles) {
+			if ("ROLE_TECH_ADMIN".equals(role)) {
+				List<Draft> submitted = Lists.newArrayList(draftDAO.findDraftsByStatus("SUBMITTED"));
+				List<Map<String, Object>> subordinatesList = crmRepository.findUserSubordinates(userId);
+				Set<String> subordinates = Sets.newHashSet();
+				for (Map<String, Object> subordinate : subordinatesList) {
+					subordinates.add(subordinate.get("login").toString());
+				}
+				for (Draft draft : submitted) {
+					if (subordinates.contains(draft.getUserId())) {
+						drafts.add(draft);
+					}
+				}
+			}
+			if ("ROLE_ACCOUNTING".equals(role)) {
+				Iterator<Draft> reviewed = draftDAO.findDraftsByStatus("APPROVED");
+				Iterators.addAll(drafts, reviewed);
+			}
 		}
 		return ImmutableMap.of("drafts", (Object) drafts);
 	}

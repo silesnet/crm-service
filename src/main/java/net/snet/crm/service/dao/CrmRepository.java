@@ -1,5 +1,6 @@
 package net.snet.crm.service.dao;
 
+import java.util.List;
 import java.util.Map;
 
 public interface CrmRepository {
@@ -12,6 +13,8 @@ public interface CrmRepository {
 	Map<String,Object> insertAgreement(long customerId, String country);
 
 	Map<String, Object> findAgreementById(long agreementId);
+
+	List<Map<String, Object>> findAgreementsByCustomerId(long customerId);
 
 	Map<String, Object> updateAgreementStatus(long agreementId, String status);
 
@@ -28,4 +31,8 @@ public interface CrmRepository {
 	Map<String, Object> updateConnection(long serviceId, Iterable<Map.Entry<String, Object>> updates);
 
 	void deleteConnection(long serviceId);
+
+	List<Map<String, Object>> findUserSubordinates(String login);
+
+	Map<String, Object> findUserByLogin(String login);
 }

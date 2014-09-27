@@ -70,7 +70,9 @@ public class UserResource {
 				|| (key.isPresent() && "test".equals(key.get()))) {
 			Map<String, Object> user = Maps.newHashMap();
 			user.put("user", "test");
+			user.put("name", "Test");
 			user.put("roles", "ANONYMOUS_ROLE");
+			user.put("operation_country", "CZ");
 			return Response.ok(ImmutableMap.of("users", user)).build();
 		}
 		if (session.isPresent()) {
