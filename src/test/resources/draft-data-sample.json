@@ -1,0 +1,61 @@
+{
+  "customer": {
+    "id": "1442",
+    "agreement_id": "104667",
+    "service_id": "10466701",
+    "connection_id": "10466701",
+    "customer_type": "1",
+    "name": "Milan Kolouch",
+    "surname": "",
+    "supplementary_name": "",
+    "public_id": "9912310638",
+    "dic": "",
+    "representative": "",
+    "email": "MilanKolouch@superrito.com",
+    "phone": "542 340 422",
+    "contact_name": "",
+    "info": "",
+    "address": {
+      "street": "Spodní Pustá 40",
+      "descriptive_number": "",
+      "orientation_number": "",
+      "town": "Vacenovice",
+      "postal_code": "69606",
+      "country": "10"
+    }
+  },
+  "service": {
+    "contract_no": "0",
+    "product": "1",
+    "downlink": "10",
+    "uplink": "5",
+    "price": "315",
+    "ssid": "435",
+    "mac_address": "",
+    "core_router": null,
+    "config": "1",
+    "activate_on": "16.09.2014",
+    "activation_fee": "",
+    "operator": null,
+    "info_service": "",
+    "location_address": {
+      "location_street": "",
+      "location_descriptive_number": "",
+      "location_orientation_number": "",
+      "location_town": "",
+      "location_postal_code": "",
+      "location_country": "10"
+    },
+    "devices": [{
+      "name": "",
+      "owner": "silesnet"
+    }]
+  },
+  "connections": {
+    "auth_type": "1",
+    "auth_a": "",
+    "auth_b": "",
+    "ip": "",
+    "is_ip_public": false
+  }
+}

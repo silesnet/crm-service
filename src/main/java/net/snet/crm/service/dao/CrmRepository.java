@@ -10,6 +10,8 @@ public interface CrmRepository {
 
 	void deleteCustomer(long customerId);
 
+	Map<String, Object> updateCustomer(long customerId, Map<String, Object> updates);
+
 	Map<String,Object> insertAgreement(long customerId, String country);
 
 	Map<String, Object> findAgreementById(long agreementId);
@@ -24,6 +26,8 @@ public interface CrmRepository {
 
 	void deleteService(long serviceId);
 
+	Map<String, Object> updateService(long serviceId, Map<String, Object> updates);
+
 	Map<String,Object> insertConnection(long serviceId);
 
 	Map<String,Object> findConnectionByServiceId(long serviceId);
@@ -35,4 +39,5 @@ public interface CrmRepository {
 	List<Map<String, Object>> findUserSubordinates(String login);
 
 	Map<String, Object> findUserByLogin(String login);
+
 }

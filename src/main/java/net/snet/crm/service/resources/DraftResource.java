@@ -20,7 +20,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.io.IOException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -159,19 +162,46 @@ public class DraftResource {
 	@PUT
 	@Path("new/{draftId}")
 	@Timed(name = "put-requests")
-	public Response updateDraftAndStatus(@PathParam("draftId") Long draftId, Map<String, Object> drafts) {
+	public Response updateDraftAndStatus(@PathParam("draftId") Long draftId, Map<String, Object> drafts) throws IOException {
 		logger.debug("updating draft '{}'", draftId);
 		final Map<String, Object> draft = (Map<String, Object>) drafts.get("drafts");
-		final Draft currentDraft = draftDAO.findDraftById(draftId);
+		Draft currentDraft = draftDAO.findDraftById(draftId);
 		checkState(currentDraft != null, "trying to update draft '%s' that does not exist", draftId);
+		final String currentDraftStatus = currentDraft.getStatus();
 		final Optional<String> data = Optional.fromNullable((String) draft.get("data"));
 		if (data.isPresent()) {
 			draftDAO.updateDraftData(data.get(), draftId);
 		}
 		final Optional<String> status = Optional.fromNullable((String) draft.get("status"));
 		if (status.isPresent()) {
-			if ("ACCEPTED".equals(currentDraft.getStatus()) && "IMPORTED".equals(status.get())) {
+			if ("ACCEPTED".equals(currentDraftStatus) && "IMPORTED".equals(status.get())) {
 				logger.debug("importing draft '{}' into tables");
+				final Map<String, Object> dataMap = (Map<String, Object>) objectMapper.readValue(currentDraft.getData(), Map.class);
+				// import customer
+				final Long customerId = getNestedLong("customer.id", dataMap);
+				final Map<String, Object> customer = crmRepository.findCustomerById(customerId);
+				checkState(customer != null, "customer '%s' does not exist", customerId);
+				final Map<String, Object> customerFormMap = (Map<String, Object>) dataMap.get("customer");
+				final CustomerForm customerForm = new CustomerForm(customerFormMap);
+				final Map<String, Object> customerUpdate = customerForm.customerUpdate();
+				customerUpdate.put("status", "ACTIVE");
+				crmRepository.updateCustomer(customerId, customerUpdate);
+				// import agreement
+				final long agreementId = getNestedLong("customer.agreement_id", dataMap);
+				final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId);
+				checkState(agreement != null, "agreement '%s' does not exist", agreementId);
+				if (!"ACTIVE".equals(agreement.get("status"))) {
+					crmRepository.updateAgreementStatus(agreementId, "ACTIVE");
+				}
+				// import service
+				final long serviceId = getNestedLong("customer.service_id", dataMap);
+				final Map<String, Object> service = crmRepository.findServiceById(serviceId);
+				checkState(service != null, "service '%s' does not exist", customerId);
+				final Map<String, Object> serviceFormMap = (Map<String, Object>) dataMap.get("service");
+				final ServiceForm serviceForm = new ServiceForm(serviceFormMap);
+				final Map<String, Object> serviceUpdate = serviceForm.serviceUpdate();
+				serviceUpdate.put("status", "ACTIVE");
+				crmRepository.updateService(serviceId, serviceUpdate);
 			}
 			draftDAO.updateDraftStatus(status.get(), draftId);
 		}

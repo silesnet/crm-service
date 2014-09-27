@@ -1,6 +1,8 @@
 package net.snet.crm.service.resources
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.base.Charsets
+import com.google.common.io.Resources
 import com.sun.jersey.api.client.ClientResponse
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.crm.service.bo.Draft
@@ -270,7 +272,7 @@ class DraftResourceTest extends Specification {
 	}
 }
 '''
-		when: 'POST draft creation data'
+		when: 'PUT draft update data'
 			def response = resources.client().resource('/drafts/new/12')
 					.type('application/json').put(ClientResponse.class, updateDraft)
 		then: 'response has correct headers'
@@ -291,7 +293,7 @@ class DraftResourceTest extends Specification {
 	}
 }
 '''
-		when: 'POST draft creation data'
+		when: 'PUT draft update data'
 			def response = resources.client().resource('/drafts/new/12')
 					.type('application/json').put(ClientResponse.class, updateDraft)
 		then: 'response has correct headers'
@@ -302,6 +304,42 @@ class DraftResourceTest extends Specification {
 			1 * draftDAO.updateDraftData('{}', 12L)
 	}
 
+	def 'it should import draft data into system'() {
+		given: 'accepted draft'
+		and: 'draft status update to IMPORTED'
+			def updateDraft = '''
+{
+	"drafts": {
+		"status": "IMPORTED"
+	}
+}
+'''
+		when: 'PUT draft update data'
+			def response = resources.client().resource('/drafts/new/12')
+					.type('application/json').put(ClientResponse.class, updateDraft)
+		then: 'response has correct headers'
+			response.status == 204
+		and: 'find current draft was called'
+			1 * draftDAO.findDraftById(12L) >> new Draft(12L, 'service', 'test', sampleDraftData('draft-data-sample.json'), 'ACCEPTED')
+		and: 'find customer was called'
+			1 * crmRepository.findCustomerById(1442L) >> [:]
+		and: 'update customer was called'
+			1 * crmRepository.updateCustomer(1442L, _)
+		and: 'find agreement was called'
+			1 * crmRepository.findAgreementById(104667L) >> [id: 104667L, country: 'CZ', customer_id: 1442L , status: 'DRAFT' ]
+		and: 'update agreement was called'
+			1 * crmRepository.updateAgreementStatus(104667L, 'ACTIVE')
+		and: 'find service was called'
+			1 * crmRepository.findServiceById(10466701L) >> [:]
+		and: 'update service was called'
+			1 * crmRepository.updateService(10466701L, _)
+		and: 'update draft status was called'
+			1 * draftDAO.updateDraftStatus('IMPORTED', 12L)
+	}
+
+  String sampleDraftData(String resource) {
+		new File(Resources.getResource(resource).file).getText('UTF-8')
+	}
 
 	static class CrmRepositoryDelegate implements CrmRepository {
 		@Delegate
