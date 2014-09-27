@@ -100,6 +100,12 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
+	public Map<String, Object> updateCustomer(long customerId, Map<String, Object> updates) {
+		// TODO: implement
+		return null;
+	}
+
+	@Override
 	public Map<String, Object> insertAgreement(long customerId, String country) {
 		checkArgument(COUNTRIES.keySet().contains(country), "unknown country '%s'", country);
 		Map<String, Object> customer = findCustomerById(customerId);
@@ -248,6 +254,12 @@ public class CrmRepositoryJdbi implements CrmRepository {
 				return null;
 			}
 		});
+	}
+
+	@Override
+	public Map<String, Object> updateService(long serviceId, Map<String, Object> updates) {
+		// TODO: implement
+		return Maps.newHashMap();
 	}
 
 	@Override
