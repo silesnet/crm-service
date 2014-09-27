@@ -267,7 +267,6 @@ class CrmRepositoryJdbiTest extends Specification {
       handle.insert("INSERT INTO users(id, login, name, reports_to) VALUES (2, 'operator', 'Operator', 1)")
     when: 'searching for manager subordinates'
       def subordinates = repository.findUserSubordinates('manager')
-      println subordinates
     then: 'subordinate is found'
       subordinates.size() == 1
       subordinates[0].id == 2
