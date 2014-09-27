@@ -148,7 +148,6 @@ class CrmRepositoryJdbiTest extends Specification {
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
     when: 'insert agreement service'
       def service = repository.insertService(agreement.id as Long)
-      println service
     then: 'service is inserted'
       service.id == (agreement.id * 100) + 1
       service.customer_id == customer.id

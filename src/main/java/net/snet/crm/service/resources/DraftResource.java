@@ -149,19 +149,19 @@ public class DraftResource {
 	@Timed(name = "put-requests")
 	public Response updateDraftAndStatus(@PathParam("draftId") Long draftId, Map<String, Object> drafts) {
 		logger.debug("updating draft '{}'", draftId);
+		final Map<String, Object> draft = (Map<String, Object>) drafts.get("drafts");
 		final Draft currentDraft = draftDAO.findDraftById(draftId);
 		checkState(currentDraft != null, "trying to update draft '%s' that does not exist", draftId);
-		final Map<String, Object> draft = (Map<String, Object>) drafts.get("drafts");
+		final Optional<String> data = Optional.fromNullable((String) draft.get("data"));
+		if (data.isPresent()) {
+			draftDAO.updateDraftData(data.get(), draftId);
+		}
 		final Optional<String> status = Optional.fromNullable((String) draft.get("status"));
 		if (status.isPresent()) {
 			if ("ACCEPTED".equals(currentDraft.getStatus()) && "IMPORTED".equals(status.get())) {
 				logger.debug("importing draft '{}' into tables");
 			}
 			draftDAO.updateDraftStatus(status.get(), draftId);
-		}
-		final Optional<String> data = Optional.fromNullable((String) draft.get("data"));
-		if (data.isPresent()) {
-			draftDAO.updateDraftData(data.get(), draftId);
 		}
 		return Response.noContent().build();
 	}
