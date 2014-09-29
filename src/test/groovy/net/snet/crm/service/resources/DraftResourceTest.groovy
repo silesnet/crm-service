@@ -323,11 +323,13 @@ class DraftResourceTest extends Specification {
 		and: 'find customer was called'
 			1 * crmRepository.findCustomerById(1442L) >> [:]
 		and: 'update customer was called'
-			1 * crmRepository.updateCustomer(1442L, _)
+			1 * crmRepository.updateCustomer(1442L, _) >> [contract_no: '10, 20']
 		and: 'find agreement was called'
 			1 * crmRepository.findAgreementById(104667L) >> [id: 104667L, country: 'CZ', customer_id: 1442L , status: 'DRAFT' ]
 		and: 'update agreement was called'
 			1 * crmRepository.updateAgreementStatus(104667L, 'ACTIVE')
+		and: 'set customer agreements was called'
+			1 * crmRepository.setCustomerAgreements(1442L, '10, 20, 4667')
 		and: 'find service was called'
 			1 * crmRepository.findServiceById(10466701L) >> [:]
 		and: 'update service was called'

@@ -10,6 +10,7 @@ import com.google.common.collect.*;
 import com.sun.jersey.api.Responses;
 import net.snet.crm.service.bo.Draft;
 import net.snet.crm.service.dao.CrmRepository;
+import net.snet.crm.service.dao.CrmRepositoryJdbi;
 import net.snet.crm.service.dao.DraftDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -185,7 +186,7 @@ public class DraftResource {
 				final CustomerForm customerForm = new CustomerForm(customerFormMap);
 				final Map<String, Object> customerUpdate = customerForm.customerUpdate();
 				customerUpdate.put("status", "ACTIVE");
-				crmRepository.updateCustomer(customerId, customerUpdate);
+				final Map<String, Object> updatedCustomer = crmRepository.updateCustomer(customerId, customerUpdate);
 				// import agreement
 				final long agreementId = getNestedLong("customer.agreement_id", dataMap);
 				final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId);
@@ -193,6 +194,13 @@ public class DraftResource {
 				if (!"ACTIVE".equals(agreement.get("status"))) {
 					crmRepository.updateAgreementStatus(agreementId, "ACTIVE");
 				}
+				long contractNumber = agreementId % CrmRepositoryJdbi.SERVICE_COUNTRY_MULTIPLIER;
+				String agreements = "" + contractNumber;
+				Optional<String> currentAgreements = Optional.fromNullable((String) updatedCustomer.get("contract_no"));
+				if (currentAgreements.isPresent() && currentAgreements.get().trim().length() > 0) {
+					agreements = currentAgreements.get().toString().trim() + ", " + contractNumber;
+				}
+				crmRepository.setCustomerAgreements(customerId, agreements);
 				// import service
 				final long serviceId = getNestedLong("customer.service_id", dataMap);
 				final Map<String, Object> service = crmRepository.findServiceById(serviceId);
