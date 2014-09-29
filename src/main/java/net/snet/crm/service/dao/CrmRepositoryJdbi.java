@@ -1,6 +1,7 @@
 package net.snet.crm.service.dao;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,10 +31,10 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.*;
 
 public class CrmRepositoryJdbi implements CrmRepository {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CrmRepositoryJdbi.class);
+	private static final Logger logger = LoggerFactory.getLogger(CrmRepositoryJdbi.class);
 
 	private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
-	private static final int SERVICE_COUNTRY_MULTIPLIER = 100000;
+	public static final int SERVICE_COUNTRY_MULTIPLIER = 100000;
 	private static final Map<String, String> CONNECTION_FIELDS;
 
 	static {
@@ -100,9 +102,50 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
-	public Map<String, Object> updateCustomer(long customerId, Map<String, Object> updates) {
-		// TODO: implement
-		return null;
+	public Map<String, Object> updateCustomer(final long customerId, final Map<String, Object> updates) {
+		if (updates.size() == 0) {
+			logger.debug("nothing to update returning original customer '{}'", customerId);
+			return findCustomerById(customerId);
+		}
+		final String sql = sqlUpdate("customers", updates, "id");
+		db.begin();
+		try {
+			Integer updated = db.withHandle(new HandleCallback<Integer>() {
+				@Override
+				public Integer withHandle(Handle handle) throws Exception {
+					return handle.createStatement(sql)
+							.bind("id", customerId)
+							.bindFromMap(updates)
+							.execute();
+				}
+			});
+			if (updated != 1) {
+				throw new IllegalStateException("failed to update customer '" + customerId + "'");
+			}
+			db.commit();
+			return findCustomerById(customerId);
+		} catch (Exception e) {
+			db.rollback();
+			throw new RuntimeException(e);
+		}
+	}
+
+	private String sqlUpdate(String table, Map<String, Object> updates, String identity) {
+		return "UPDATE " + table + " SET " + updateExpression(updates) +
+				" WHERE " + identity + "=:" + identity;
+	}
+
+	private String updateExpression(Map<String, Object> updates) {
+		final ArrayList<String> items = Lists.newArrayList();
+		for (String column: updates.keySet()) {
+			items.add(column + "=:" + column);
+		}
+		return Joiner.on(", ").join(items);
+	}
+
+	@Override
+	public void setCustomerAgreements(long customerId, String agreements) {
+		db.setCustomerAgreements(customerId, agreements);
 	}
 
 	@Override
@@ -116,13 +159,6 @@ public class CrmRepositoryJdbi implements CrmRepository {
 			if (agreementId == 0) {
 				agreementId = nextAgreementId(country);
 				db.insertAgreement(agreementId, country, customerId);
-//			long contractNumber = agreementId % SERVICE_COUNTRY_MULTIPLIER;
-//			String agreements = "" + contractNumber;
-//			Optional<Object> currentAgreements = Optional.fromNullable(customer.get("contract_no"));
-//			if (currentAgreements.isPresent() && currentAgreements.get().toString().trim().length() > 0) {
-//				agreements = currentAgreements.get().toString().trim() + ", " + contractNumber;
-//			}
-//			db.setCustomerAgreements(customerId, agreements);
 			} else {
 				int changes = 0;
 				changes += db.updateAgreementCustomer(agreementId, customerId);
@@ -257,9 +293,39 @@ public class CrmRepositoryJdbi implements CrmRepository {
 	}
 
 	@Override
-	public Map<String, Object> updateService(long serviceId, Map<String, Object> updates) {
-		// TODO: implement
-		return Maps.newHashMap();
+	public Map<String, Object> updateService(final long serviceId, final Map<String, Object> updates) {
+		if (updates.size() == 0) {
+			logger.debug("nothing to update returning original service '{}'", serviceId);
+			return findServiceById(serviceId);
+		}
+		final Optional<String> status = Optional.fromNullable((String) updates.get("status"));
+		if (status.isPresent()) {
+			updates.remove("status");
+		}
+		final String sql = sqlUpdate("services", updates, "id");
+		db.begin();
+		try {
+			Integer updated = db.withHandle(new HandleCallback<Integer>() {
+				@Override
+				public Integer withHandle(Handle handle) throws Exception {
+					return handle.createStatement(sql)
+							.bind("id", serviceId)
+							.bindFromMap(updates)
+							.execute();
+				}
+			});
+			if (updated != 1) {
+				throw new IllegalStateException("failed to update service '" + serviceId + "'");
+			}
+			if (status.isPresent()) {
+				db.updateServiceStatus(serviceId, status.get());
+			}
+			db.commit();
+			return findServiceById(serviceId);
+		} catch (Exception e) {
+			db.rollback();
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
@@ -309,7 +375,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
 			fields.add(update.getKey() + "=:" + update.getKey());
 		}
 		if (updateMap.size() == 0) {
-			LOGGER.debug("nothing to update returning original connection for service '{}'", serviceId);
+			logger.debug("nothing to update returning original connection for service '{}'", serviceId);
 			return findConnectionByServiceId(serviceId);
 		}
 		final String sqlTemplate = "UPDATE connections SET " + Joiner.on(", ").join(fields) + " WHERE service_id=:service_id";

@@ -6,12 +6,16 @@ import org.skife.jdbi.v2.DBI
 import org.skife.jdbi.v2.Handle
 import spock.lang.Shared
 import spock.lang.Specification
+import spock.lang.Subject
 
 class CrmRepositoryJdbiTest extends Specification {
   @Shared DBI dbi = new DBI("jdbc:h2:mem:customerRepositoryTest")
   @Shared Handle handle
 
+	@Subject CrmRepository repository
+
   def setup() {
+	  repository = new CrmRepositoryJdbi(dbi)
     handle = dbi.open()
     handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
   }
@@ -24,13 +28,12 @@ class CrmRepositoryJdbiTest extends Specification {
     handle.execute('DROP TABLE connections')
     handle.execute('DROP TABLE users')
     handle.close()
+	  repository = null
   }
 
   def 'it should insert new customer'() {
     given: 'new customer name'
       def customerName = 'New Name'
-    and: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
     and: 'customers table is empty'
       assert handle.select('SELECT count(*) as cnt from customers').first().cnt == 0
     when: 'new customers is inserted into repository'
@@ -48,9 +51,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
 	def 'it should delete customer'() {
-		given: 'repository'
-			def repository = new CrmRepositoryJdbi(dbi)
-		and: 'existing customer'
+		given: 'existing customer'
 			def customer = repository.insertCustomer([name: 'test'])
 		  assert customer != null
 		when: 'customer is deleted'
@@ -60,9 +61,7 @@ class CrmRepositoryJdbiTest extends Specification {
 	}
 
   def 'it should find agreements by customer id'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'customers'
+    given: 'customers'
       def customer = repository.insertCustomer([name: 'Existing Customer'])
     and: 'agreements'
       def agreement1 = repository.insertAgreement(customer.id as Long, 'CZ')
@@ -78,8 +77,6 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
   def 'it should roll back on error inserting customer'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
     when: 'invalid customer is inserted'
       repository.insertCustomer([name: null])
     then:
@@ -89,9 +86,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
   def 'it should insert new customer agreement'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing customer'
+    given: 'existing customer'
       def customer = repository.insertCustomer([name: 'existing customer'])
     and: 'country'
       def country = 'CZ'
@@ -109,9 +104,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
   def 'it should properly calculate agreement id'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing customer'
+    given: 'existing customer'
       def customer = repository.insertCustomer([name: 'existing customer'])
     and: 'country'
       def country = 'CZ'
@@ -128,9 +121,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
   def 'it should reuse available agreement id'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing existing agreement with AVAILABLE status'
+    given: 'existing existing agreement with AVAILABLE status'
       def customer = repository.insertCustomer([name: 'Test'])
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       def availableAgreement = repository.updateAgreementStatus(agreement.id as Long, 'AVAILABLE')
@@ -147,9 +138,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
 	def 'it should update customer agreement status'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing agreement'
+    given: 'existing agreement'
       def customer = repository.insertCustomer([name: 'John'])
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       assert agreement != null
@@ -160,9 +149,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
   def 'it should insert new agreement service'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing customer and agreement'
+    given: 'existing customer and agreement'
       def customer = repository.insertCustomer([name: 'existing customer'])
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
     when: 'insert agreement service'
@@ -174,9 +161,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
   def 'it should fail inserting 100th service for agreement'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing customer and agreement with 99 services'
+    given: 'existing customer and agreement with 99 services'
       def customer = repository.insertCustomer([name: 'existing customer'])
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       def lastService = [:]
@@ -192,9 +177,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
 	def 'it should delete service'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing service'
+    given: 'existing service'
       def customer = repository.insertCustomer([name: 'John'])
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       def service = repository.insertService(agreement.id as Long)
@@ -207,9 +190,7 @@ class CrmRepositoryJdbiTest extends Specification {
 	}
 
   def 'it should insert new service connection'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing customer, agreement and service'
+    given: 'existing customer, agreement and service'
       def customer = repository.insertCustomer([name: 'existing customer'])
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       def service = repository.insertService(agreement.id as Long)
@@ -220,9 +201,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
 	def 'it should delete service connection'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing service connection'
+    given: 'existing service connection'
       def customer = repository.insertCustomer([name: 'John'])
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       def service = repository.insertService(agreement.id as Long)
@@ -235,9 +214,7 @@ class CrmRepositoryJdbiTest extends Specification {
 	}
 
   def 'it should update service connection'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'existing customer, agreement, service and connection'
+    given: 'existing customer, agreement, service and connection'
       def customer = repository.insertCustomer([name: 'existing customer'])
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       def service = repository.insertService(agreement.id as Long)
@@ -259,9 +236,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
   def 'it should find user subordinates'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'manager'
+    given: 'manager'
       handle.insert("INSERT INTO users(id, login, name, reports_to) VALUES (1, 'manager', 'Manager', 0)")
     and: 'subordinate'
       handle.insert("INSERT INTO users(id, login, name, reports_to) VALUES (2, 'operator', 'Operator', 1)")
@@ -278,9 +253,7 @@ class CrmRepositoryJdbiTest extends Specification {
   }
 
   def 'it should find user by login'() {
-    given: 'repository'
-      def repository = new CrmRepositoryJdbi(dbi)
-    and: 'user'
+    given: 'user'
       handle.insert("INSERT INTO users(id, login, name, reports_to) VALUES (1, 'manager', 'Manager', 0)")
     when: 'searching for user by login name'
       def user = repository.findUserByLogin('manager')
@@ -294,4 +267,38 @@ class CrmRepositoryJdbiTest extends Specification {
       user.operation_country == 'CZ'
   }
 
+	def 'it should update customer'() {
+	  given: 'existing customer'
+		  def customer = repository.insertCustomer([name: 'New Customer', country: 20])
+	  and: 'customer update map'
+			def update = [ name: 'Updated Name', country: 10]
+		when: 'customer update is called'
+			def updated = repository.updateCustomer(customer.id as Long, update)
+		then:
+			updated != null
+			updated.id == customer.id
+			updated.name == 'Updated Name'
+			updated.country == 10
+	}
+
+	def 'it should update service'() {
+		given: 'existing customer'
+			def customer = repository.insertCustomer([name: 'New Customer', country: 20])
+		and: 'existing agreement'
+			def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
+		and: 'existing service'
+			def service = repository.insertService(agreement.id as Long)
+		and: 'service update map'
+			def update = [ name: 'Updated Name', price: 10, status: 'ACTIVE']
+		expect:
+			service.status == 'DRAFT'
+		when: 'service update is called'
+			def updated = repository.updateService(service.id as Long, update)
+		then:
+			updated != null
+			updated.id == service.id
+			updated.name == 'Updated Name'
+			updated.price == 10
+			updated.status == 'ACTIVE'
+	}
 }

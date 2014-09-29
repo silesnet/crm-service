@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 public interface CrmRepository {
+
+	// customer
+
 	Map<String, Object> insertCustomer(Map<String, Object> customer);
 
 	Map<String, Object> findCustomerById(long customerId);
@@ -11,6 +14,10 @@ public interface CrmRepository {
 	void deleteCustomer(long customerId);
 
 	Map<String, Object> updateCustomer(long customerId, Map<String, Object> updates);
+
+	void setCustomerAgreements(long customerId, String agreements);
+
+	// agreement
 
 	Map<String,Object> insertAgreement(long customerId, String country);
 
@@ -20,6 +27,8 @@ public interface CrmRepository {
 
 	Map<String, Object> updateAgreementStatus(long agreementId, String status);
 
+	// service
+
 	Map<String, Object> insertService(long agreementId);
 
 	Map<String, Object> findServiceById(long serviceId);
@@ -27,6 +36,8 @@ public interface CrmRepository {
 	void deleteService(long serviceId);
 
 	Map<String, Object> updateService(long serviceId, Map<String, Object> updates);
+
+	// connection
 
 	Map<String,Object> insertConnection(long serviceId);
 
@@ -36,8 +47,9 @@ public interface CrmRepository {
 
 	void deleteConnection(long serviceId);
 
+	// user
+
 	List<Map<String, Object>> findUserSubordinates(String login);
 
 	Map<String, Object> findUserByLogin(String login);
-
 }
