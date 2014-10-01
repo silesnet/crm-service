@@ -19,6 +19,7 @@ class CustomerFormTest extends Specification {
 		when:
 			def customerUpdate = customerForm.customerUpdate()
 		then:
+			println customerUpdate
 			customerUpdate.name == 'Milan Kolouch'
 	}
 
