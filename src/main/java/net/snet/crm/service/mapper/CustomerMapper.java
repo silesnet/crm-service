@@ -44,7 +44,8 @@ public class CustomerMapper implements ResultSetMapper<Customer> {
                 r.getTimestamp("updated"),
                 r.getString("account_no"),
                 r.getString("bank_no"),
-                r.getInt("variable")
+                r.getInt("variable"),
+                r.getString("customer_status")
         );
     }
 }

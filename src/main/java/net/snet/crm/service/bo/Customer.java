@@ -41,8 +41,9 @@ public class Customer {
     private String accountNo;
     private String bankNo;
     private int variable;
+    private String customerStatus;
 
-    public Customer(long id, long historyId, String publicId, String name, String supplementaryName, String street, String city, String postalCode, int country, String email, String dic, String contractNo, String connectionSpot, Timestamp insertedOn, int frequency, Timestamp lastlyBilled, boolean isBilledAfter, boolean deliverByEmail, String deliverCopyEmail, boolean deliverByMail, boolean isAutoBilling, String info, String contactName, String phone, boolean isActive, int status, long shireId, int format, boolean deliverSigned, String symbol, Timestamp updated, String accountNo, String bankNo, int variable) {
+    public Customer(long id, long historyId, String publicId, String name, String supplementaryName, String street, String city, String postalCode, int country, String email, String dic, String contractNo, String connectionSpot, Timestamp insertedOn, int frequency, Timestamp lastlyBilled, boolean isBilledAfter, boolean deliverByEmail, String deliverCopyEmail, boolean deliverByMail, boolean isAutoBilling, String info, String contactName, String phone, boolean isActive, int status, long shireId, int format, boolean deliverSigned, String symbol, Timestamp updated, String accountNo, String bankNo, int variable, String customerStatus) {
         this.id = id;
         this.historyId = historyId;
         this.publicId = publicId;
@@ -77,6 +78,7 @@ public class Customer {
         this.accountNo = accountNo;
         this.bankNo = bankNo;
         this.variable = variable;
+        this.customerStatus = customerStatus;
     }
 
     public long getId() {
@@ -355,5 +357,14 @@ public class Customer {
 
     public void setVariable(int variable) {
         this.variable = variable;
+    }
+
+    @JsonProperty("customerStatus")
+    public String getCustomerStatus() {
+        return customerStatus;
+    }
+    @JsonProperty("customerStatus")
+    public void setCustomerStatus(String customerStatus) {
+        this.customerStatus = customerStatus;
     }
 }
