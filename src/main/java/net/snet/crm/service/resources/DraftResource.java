@@ -188,7 +188,7 @@ public class DraftResource {
 				customerUpdate.put("status", "ACTIVE");
 				final Map<String, Object> updatedCustomer = crmRepository.updateCustomer(customerId, customerUpdate);
 				// import agreement
-				final long agreementId = getNestedLong("customer.agreement_id", dataMap);
+				final long agreementId = getNestedLong("service.contract_no", dataMap);
 				final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId);
 				checkState(agreement != null, "agreement '%s' does not exist", agreementId);
 				if (!"ACTIVE".equals(agreement.get("status"))) {
@@ -202,7 +202,7 @@ public class DraftResource {
 				}
 				crmRepository.setCustomerAgreements(customerId, agreements);
 				// import service
-				final long serviceId = getNestedLong("customer.service_id", dataMap);
+				final long serviceId = getNestedLong("service.service_id", dataMap);
 				final Map<String, Object> service = crmRepository.findServiceById(serviceId);
 				checkState(service != null, "service '%s' does not exist", customerId);
 				final Map<String, Object> serviceFormMap = (Map<String, Object>) dataMap.get("service");
