@@ -242,7 +242,7 @@ public class DraftResource {
 						crmRepository.deleteCustomer(customerId.get());
 					}
 				}
-				final Optional<Long> agreementId = getSafeLong("service.agreement_id", draftData);
+				final Optional<Long> agreementId = getSafeLong("service.contract_no", draftData);
 				if (agreementId.isPresent()) {
 					final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId.get());
 					if (agreement != null && "DRAFT".equals(agreement.get("status"))) {
