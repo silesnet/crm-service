@@ -224,7 +224,7 @@ public class DraftResource {
 		if (draft != null) {
 			if ("service".equals(draft.getType())) {
 				Map<String, Object> draftData = objectMapper.readValue(draft.getData(), entityMapType);
-				final Optional<Long> serviceId = getSafeLong("customer.service_id", draftData);
+				final Optional<Long> serviceId = getSafeLong("service.service_id", draftData);
 				if (serviceId.isPresent()) {
 					final Map<String, Object> service = crmRepository.findServiceById(serviceId.get());
 					if (service != null && "DRAFT".equals(service.get("status"))) {
@@ -242,7 +242,7 @@ public class DraftResource {
 						crmRepository.deleteCustomer(customerId.get());
 					}
 				}
-				final Optional<Long> agreementId = getSafeLong("customer.agreement_id", draftData);
+				final Optional<Long> agreementId = getSafeLong("service.agreement_id", draftData);
 				if (agreementId.isPresent()) {
 					final Map<String, Object> agreement = crmRepository.findAgreementById(agreementId.get());
 					if (agreement != null && "DRAFT".equals(agreement.get("status"))) {
