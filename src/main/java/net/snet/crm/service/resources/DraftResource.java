@@ -69,7 +69,7 @@ public class DraftResource {
 					subordinates.add(subordinate.get("login").toString());
 				}
 				for (Draft draft : submitted) {
-					if (subordinates.contains(draft.getUserId())) {
+					if (subordinates.contains(draft.getUserId()) || userId.equals(draft.getUserId())) {
 						drafts.add(draft);
 					}
 				}
@@ -175,7 +175,7 @@ public class DraftResource {
 		}
 		final Optional<String> status = Optional.fromNullable((String) draft.get("status"));
 		if (status.isPresent()) {
-			if ("ACCEPTED".equals(currentDraftStatus) && "IMPORTED".equals(status.get())) {
+			if ("APPROVED".equals(currentDraftStatus) && "IMPORTED".equals(status.get())) {
 				logger.debug("importing draft '{}' into tables");
 				final Map<String, Object> dataMap = (Map<String, Object>) objectMapper.readValue(currentDraft.getData(), Map.class);
 				// import customer
@@ -185,7 +185,7 @@ public class DraftResource {
 				final Map<String, Object> customerFormMap = (Map<String, Object>) dataMap.get("customer");
 				final CustomerForm customerForm = new CustomerForm(customerFormMap);
 				final Map<String, Object> customerUpdate = customerForm.customerUpdate();
-				customerUpdate.put("status", "ACTIVE");
+				customerUpdate.put("customer_status", "ACTIVE");
 				final Map<String, Object> updatedCustomer = crmRepository.updateCustomer(customerId, customerUpdate);
 				// import agreement
 				final long agreementId = getNestedLong("service.contract_no", dataMap);
