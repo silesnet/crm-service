@@ -1,42 +1,40 @@
 {
   "customer": {
-    "id": "1442",
-    "agreement_id": "104667",
-    "service_id": "10466701",
-    "connection_id": "10466701",
+    "id": "1534",
     "customer_type": "1",
     "name": "Milan",
     "surname": "Kolouch",
     "supplementary_name": "",
-    "public_id": "9912310638",
+    "public_id": "9999999",
     "dic": "",
     "representative": "",
-    "email": "MilanKolouch@superrito.com",
-    "phone": "542 340 422",
-    "contact_name": "",
-    "info": "",
+    "email": "milan.kolouch@seznam.cz",
+    "phone": "",
+    "customer_status": "DRAFT",
+    "info": "Bla bla bla",
     "address": {
-      "street": "Spodní Pustá 40",
-      "descriptive_number": "",
+      "street": "Dlouhá",
+      "descriptive_number": "58",
       "orientation_number": "",
-      "town": "Vacenovice",
-      "postal_code": "69606",
+      "town": "Dobříš",
+      "postal_code": "73301",
       "country": "10"
     }
   },
   "service": {
-    "contract_no": "0",
+    "contract_no": "104667",
+    "service_id": "10466701",
     "product": "1",
-    "downlink": "10",
-    "uplink": "5",
-    "price": "315",
+    "downlink": "",
+    "uplink": "",
+    "price": "",
     "ssid": "435",
     "mac_address": "",
     "core_router": null,
     "config": "1",
-    "activate_on": "16.09.2014",
+    "activate_on": "03.10.2014",
     "activation_fee": "",
-    "operator": null,
+    "operator": "16",
     "info_service": "",
     "location_address": {
       "location_street": "",
@@ -57,5 +55,6 @@
     "auth_b": "",
     "ip": "",
     "is_ip_public": false
-  }
+  },
+  "status": "UPDATE"
 }
