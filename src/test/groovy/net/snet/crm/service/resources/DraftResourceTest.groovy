@@ -200,7 +200,7 @@ class DraftResourceTest extends Specification {
 					.type('application/json').delete(ClientResponse.class)
 		then: 'status is no content'
 			response.status == 204
-			1 * draftDAO.findDraftById(DRAFT_ID) >> new Draft(DRAFT_ID, 'service', 'test', '{ "customer": { "id": "297" }, "service": { "service_id": "10466601", "agreement_id": "104666" } }', 'DRAFT')
+			1 * draftDAO.findDraftById(DRAFT_ID) >> new Draft(DRAFT_ID, 'service', 'test', '{ "customer": { "id": "297" }, "service": { "service_id": "10466601", "contract_no": "104666" } }', 'DRAFT')
 			1 * draftDAO.deleteDraftById(DRAFT_ID)
 		and: 'service is deleted'
 			1 * crmRepository.findServiceById(SERVICE_ID) >> [ status: 'DRAFT']
@@ -223,7 +223,7 @@ class DraftResourceTest extends Specification {
 					.type('application/json').delete(ClientResponse.class)
 		then: 'status is no content'
 			response.status == 204
-			1 * draftDAO.findDraftById(DRAFT_ID) >> new Draft(DRAFT_ID, 'service', 'test', '{ "customer": { "id": "297" }, "service": { "service_id": "10466601", "agreement_id": "104666" } }', 'DRAFT')
+			1 * draftDAO.findDraftById(DRAFT_ID) >> new Draft(DRAFT_ID, 'service', 'test', '{ "customer": { "id": "297" }, "service": { "service_id": "10466601", "contract_no": "104666" } }', 'DRAFT')
 			1 * draftDAO.deleteDraftById(DRAFT_ID)
 		and: 'service is deleted'
 			1 * crmRepository.findServiceById(SERVICE_ID) >> [ status: 'DRAFT']
@@ -246,7 +246,7 @@ class DraftResourceTest extends Specification {
 					.type('application/json').delete(ClientResponse.class)
 		then: 'status is no content'
 			response.status == 204
-			1 * draftDAO.findDraftById(DRAFT_ID) >> new Draft(DRAFT_ID, 'service', 'test', '{ "customer": { "id": "297" }, "service": { "service_id": "10466601", "agreement_id": "104666" } }', 'DRAFT')
+			1 * draftDAO.findDraftById(DRAFT_ID) >> new Draft(DRAFT_ID, 'service', 'test', '{ "customer": { "id": "297" }, "service": { "service_id": "10466601", "contract_no": "104666" } }', 'DRAFT')
 			1 * draftDAO.deleteDraftById(DRAFT_ID)
 		and: 'service is deleted'
 			1 * crmRepository.findServiceById(SERVICE_ID) >> [ status: 'DRAFT']
