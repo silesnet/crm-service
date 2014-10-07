@@ -8,6 +8,7 @@ import net.snet.crm.service.bo.Draft
 import net.snet.crm.service.dao.CrmRepository
 import net.snet.crm.service.dao.DraftDAO
 import org.junit.ClassRule
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
@@ -303,6 +304,7 @@ class DraftResourceTest extends Specification {
 			1 * draftDAO.updateDraftData('{}', 12L)
 	}
 
+  @Ignore
 	def 'it should import draft data into system'() {
 		given: 'accepted draft'
 		and: 'draft status update to IMPORTED'
