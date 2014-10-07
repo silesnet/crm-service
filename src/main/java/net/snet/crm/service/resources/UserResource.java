@@ -72,7 +72,7 @@ public class UserResource {
 			user.put("user", "test");
 			user.put("name", "Test");
 			user.put("roles", "ANONYMOUS_ROLE");
-			user.put("operation_country", "CZ");
+			user.put("operation_country", "PL");
 			return Response.ok(ImmutableMap.of("users", user)).build();
 		}
 		if (session.isPresent()) {

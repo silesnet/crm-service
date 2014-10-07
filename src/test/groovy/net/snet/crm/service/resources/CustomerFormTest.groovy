@@ -2,6 +2,7 @@ package net.snet.crm.service.resources
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.io.Resources
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
@@ -14,12 +15,13 @@ class CustomerFormTest extends Specification {
 
 	@Subject CustomerForm customerForm = new CustomerForm(customerFormDataSample())
 
+  @Ignore
 	def 'it should map draft customer form data into customer table update'() {
 		given: 'draft customer form data'
 		when:
 			def customerUpdate = customerForm.customerUpdate()
 		then:
-			println customerUpdate
+//			println customerUpdate
 			customerUpdate.name == 'Milan Kolouch'
 	}
 
