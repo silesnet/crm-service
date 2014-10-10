@@ -12,7 +12,10 @@ public class CustomerSearchMapper implements ResultSetMapper<CustomerSearch> {
     @Override
     public CustomerSearch map(int index, ResultSet r, StatementContext ctx) throws SQLException {
         return new CustomerSearch(r.getLong("id"),
-                r.getString("name")
+                r.getString("name"),
+                r.getString("street"),
+                r.getString("city"),
+                r.getString("postal_code")
         );
     }
 }
