@@ -110,6 +110,9 @@ public class CustomerResource {
 					Map<String, Object> customerMap = Maps.newLinkedHashMap();
 					customerMap.put("id", customer.getId());
 					customerMap.put("name", customer.getName());
+                    customerMap.put("street", customer.getStreet());
+                    customerMap.put("city", customer.getCity());
+                    customerMap.put("postal_code", customer.getPostalCode());
 					List<Long> agreementIds = Lists.newArrayList();
 					List<Map<String, Object>> agreements = repository.findAgreementsByCustomerId(customer.getId());
 					for (Map<String, Object> agreement : agreements) {

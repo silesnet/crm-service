@@ -16,7 +16,7 @@ public interface CustomerDAO {
     @RegisterMapper(CustomerMapper.class)
     Customer findById(@Bind("id") long id);
 
-    @SqlQuery("SELECT id, name, supplementary_name FROM customers WHERE lower(translate(name , :fromChars, :toChars)) LIKE :query LIMIT 20")
+    @SqlQuery("SELECT id, name, supplementary_name, street, city, postal_code FROM customers WHERE lower(translate(name , :fromChars, :toChars)) LIKE :query LIMIT 20")
     @RegisterMapper(CustomerSearchMapper.class)
     Iterator<CustomerSearch> getCustomersByName(@Bind("query") String query, @Bind("fromChars") String fromChars, @Bind("toChars") String toChars);
 
