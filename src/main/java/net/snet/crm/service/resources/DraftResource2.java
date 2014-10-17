@@ -14,6 +14,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -34,8 +35,9 @@ public class DraftResource2 {
   }
 
   @POST
-  public Response createDraft(Map<String, Object> body) {
-    final Optional<Map<String, Object>> draftData = fetchNestedMap("drafts", body);
+  public Response createDraft(LinkedHashMap<String, Object> body) {
+    final Optional<Map<String, Object>> draftData =
+        fetchNestedMap("drafts", body);
     checkArgument(draftData.isPresent(), "cannot create draft, data not sent");
     logger.debug("creating '{}' draft",
         fetchNested("entityType", draftData.get()).get());

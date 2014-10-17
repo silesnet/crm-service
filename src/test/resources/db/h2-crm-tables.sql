@@ -104,6 +104,17 @@ CREATE TABLE drafts
   status character varying(16) NOT NULL DEFAULT 'DRAFT'
 );
 
+CREATE TABLE drafts2
+(
+  id serial NOT NULL,
+  user character varying(50) NOT NULL,
+  entity_type character varying(20) NOT NULL,
+  entity_id bigint NOT NULL,
+  entity_name character varying(50) NOT NULL,
+  status character varying(16) NOT NULL DEFAULT 'DRAFT',
+  data character varying(5000) NOT NULL DEFAULT '{}'
+);
+
 CREATE TABLE users
 (
   id bigint NOT NULL,
