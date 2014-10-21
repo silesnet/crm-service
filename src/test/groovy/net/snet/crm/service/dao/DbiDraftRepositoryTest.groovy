@@ -55,6 +55,18 @@ class DbiDraftRepositoryTest extends Specification {
       }
   }
 
+  def 'should set correct entity id from original table'() {
+    given:
+      def draftData = createDraftData()
+      draftData.entityType = 'customers'
+      draftData.remove('entityId')
+    when:
+      draftId = repo.createDraft(draftData)
+    then:
+      def draft = handle.select('SELECT * from drafts2 where id=:id', draftId)
+      draft.entity_id == 1
+  }
+
   def createDraftData() {
     [
         user: 'test',
