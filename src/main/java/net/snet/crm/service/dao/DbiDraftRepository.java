@@ -2,6 +2,8 @@ package net.snet.crm.service.dao;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
@@ -11,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkState;
 import static net.snet.crm.service.utils.Databases.getRecord;
 import static net.snet.crm.service.utils.Databases.insertRecord;
 import static net.snet.crm.service.utils.Entities.*;
@@ -42,11 +45,15 @@ public class DbiDraftRepository implements DraftRepository {
   public long createDraft(final Map<String, Object> draft) {
     logger.debug("creating draft");
     final Map<String, Object> record = recordOf(draft, draftFields);
+	  final Optional<String> entityType = fetchNested("entity_type", record, String.class);
+	  checkState(entityType.isPresent(), "entity type was not provided");
+	  logger.debug("entity type: {}", entityType.get());
     record.put("data", toJson(record.get("data")));
     // TODO set correct entityId for the draft
     return dbi.withHandle(new HandleCallback<Long>() {
       @Override
       public Long withHandle(Handle handle) throws Exception {
+
         return insertRecord(DRAFTS_TABLE, record, handle);
       }
     });
