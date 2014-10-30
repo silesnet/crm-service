@@ -6,6 +6,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.util.LongMapper;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -17,6 +18,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class Databases {
   private static Function<String, String> idToNull = idToNull();
   private static Function<String, String> toValueReference = toValueReference();
+
+	public static long nextEntityIdFor(final String table, final Handle handle) {
+		long tableMaxId = handle
+				.createQuery("SELECT max(id) FROM " + table + ";")
+				.map(LongMapper.FIRST)
+				.first();
+		return tableMaxId + 1;
+	}
 
   public static long insertRecord(final String table,
                                   final Map<String, Object> record,
