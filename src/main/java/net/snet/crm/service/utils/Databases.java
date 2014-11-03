@@ -12,19 +12,33 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class Databases {
+  private static String DRAFTS_TABLE = "drafts2";
+  private static Pattern TABLE_NAME = Pattern.compile("^[a-zA-Z0-9_]+$");
+
   private static Function<String, String> idToNull = idToNull();
   private static Function<String, String> toValueReference = toValueReference();
 
 	public static long nextEntityIdFor(final String table, final Handle handle) {
-		long tableMaxId = handle
-				.createQuery("SELECT max(id) FROM " + table + ";")
+    checkTableName(table);
+		long lastId = handle
+				.createQuery(
+            "SELECT max(max_id) FROM (" +
+              "SELECT MAX(id) max_id FROM " + table + " " +
+              "UNION ALL " +
+              "SELECT MAX(entity_id) max_id FROM " + DRAFTS_TABLE + " WHERE " +
+                "entity_type=:table" +
+            ") sub_query"
+        )
+        .bind("table", table)
 				.map(LongMapper.FIRST)
 				.first();
-		return tableMaxId + 1;
+		return lastId + 1;
 	}
 
   public static long insertRecord(final String table,
@@ -39,6 +53,7 @@ public class Databases {
   public static Map<String, Object> getRecord(final String table,
                                               final long id,
                                               final Handle handle) {
+    checkTableName(table);
     final Map<String, Object> record = handle
         .createQuery("SELECT * FROM " + table + " WHERE id=:id;")
         .bind("id", id)
@@ -57,6 +72,7 @@ public class Databases {
                                   final Collection<String> rawColumns,
                                   final Function<String, String> updateName,
                                   final Predicate<String> filterColumn) {
+    checkTableName(table);
     final List<String> columns = FluentIterable.from(rawColumns)
         .transform(updateName)
         .filter(filterColumn)
@@ -85,6 +101,11 @@ public class Databases {
         return ":" + column;
       }
     };
+  }
+
+  private static void checkTableName(final String table) {
+    checkArgument(TABLE_NAME.matcher(table).matches(),
+        "illegal table name provided '%s'", table);
   }
 
 }

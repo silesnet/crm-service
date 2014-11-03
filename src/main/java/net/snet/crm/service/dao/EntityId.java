@@ -1,4 +1,5 @@
 package net.snet.crm.service.dao;
 
-public class EntityId {
+public interface EntityId {
+  public long nextEntityId();
 }

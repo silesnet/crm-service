@@ -3,8 +3,7 @@ package net.snet.crm.service.dao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableMap;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.tweak.HandleCallback;
@@ -49,11 +48,12 @@ public class DbiDraftRepository implements DraftRepository {
 	  checkState(entityType.isPresent(), "entity type was not provided");
 	  logger.debug("entity type: {}", entityType.get());
     record.put("data", toJson(record.get("data")));
-    // TODO set correct entityId for the draft
     return dbi.withHandle(new HandleCallback<Long>() {
       @Override
       public Long withHandle(Handle handle) throws Exception {
-
+        // TODO check for 'AVAILABLE' drafts of the same type, reuse if possible
+        final EntityId entityId = EntityIdFactory.entityIdFor(entityType.get(), handle);
+        record.put("entity_id", entityId.nextEntityId());
         return insertRecord(DRAFTS_TABLE, record, handle);
       }
     });
