@@ -9,17 +9,19 @@ import spock.lang.Specification
 import static net.snet.crm.service.utils.Databases.*
 
 class DatabasesTest extends Specification {
-  @Shared DBI dbi = new DBI("jdbc:h2:mem:databaseTest")
-  @Shared Handle handle
+  @Shared
+  DBI dbi = new DBI("jdbc:h2:mem:databaseTest")
+  @Shared
+  Handle handle
 
   def setup() {
     handle = dbi.open()
     handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
-    handle.execute('CREATE TABLE e (\n' +
-        '    id bigint NOT NULL,\n' +
-        '    history_id bigint NOT NULL,\n' +
-        '    public_id character varying(20) NOT NULL,\n' +
-        '    name character varying(80) NOT NULL,')
+    handle.execute('''\
+      CREATE TABLE entities (
+        id bigint NOT NULL,
+        name character varying(80) NOT NULL
+      )'''.stripIndent())
   }
 
   def 'should create insert sql statement'() {
@@ -32,9 +34,18 @@ class DatabasesTest extends Specification {
       sql == 'INSERT INTO table (col1, col2) VALUES (:col1, :col2);'
   }
 
+  def 'should fail when creating insert for illegal table name'() {
+    given:
+      def table = ';drop'
+    when:
+      insertSql(table, [] as Set)
+    then:
+      thrown(RuntimeException)
+  }
+
   def 'should find next entity id when core table is empty'() {
     given: 'empty core table'
-      def table = 'customers'
+      def table = 'entities'
     when:
       def entityId = nextEntityIdFor(table, handle)
     then:
@@ -43,14 +54,25 @@ class DatabasesTest extends Specification {
 
   def 'should find next entity id when core table has records'() {
     given: 'empty core table'
-      def table = 'customers'
-      handle.execute("INSERT INTO customers (id, history_id, name, public_id, inserted_on) VALUES (1, 1, 'name', '9', now());")
+      def table = 'entities'
+      handle.execute("INSERT INTO entities (id, name) VALUES (1, 'name');")
     when:
       def entityId = nextEntityIdFor(table, handle)
     then:
-      entityId == 1
+      entityId == 2
   }
 
+  def 'should find next entity id when draft exist'() {
+    given: 'draft record for entity'
+      def table = 'entities'
+      handle.execute("INSERT INTO drafts2 (user, entity_type, entity_id, " +
+          "entity_name, status, data) VALUES ('test', 'entities', 7, " +
+          "'name', 'DRAFT', '{}');")
+    when:
+      def entityId = nextEntityIdFor(table, handle)
+    then:
+      entityId == 8
+  }
 
   def cleanup() {
     handle.execute('DROP TABLE customers')
@@ -61,6 +83,7 @@ class DatabasesTest extends Specification {
     handle.execute('DROP TABLE users')
     handle.execute('DROP TABLE drafts')
     handle.execute('DROP TABLE drafts2')
+    handle.execute('DROP TABLE entities')
     handle.close()
   }
 

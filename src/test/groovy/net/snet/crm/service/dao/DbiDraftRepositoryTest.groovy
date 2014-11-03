@@ -31,7 +31,7 @@ class DbiDraftRepositoryTest extends Specification {
         id == draftId
         user == 'test'
         entity_type == 'services'
-        entity_id == 0
+        entity_id > 0
         entity_name == 'LanAccess'
         status == 'DRAFT'
         data == '{"name":"LanAccess"}'
@@ -48,23 +48,11 @@ class DbiDraftRepositoryTest extends Specification {
         id == draftId
         user == 'test'
         entityType == 'services'
-        entityId == 0
+        entityId > 0
         entityName == 'LanAccess'
         status == 'DRAFT'
         data == '{"name":"LanAccess"}'
       }
-  }
-
-  def 'should set correct entity id from original table'() {
-    given:
-      def draftData = createDraftData()
-      draftData.entityType = 'customers'
-      draftData.remove('entityId')
-    when:
-      draftId = repo.createDraft(draftData)
-    then:
-      def draft = handle.select('SELECT * from drafts2 where id=:id', draftId)
-      draft.entity_id == 1
   }
 
   def createDraftData() {

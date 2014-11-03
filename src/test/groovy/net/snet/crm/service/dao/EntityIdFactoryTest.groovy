@@ -6,7 +6,8 @@ import org.skife.jdbi.v2.Handle
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static net.snet.crm.service.utils.Databases.*
+import static net.snet.crm.service.utils.Databases.insertSql
+import static net.snet.crm.service.utils.Databases.nextEntityIdFor
 
 class EntityIdFactoryTest extends Specification {
   @Shared
@@ -17,61 +18,59 @@ class EntityIdFactoryTest extends Specification {
   def setup() {
     handle = dbi.open()
     handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
-    handle.execute('''\
-      CREATE TABLE entities (
-        id bigint NOT NULL,
-        name character varying(80) NOT NULL
-      )'''.stripIndent())
   }
 
-  def 'should create insert sql statement'() {
-    given:
-      def table = 'table'
-      def columns = values().keySet()
+  def 'should find next customers id when draft exist'() {
+    given: 'customers draft record'
+      def table = 'customers'
+      insertDraftOf(table, 7, 'name')
     when:
-      def sql = insertSql(table, columns)
-    then:
-      sql == 'INSERT INTO table (col1, col2) VALUES (:col1, :col2);'
-  }
-
-  def 'should fail when creating insert for illega table name'() {
-    given:
-      def table = ';drop'
-    when:
-      insertSql(table, [] as Set)
-    then:
-      thrown(RuntimeException)
-  }
-
-  def 'should find next entity id when core table is empty'() {
-    given: 'empty core table'
-      def table = 'entities'
-    when:
-      def entityId = nextEntityIdFor(table, handle)
-    then:
-      entityId == 1
-  }
-
-  def 'should find next entity id when core table has records'() {
-    given: 'empty core table'
-      def table = 'entities'
-      handle.execute("INSERT INTO entities (id, name) VALUES (1, 'name');")
-    when:
-      def entityId = nextEntityIdFor(table, handle)
-    then:
-      entityId == 2
-  }
-
-  def 'should find next entity id when draft exist'() {
-    given: 'draft record for entity'
-      def table = 'entities'
-      handle.execute("INSERT INTO drafts2 (user, entity_type, entity_id, " +
-          "entity_name, status, data) VALUES ('test', 'entities', 7, " +
-          "'name', 'DRAFT', '{}');")
-    when:
-      def entityId = nextEntityIdFor(table, handle)
+      def entityId = EntityIdFactory.entityIdFor(table, handle).nextEntityId()
     then:
       entityId == 8
+  }
+
+  def 'should find next agreement id when draft exist'() {
+    given: 'agreements draft record'
+      def table = 'agreements'
+      insertDraftOf(table, 100012, 'CZ')
+      insertDraftOf(table, 200012, 'PL')
+    when:
+      def entityId = EntityIdFactory.entityIdFor("${table}.CZ",
+          handle).nextEntityId()
+    then:
+      entityId == 100013
+  }
+
+  def 'should find next services id for agreement when no draft nor service exist'() {
+    given:
+      def table = 'services'
+      def agreement = '100012'
+    when:
+      def entityId = EntityIdFactory.entityIdFor("${table}.${agreement}", handle)
+                        .nextEntityId()
+    then:
+      entityId == 10001201
+  }
+
+  def 'should find next services id for agreement when service exist but not draft'() {
+    given:
+      def table = 'services'
+      def agreement = '100012'
+      handle.execute("INSERT INTO services(id, period_from, name, price) " +
+          "VALUES (10001201, '2014-11-01', 'LANAccess', 100);")
+    when:
+      def entityId = EntityIdFactory.entityIdFor("${table}.${agreement}", handle)
+                        .nextEntityId()
+    then:
+      entityId == 10001202
+  }
+
+
+  def insertDraftOf(entityType, entityId, entityName) {
+    handle.execute("INSERT INTO drafts2 (user, entity_type, entity_id, " +
+        "entity_name, status, data) VALUES ('test', '${entityType}', ${entityId}, " +
+        "'${entityName}', 'DRAFT', '{}');")
   }
 
   def cleanup() {
@@ -83,14 +82,6 @@ class EntityIdFactoryTest extends Specification {
     handle.execute('DROP TABLE users')
     handle.execute('DROP TABLE drafts')
     handle.execute('DROP TABLE drafts2')
-    handle.execute('DROP TABLE entities')
     handle.close()
-  }
-
-  def Map values() {
-    [
-        col1: 'val1',
-        col2: 'val2'
-    ]
   }
 }
