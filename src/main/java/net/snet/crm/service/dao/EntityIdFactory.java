@@ -1,54 +1,79 @@
 package net.snet.crm.service.dao;
 
-import net.snet.crm.service.utils.Databases;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Longs;
 import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.util.LongMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static net.snet.crm.service.utils.Databases.lastEntityIdFor;
 
 public class EntityIdFactory {
-  private static String DRAFTS_TABLE = "drafts2";
+  private static final Logger logger =
+      LoggerFactory.getLogger(EntityIdFactory.class);
 
-  public static EntityId entityIdFor(final String entityTypeAndClass,
+  private static Map<String, Long> AGREEMENT_COUNTRY = ImmutableMap.of(
+      "CZ", 100000L,
+      "PL", 200000L
+  );
+
+  public static EntityId entityIdFor(final String type,
+                                     final String spate,
                                      final Handle handle) {
-    final int classIdx = entityTypeAndClass.lastIndexOf(".");
-    final String entityClass = classIdx > 0 ?
-                    entityTypeAndClass.substring(classIdx + 1) : "";
-    final String entityType = classIdx > 0 ?
-                    entityTypeAndClass.substring(0, classIdx) : entityTypeAndClass;
-    if ("agreements".equals(entityType)) {
+
+    checkNotNull(type, "entity type can't be null");
+    checkNotNull(type, "entity spate can't be null");
+
+    logger.debug("providing EntityId for '{}.{}'", type, spate);
+    if ("agreements".equals(type)) {
       return new EntityId() {
         @Override
         public long nextEntityId() {
-          final long lastId = handle.createQuery("SELECT max(entity_id) FROM " +
-              DRAFTS_TABLE + " WHERE " +
-              "entity_type='agreements' AND entity_name=:entity_class;")
-              .bind("entity_class", entityClass)
-              .map(LongMapper.FIRST)
-              .first();
-          return lastId + 1;
-        }
-      };
-    }
-    if ("services".equals(entityType)) {
-      return new EntityId() {
-        @Override
-        public long nextEntityId() {
-          long lastId = handle.createQuery("SELECT max(entity_id) FROM " +
-              DRAFTS_TABLE + " WHERE " +
-              "entity_type='services' AND entity_name=:entity_class;")
-              .bind("entity_class", entityClass)
-              .map(LongMapper.FIRST)
-              .first();
+          final String country = spate.toUpperCase();
+          checkState(AGREEMENT_COUNTRY.containsKey(country),
+              "unknown agreement country '%s'", country);
+          long lastId = lastEntityIdFor(
+              type, spate, "country='" + country + "'", handle);
           if (lastId == 0) {
-            lastId = Long.valueOf(entityClass) * 100;
+            lastId = AGREEMENT_COUNTRY.get(country);
           }
           return lastId + 1;
         }
       };
     }
+
+    if ("services".equals(type)) {
+      return new EntityId() {
+        @Override
+        public long nextEntityId() {
+          final Long agreementId = Longs.tryParse(spate);
+          checkNotNull(agreementId,
+              "not numeric agreement id '%s'", spate);
+          final long lowerBound =
+              (agreementId - (agreementId % 100000)) * 100;
+          final long upperBound = lowerBound + 10000000;
+          final String constrain =
+              String.format("%d < id AND id < %d", lowerBound, upperBound);
+          long lastId = lastEntityIdFor(type, spate, constrain, handle);
+          if (lastId == 0) {
+            lastId = agreementId * 100;
+          }
+          checkState((lastId % 100) < 99,
+              "no free service id for agreement '%s', last service id found '%s'",
+              agreementId, lastId);
+          return lastId + 1;
+        }
+      };
+    }
+
     return new EntityId() {
       @Override
       public long nextEntityId() {
-        return Databases.nextEntityIdFor(entityType, handle);
+        return lastEntityIdFor(type, spate, handle) + 1;
      }
     };
   }

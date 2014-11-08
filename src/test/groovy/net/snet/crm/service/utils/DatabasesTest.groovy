@@ -43,35 +43,39 @@ class DatabasesTest extends Specification {
       thrown(RuntimeException)
   }
 
-  def 'should find next entity id when core table is empty'() {
-    given: 'empty core table'
-      def table = 'entities'
+  def 'should find last entity id when core table is empty'() {
+    given:
+      def entityType = 'entities'
+      def entitySpate = ''
     when:
-      def entityId = nextEntityIdFor(table, handle)
+      def entityId = lastEntityIdFor(entityType, entitySpate, handle)
+    then:
+      entityId == 0
+  }
+
+  def 'should find last entity id when core table has records'() {
+    given: 'empty core table'
+      def entityType = 'entities'
+      def entitySpate = ''
+      handle.execute("INSERT INTO entities (id, name) VALUES (1, 'name');")
+    when:
+      def entityId = lastEntityIdFor(entityType, entitySpate, handle)
     then:
       entityId == 1
   }
 
-  def 'should find next entity id when core table has records'() {
-    given: 'empty core table'
-      def table = 'entities'
-      handle.execute("INSERT INTO entities (id, name) VALUES (1, 'name');")
-    when:
-      def entityId = nextEntityIdFor(table, handle)
-    then:
-      entityId == 2
-  }
-
-  def 'should find next entity id when draft exist'() {
+  def 'should find last entity id when draft exist'() {
     given: 'draft record for entity'
-      def table = 'entities'
-      handle.execute("INSERT INTO drafts2 (user, entity_type, entity_id, " +
-          "entity_name, status, data) VALUES ('test', 'entities', 7, " +
-          "'name', 'DRAFT', '{}');")
+      def entityType = 'entities'
+      def entitySpate = 'CZ'
+      handle.execute('''\
+        INSERT INTO drafts2 (user, entity_type, entity_spate, entity_id,
+        entity_name, status, data) VALUES ('test', 'entities', 'CZ', 7, 'name',
+        'DRAFT', '{}');''')
     when:
-      def entityId = nextEntityIdFor(table, handle)
+      def entityId = lastEntityIdFor(entityType, entitySpate, handle)
     then:
-      entityId == 8
+      entityId == 7
   }
 
   def cleanup() {

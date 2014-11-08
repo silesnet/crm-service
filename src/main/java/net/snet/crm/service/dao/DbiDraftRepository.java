@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
+import static net.snet.crm.service.dao.EntityIdFactory.entityIdFor;
 import static net.snet.crm.service.utils.Databases.getRecord;
 import static net.snet.crm.service.utils.Databases.insertRecord;
 import static net.snet.crm.service.utils.Entities.*;
@@ -26,6 +27,7 @@ public class DbiDraftRepository implements DraftRepository {
           .put("id", "id")
           .put("user", "user")
           .put("entityType", "entity_type")
+          .put("entitySpate", "entity_spate")
           .put("entityId", "entity_id")
           .put("entityName", "entity_name")
           .put("status", "status")
@@ -45,14 +47,17 @@ public class DbiDraftRepository implements DraftRepository {
     logger.debug("creating draft");
     final Map<String, Object> record = recordOf(draft, draftFields);
 	  final Optional<String> entityType = fetchNested("entity_type", record, String.class);
-	  checkState(entityType.isPresent(), "entity type was not provided");
-	  logger.debug("entity type: {}", entityType.get());
+    checkState(entityType.isPresent(), "entity type was not provided");
+    final Optional<String> entitySpate = fetchNested("entity_spate", record, String.class);
+    checkState(entitySpate.isPresent(), "entity spate was not provided");
+    logger.debug("entity type.spate: {}.{}", entityType.get(), entitySpate.get());
     record.put("data", toJson(record.get("data")));
     return dbi.withHandle(new HandleCallback<Long>() {
       @Override
       public Long withHandle(Handle handle) throws Exception {
         // TODO check for 'AVAILABLE' drafts of the same type, reuse if possible
-        final EntityId entityId = EntityIdFactory.entityIdFor(entityType.get(), handle);
+        final EntityId entityId =
+            entityIdFor(entityType.get(), entitySpate.get(), handle);
         record.put("entity_id", entityId.nextEntityId());
         return insertRecord(DRAFTS_TABLE, record, handle);
       }
