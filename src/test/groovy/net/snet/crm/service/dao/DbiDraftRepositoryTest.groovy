@@ -31,6 +31,7 @@ class DbiDraftRepositoryTest extends Specification {
         id == draftId
         user == 'test'
         entity_type == 'services'
+        entity_spate == '101234'
         entity_id > 0
         entity_name == 'LanAccess'
         status == 'DRAFT'
@@ -48,6 +49,7 @@ class DbiDraftRepositoryTest extends Specification {
         id == draftId
         user == 'test'
         entityType == 'services'
+        entitySpate == '101234'
         entityId > 0
         entityName == 'LanAccess'
         status == 'DRAFT'
@@ -59,6 +61,7 @@ class DbiDraftRepositoryTest extends Specification {
     [
         user: 'test',
         entityType: 'services',
+        entitySpate: '101234',
         entityId: 0,
         entityName: 'LanAccess',
         status: 'DRAFT',
