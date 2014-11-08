@@ -58,7 +58,7 @@ public class DbiDraftRepository implements DraftRepository {
         // TODO check for 'AVAILABLE' drafts of the same type, reuse if possible
         final EntityId entityId =
             entityIdFor(entityType.get(), entitySpate.get(), handle);
-        record.put("entity_id", entityId.nextEntityId());
+        record.put("entity_id", entityId.nextId());
         return insertRecord(DRAFTS_TABLE, record, handle);
       }
     });

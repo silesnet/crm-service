@@ -32,7 +32,7 @@ public class EntityIdFactory {
     if ("agreements".equals(type)) {
       return new EntityId() {
         @Override
-        public long nextEntityId() {
+        public long nextId() {
           final String country = spate.toUpperCase();
           checkState(AGREEMENT_COUNTRY.containsKey(country),
               "unknown agreement country '%s'", country);
@@ -49,7 +49,7 @@ public class EntityIdFactory {
     if ("services".equals(type)) {
       return new EntityId() {
         @Override
-        public long nextEntityId() {
+        public long nextId() {
           final Long agreementId = Longs.tryParse(spate);
           checkNotNull(agreementId,
               "not numeric agreement id '%s'", spate);
@@ -72,7 +72,7 @@ public class EntityIdFactory {
 
     return new EntityId() {
       @Override
-      public long nextEntityId() {
+      public long nextId() {
         return lastEntityIdFor(type, spate, handle) + 1;
      }
     };

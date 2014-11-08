@@ -24,7 +24,7 @@ class EntityIdFactoryTest extends Specification {
       def entity = 'customers'
       def spate = ''
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 1
   }
@@ -35,7 +35,7 @@ class EntityIdFactoryTest extends Specification {
       def spate = ''
       insertCustomerOf(6)
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 7
   }
@@ -47,7 +47,7 @@ class EntityIdFactoryTest extends Specification {
       insertCustomerOf(6)
       insertDraftOf(entity, '', 7, 'name')
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 8
   }
@@ -57,7 +57,7 @@ class EntityIdFactoryTest extends Specification {
       def entity = 'agreements'
       def spate = 'CZ'
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 100001
   }
@@ -67,7 +67,7 @@ class EntityIdFactoryTest extends Specification {
       def entity = 'agreements'
       def spate = 'PL'
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 200001
   }
@@ -79,7 +79,7 @@ class EntityIdFactoryTest extends Specification {
       insertAgreementOf(6, 'CZ')
       insertAgreementOf(7, 'PL')
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 7
   }
@@ -92,7 +92,7 @@ class EntityIdFactoryTest extends Specification {
       insertAgreementOf(8, 'PL')
       insertDraftOf(entity, 'CZ', 7, 'name')
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 8
   }
@@ -102,7 +102,7 @@ class EntityIdFactoryTest extends Specification {
       def entity = 'services'
       def spate = '100567'
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 10056701
   }
@@ -113,7 +113,7 @@ class EntityIdFactoryTest extends Specification {
       def spate = '100567'
       insertServiceOf(10056701)
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 10056702
   }
@@ -125,7 +125,7 @@ class EntityIdFactoryTest extends Specification {
       insertServiceOf(10056701)
       insertDraftOf(entity, spate, 10056702, 'LAN')
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 10056703
   }
@@ -136,7 +136,7 @@ class EntityIdFactoryTest extends Specification {
       def spate = '100567'
       insertServiceOf(20056701)
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 10056701
   }
@@ -147,7 +147,7 @@ class EntityIdFactoryTest extends Specification {
       def spate = '200567'
       insertServiceOf(10056701)
     when:
-      def nextId = entityIdFor(entity, spate, handle).nextEntityId()
+      def nextId = entityIdFor(entity, spate, handle).nextId()
     then:
       nextId == 20056701
   }
@@ -158,7 +158,7 @@ class EntityIdFactoryTest extends Specification {
       def spate = '100567'
       insertServiceOf(10056799)
     when:
-      println entityIdFor(entity, spate, handle).nextEntityId()
+      println entityIdFor(entity, spate, handle).nextId()
     then:
       thrown(RuntimeException)
   }
