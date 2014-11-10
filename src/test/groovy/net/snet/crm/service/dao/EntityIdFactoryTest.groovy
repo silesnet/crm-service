@@ -166,7 +166,8 @@ class EntityIdFactoryTest extends Specification {
   def insertDraftOf(entityType, entitySpate, entityId, entityName) {
     handle.execute("""\
       INSERT INTO drafts2
-        (user, entity_type, entity_spate, entity_id, entity_name, status, data)
+        (user_login, entity_type, entity_spate, entity_id, entity_name,
+         status, data)
       VALUES
         ('test', '${entityType}', '${entitySpate}', ${entityId},
          '${entityName}', 'DRAFT', '{}');""".stripIndent()

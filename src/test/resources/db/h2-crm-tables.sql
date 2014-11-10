@@ -107,7 +107,7 @@ CREATE TABLE drafts
 CREATE TABLE drafts2
 (
   id serial NOT NULL,
-  user character varying(50) NOT NULL,
+  user_login character varying(50) NOT NULL,
   entity_type character varying(20) NOT NULL,
   entity_spate character varying(20) NOT NULL DEFAULT '',
   entity_id bigint NOT NULL,

@@ -29,7 +29,7 @@ class DbiDraftRepositoryTest extends Specification {
       def draft = handle.select('SELECT * from drafts2 where id=:id', draftId)
       with(draft[0]) {
         id == draftId
-        user == 'test'
+        user_login == 'test'
         entity_type == 'services'
         entity_spate == '101234'
         entity_id > 0
@@ -47,7 +47,7 @@ class DbiDraftRepositoryTest extends Specification {
     then:
       with(draft) {
         id == draftId
-        user == 'test'
+        userLogin == 'test'
         entityType == 'services'
         entitySpate == '101234'
         entityId > 0
@@ -59,7 +59,7 @@ class DbiDraftRepositoryTest extends Specification {
 
   def createDraftData() {
     [
-        user: 'test',
+        userLogin: 'test',
         entityType: 'services',
         entitySpate: '101234',
         entityId: 0,

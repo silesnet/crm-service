@@ -1,5 +1,6 @@
 package net.snet.crm.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
@@ -8,10 +9,12 @@ import io.dropwizard.Application;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
+import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.snet.crm.service.dao.CrmRepositoryJdbi;
+import net.snet.crm.service.dao.DbiDraftRepository;
 import net.snet.crm.service.dao.DraftDAO;
 import net.snet.crm.service.resources.*;
 
@@ -61,8 +64,9 @@ public class CrmService extends Application<CrmConfiguration> {
 	public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, URISyntaxException {
 		final DBIFactory dbiFactory = new DBIFactory();
 		final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
+		final ObjectMapper mapper = environment.getObjectMapper();
 		if (configuration.getJsonPrettyPrint()) {
-			environment.getObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+			mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		}
 
 		FilterRegistration.Dynamic filters = environment.servlets().addFilter("CORS", new CrossOriginFilter());
@@ -77,18 +81,21 @@ public class CrmService extends Application<CrmConfiguration> {
 						.build("crm-service-http-client");
 
 		CrmRepositoryJdbi crmRepository = new CrmRepositoryJdbi(dbi);
-		environment.jersey().register(new CustomerResource(dbi, crmRepository));
-		environment.jersey().register(new AgreementResource(crmRepository));
-		environment.jersey().register(new ServiceResource(crmRepository));
-		environment.jersey().register(new ConnectionResource(crmRepository));
-		environment.jersey().register(new DraftResource(dbi.onDemand(DraftDAO.class), environment.getObjectMapper(), crmRepository));
-		environment.jersey().register(new RouterResource(dbi));
-		environment.jersey().register(new NetworkResource(dbi));
-		environment.jersey().register(new UserResource(dbi, crmRepository,
+		final JerseyEnvironment jersey = environment.jersey();
+		jersey.register(new CustomerResource(dbi, crmRepository));
+		jersey.register(new AgreementResource(crmRepository));
+		jersey.register(new ServiceResource(crmRepository));
+		jersey.register(new ConnectionResource(crmRepository));
+		jersey.register(new DraftResource(dbi.onDemand(DraftDAO.class), mapper, crmRepository));
+		jersey.register(new RouterResource(dbi));
+		jersey.register(new NetworkResource(dbi));
+		jersey.register(new UserResource(dbi, crmRepository,
 				new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository)));
-		environment.jersey().register(new ProductResource(dbi));
-		environment.jersey().register(new ContractResource(dbi));
-		environment.jersey().register(new BaseResource());
+		jersey.register(new ProductResource(dbi));
+		jersey.register(new ContractResource(dbi));
+		jersey.register(new BaseResource());
+		final DbiDraftRepository draftRepository = new DbiDraftRepository(dbi, mapper);
+		jersey.register(new DraftResource2(draftRepository));
 	}
 
 	private SchemeRegistry schemeRegistry() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
