@@ -141,6 +141,17 @@ class EntityIdFactoryTest extends Specification {
       nextId == 10056701
   }
 
+  def 'should find next CZ service id when noise CZ services exist'() {
+    given:
+      def entity = 'services'
+      def spate = '100567'
+      insertServiceOf(10056601)
+    when:
+      def nextId = entityIdFor(entity, spate, handle).nextId()
+    then:
+      nextId == 10056701
+  }
+
   def 'should find next PL service id when noise CZ services exist'() {
     given:
       def entity = 'services'

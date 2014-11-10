@@ -53,11 +53,7 @@ public class EntityIdFactory {
           final Long agreementId = Longs.tryParse(spate);
           checkNotNull(agreementId,
               "not numeric agreement id '%s'", spate);
-          final long lowerBound =
-              (agreementId - (agreementId % 100000)) * 100;
-          final long upperBound = lowerBound + 10000000;
-          final String constrain =
-              String.format("%d < id AND id < %d", lowerBound, upperBound);
+          final String constrain = String.format("(id/100)=%d", agreementId);
           long lastId = lastEntityIdFor(type, spate, constrain, handle);
           if (lastId == 0) {
             lastId = agreementId * 100;
@@ -65,7 +61,9 @@ public class EntityIdFactory {
           checkState((lastId % 100) < 99,
               "no free service id for agreement '%s', last service id found '%s'",
               agreementId, lastId);
-          return lastId + 1;
+          final long nextId = lastId + 1;
+          logger.debug("nextId for '{}.{}' is '{}'", type, spate, nextId);
+          return nextId;
         }
       };
     }
