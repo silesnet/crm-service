@@ -5,6 +5,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
+import com.google.common.primitives.Longs;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.util.LongMapper;
 
@@ -56,10 +57,10 @@ public class Databases {
   public static long insertRecord(final String table,
                                   final Map<String, Object> record,
                                   final Handle handle) {
-    return (long) handle
+    return handle
         .createStatement(insertSql(table, record.keySet()))
         .bindFromMap(record)
-        .execute();
+        .executeAndReturnGeneratedKeys(LongMapper.FIRST).first();
   }
 
   public static Map<String, Object> getRecord(final String table,
