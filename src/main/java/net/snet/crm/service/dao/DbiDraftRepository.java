@@ -25,7 +25,7 @@ public class DbiDraftRepository implements DraftRepository {
   private static final Map<String, String> draftFields =
       ImmutableMap.<String, String>builder()
           .put("id", "id")
-          .put("user", "user")
+          .put("userLogin", "user_login")
           .put("entityType", "entity_type")
           .put("entitySpate", "entity_spate")
           .put("entityId", "entity_id")

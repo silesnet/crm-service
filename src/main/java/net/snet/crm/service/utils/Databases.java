@@ -24,22 +24,34 @@ public class Databases {
   private static Function<String, String> idToNull = idToNull();
   private static Function<String, String> toValueReference = toValueReference();
 
-	public static long nextEntityIdFor(final String table, final Handle handle) {
-    checkTableName(table);
-		long lastId = handle
-				.createQuery(
+  public static long lastEntityIdFor(final String entityType,
+                                     final String entitySpate,
+                                     final String entityConstrain,
+                                     final Handle handle) {
+
+    checkTableName(entityType);
+    return handle
+        .createQuery(
             "SELECT max(max_id) FROM (" +
-              "SELECT MAX(id) max_id FROM " + table + " " +
-              "UNION ALL " +
-              "SELECT MAX(entity_id) max_id FROM " + DRAFTS_TABLE + " WHERE " +
-                "entity_type=:table" +
-            ") sub_query"
+                "SELECT MAX(id) max_id FROM " + entityType +
+                " WHERE " + entityConstrain + " " +
+                "UNION ALL " +
+                "SELECT MAX(entity_id) max_id FROM " + DRAFTS_TABLE + " WHERE " +
+                "entity_type=:entity_type AND entity_spate=:entity_spate" +
+                ") sub_query"
         )
-        .bind("table", table)
-				.map(LongMapper.FIRST)
-				.first();
-		return lastId + 1;
-	}
+        .bind("entity_type", entityType)
+        .bind("entity_spate", entitySpate)
+        .map(LongMapper.FIRST)
+        .first();
+  }
+
+  public static long lastEntityIdFor(final String entityType,
+                                     final String entitySpate,
+                                     final Handle handle) {
+    return lastEntityIdFor(entityType, entitySpate, "1=1", handle);
+  }
+
 
   public static long insertRecord(final String table,
                                   final Map<String, Object> record,

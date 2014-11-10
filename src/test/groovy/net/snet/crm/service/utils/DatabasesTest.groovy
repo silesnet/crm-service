@@ -69,7 +69,7 @@ class DatabasesTest extends Specification {
       def entityType = 'entities'
       def entitySpate = 'CZ'
       handle.execute('''\
-        INSERT INTO drafts2 (user, entity_type, entity_spate, entity_id,
+        INSERT INTO drafts2 (user_login, entity_type, entity_spate, entity_id,
         entity_name, status, data) VALUES ('test', 'entities', 'CZ', 7, 'name',
         'DRAFT', '{}');''')
     when:
