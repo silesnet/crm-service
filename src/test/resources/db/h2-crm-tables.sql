@@ -116,6 +116,13 @@ CREATE TABLE drafts2
   data character varying(5000) NOT NULL DEFAULT '{}'
 );
 
+CREATE TABLE draft_links
+(
+  draft_id bigint NOT NULL,
+  entity character varying(40) NOT NULL,
+  entity_id bigint NOT NULL
+);
+
 CREATE TABLE users
 (
   id bigint NOT NULL,

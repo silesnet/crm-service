@@ -87,6 +87,7 @@ class DatabasesTest extends Specification {
     handle.execute('DROP TABLE users')
     handle.execute('DROP TABLE drafts')
     handle.execute('DROP TABLE drafts2')
+    handle.execute('DROP TABLE draft_links')
     handle.execute('DROP TABLE entities')
     handle.close()
   }

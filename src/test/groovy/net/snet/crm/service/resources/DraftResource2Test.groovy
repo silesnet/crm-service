@@ -15,7 +15,10 @@ import javax.ws.rs.core.MediaType
 
 class DraftResource2Test extends Specification {
 
-  public static final long CUSTOMER_DRAFT_ID = 10L
+  private static final DRAFTS = 'drafts2'
+  private static final long CUSTOMER_DRAFT_ID = 10L
+  private static final long AGREEMENT_DRAFT_ID = 10L
+
   @Shared
   DraftResource2 draftResource = new DraftResource2(null);
 
@@ -28,23 +31,23 @@ class DraftResource2Test extends Specification {
   }
 
   def 'should create new customer draft resource'() {
-    given: 'customer POST draft data'
-      def postData = createCustomerDraftPostData()
-    and: 'draft repository'
+    given:
+      def postData = postCustomerDraft()
+    and:
       def draftRepository = wiredDraftRepositoryStub()
       draftRepository.createDraft(_) >> CUSTOMER_DRAFT_ID
       draftRepository.get(CUSTOMER_DRAFT_ID) >> createdCustomerDraft()
-    when: 'invoking POST'
-      def res = post('/drafts2', postData)
+    when:
+      def res = post("/${DRAFTS}", postData)
     then:
       with(res) {
         status == 201
-        location.path.endsWith("/drafts2/${CUSTOMER_DRAFT_ID}")
+        location.path.endsWith("${DRAFTS}/${CUSTOMER_DRAFT_ID}")
       }
       res.getEntity(Map.class).drafts == createdCustomerDraft()
   }
 
-  String createCustomerDraftPostData() {
+  String postCustomerDraft() {
     '''\
       {
         "drafts": {
@@ -63,7 +66,7 @@ class DraftResource2Test extends Specification {
     [
         id: CUSTOMER_DRAFT_ID,
         entityType: 'customers',
-        entityId: 0,
+        entityId: 8,
         entityName: 'Jan Nowak',
         owner: 'test',
         status: 'DRAFT',
