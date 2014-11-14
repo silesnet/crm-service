@@ -44,7 +44,7 @@ public class DraftResource2 {
     final long draftId = draftRepository.createDraft(draftData.get());
     final Map<String, Object> draft = draftRepository.get(draftId);
     return Response
-        .created(uriInfo.getRequestUriBuilder().replacePath("{id}").build(draftId))
+        .created(uriInfo.getRequestUriBuilder().path("{id}").build(draftId))
         .entity(ImmutableMap.of("drafts", draft))
         .build();
   }
