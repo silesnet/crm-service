@@ -69,9 +69,9 @@ class DatabasesTest extends Specification {
       def entityType = 'entities'
       def entitySpate = 'CZ'
       handle.execute('''\
-        INSERT INTO drafts2 (user_login, entity_type, entity_spate, entity_id,
-        entity_name, status, data) VALUES ('test', 'entities', 'CZ', 7, 'name',
-        'DRAFT', '{}');''')
+        INSERT INTO drafts2 (entity_type, entity_spate, entity_id, entity_name,
+          status, owner, data)
+        VALUES ('entities', 'CZ', 7, 'name', 'DRAFT', 'test', '{}');'''.stripIndent())
     when:
       def entityId = lastEntityIdFor(entityType, entitySpate, handle)
     then:

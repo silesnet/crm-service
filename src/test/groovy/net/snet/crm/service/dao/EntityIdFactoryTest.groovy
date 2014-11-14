@@ -177,11 +177,11 @@ class EntityIdFactoryTest extends Specification {
   def insertDraftOf(entityType, entitySpate, entityId, entityName) {
     handle.execute("""\
       INSERT INTO drafts2
-        (user_login, entity_type, entity_spate, entity_id, entity_name,
-         status, data)
+        (entity_type, entity_spate, entity_id, entity_name,
+         status, owner, data)
       VALUES
-        ('test', '${entityType}', '${entitySpate}', ${entityId},
-         '${entityName}', 'DRAFT', '{}');""".stripIndent()
+        ('${entityType}', '${entitySpate}', ${entityId}, '${entityName}',
+         'DRAFT', 'test', '{}');""".stripIndent()
     )
   }
 

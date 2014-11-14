@@ -39,7 +39,7 @@ class DraftResource2Test extends Specification {
     then:
       with(res) {
         status == 201
-        location.path == "/drafts2/${CUSTOMER_DRAFT_ID}"
+        location.path.endsWith("/drafts2/${CUSTOMER_DRAFT_ID}")
       }
       res.getEntity(Map.class).drafts == createdCustomerDraft()
   }
