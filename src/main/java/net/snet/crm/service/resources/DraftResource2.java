@@ -6,10 +6,7 @@ import net.snet.crm.service.dao.DraftRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -46,6 +43,15 @@ public class DraftResource2 {
     return Response
         .created(uriInfo.getRequestUriBuilder().path("{id}").build(draftId))
         .entity(ImmutableMap.of("drafts", draft))
+        .build();
+  }
+
+  @GET
+  @Path("/{draftId}")
+  public Response retrieveDraft(@PathParam("draftId") long draftId) {
+    logger.debug("retrieving draft '{}", draftId);
+    return Response
+        .ok(ImmutableMap.of("drafts", draftRepository.get(draftId)))
         .build();
   }
 }
