@@ -24,6 +24,16 @@ class DatabasesTest extends Specification {
       )'''.stripIndent())
   }
 
+  def 'should create updated sql statement'() {
+    given:
+      def table = 'table'
+      def columns = values().keySet()
+    when:
+      def sql = updateSql(table, columns)
+    then:
+      sql == 'UPDATE table SET col1=:col1, col2=:col2 WHERE id=:id;'
+  }
+
   def 'should create insert sql statement'() {
     given:
       def table = 'table'
