@@ -91,15 +91,35 @@ public class DbiDraftRepository implements DraftRepository {
     return dbi.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
-        final Map<String, Object> entity =
-            entityOf(getRecord(DRAFTS_TABLE, draftId, handle), draftFields);
-        final Map<String, Object> links = draftLinks(draftId, handle);
-        if (!links.isEmpty()) {
-          entity.put("links", links);
-        }
-        return entity;
+        return getByDraftId(draftId, handle);
       }
     });
+  }
+
+  @Override
+  public Map<String, Object> getByType(final String entityType,
+                                       final long entityId) {
+    logger.debug("getting draft by type '{}/{}'", entityType, entityId);
+    return dbi.withHandle(new HandleCallback<Map<String, Object>>() {
+      @Override
+      public Map<String, Object> withHandle(Handle handle) throws Exception {
+        final Optional<Long> draftId = draftIdOfType(entityType, entityId, handle);
+        checkState(draftId.isPresent(),
+            "can't find draft by entity '%s/%s'", entityType, entityId);
+        return getByDraftId(draftId.get(), handle);
+      }
+    });
+  }
+
+  private Map<String, Object> getByDraftId(final long draftId,
+                                           final Handle handle) {
+    final Map<String, Object> entity =
+        entityOf(getRecord(DRAFTS_TABLE, draftId, handle), draftFields);
+    final Map<String, Object> links = draftLinks(draftId, handle);
+    if (!links.isEmpty()) {
+      entity.put("links", links);
+    }
+    return entity;
   }
 
   private Optional<Long> availableDraftIdOfType(final String entityType,
@@ -109,6 +129,20 @@ public class DbiDraftRepository implements DraftRepository {
             " WHERE status='AVAILABLE' AND " + "entity_type=:entity_type" +
             " ORDER BY id")
         .bind("entity_type", entityType)
+        .map(LongMapper.FIRST)
+        .first();
+    return Optional.fromNullable(availableId);
+  }
+
+  private Optional<Long> draftIdOfType(final String entityType,
+                                       final long entityId,
+                                       final Handle handle) {
+    final Long availableId = handle.createQuery(
+        "SELECT id FROM " + DRAFTS_TABLE +
+            " WHERE entity_type=:entity_type AND entity_id=:entity_id" +
+            " ORDER BY id")
+        .bind("entity_type", entityType)
+        .bind("entity_id", entityId)
         .map(LongMapper.FIRST)
         .first();
     return Optional.fromNullable(availableId);

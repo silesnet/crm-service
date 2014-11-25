@@ -49,9 +49,21 @@ public class DraftResource2 {
   @GET
   @Path("/{draftId}")
   public Response retrieveDraft(@PathParam("draftId") long draftId) {
-    logger.debug("retrieving draft '{}", draftId);
+    logger.debug("retrieving draft '{}'", draftId);
     return Response
         .ok(ImmutableMap.of("drafts", draftRepository.get(draftId)))
         .build();
   }
+
+  @GET
+  @Path("/{entityType}/{entityId}")
+  public Response retrieveDraftByType(@PathParam("entityType") String entityType,
+                                      @PathParam("entityId") long entityId) {
+    logger.debug("retrieving draft by type '{}/{}'", entityType, entityId);
+    return Response
+        .ok(ImmutableMap.of("drafts",
+            draftRepository.getByType(entityType, entityId)))
+        .build();
+  }
+
 }
