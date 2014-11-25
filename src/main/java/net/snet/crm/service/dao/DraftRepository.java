@@ -7,4 +7,6 @@ public interface DraftRepository {
   long createDraft(Map<String, Object> draft);
 
   Map<String, Object> get(long draftId);
+
+  Map<String, Object> getByType(String entityType, long entityId);
 }
