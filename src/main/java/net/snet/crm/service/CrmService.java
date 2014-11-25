@@ -18,6 +18,7 @@ import net.snet.crm.service.dao.DbiDraftRepository;
 import net.snet.crm.service.dao.DraftDAO;
 import net.snet.crm.service.resources.*;
 
+import net.snet.crm.service.utils.RuntimeExceptionMapper;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -96,6 +97,7 @@ public class CrmService extends Application<CrmConfiguration> {
 		jersey.register(new BaseResource());
 		final DbiDraftRepository draftRepository = new DbiDraftRepository(dbi, mapper);
 		jersey.register(new DraftResource2(draftRepository));
+		jersey.register(new RuntimeExceptionMapper());
 	}
 
 	private SchemeRegistry schemeRegistry() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
