@@ -53,7 +53,11 @@ public class DraftResource2 {
     logger.debug("retrieving drafts by owner '{}'", owner);
     final LinkedHashSet<Map<String, ?>> drafts = Sets.newLinkedHashSet();
     final Map<String, Object> ownerData = crmRepository.findUserByLogin(owner);
-    checkNotNull(ownerData, "unknown user '%s'", owner);
+    if (ownerData == null) {
+      throw new WebApplicationException(
+          new IllegalArgumentException("unknown user '" + owner + "'"),
+          400);
+    }
     final String roles = ownerData.get("roles").toString();
     for (String role : Splitter.on(',').trimResults().split(roles)) {
       if ("ROLE_TECH_ADMIN".equals(role)) {
