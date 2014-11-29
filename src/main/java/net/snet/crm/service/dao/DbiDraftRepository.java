@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
@@ -25,7 +26,7 @@ public class DbiDraftRepository implements DraftRepository {
       LoggerFactory.getLogger(DbiDraftRepository.class);
   public static final String DRAFTS_TABLE = "drafts2";
   public static final String DRAFTS_LINKS_TABLE = "draft_links";
-  private static final Map<String, String> draftFields =
+  private static final Map<String, String> DRAFT_FIELDS =
       ImmutableMap.<String, String>builder()
           .put("id", "id")
           .put("entityType", "entity_type")
@@ -48,7 +49,7 @@ public class DbiDraftRepository implements DraftRepository {
   @Override
   public long createDraft(final Map<String, Object> draft) {
     logger.debug("creating draft");
-    final Map<String, Object> record = recordOf(draft, draftFields);
+    final Map<String, Object> record = recordOf(draft, DRAFT_FIELDS);
 	  final Optional<String> entityType = fetchNested("entity_type", record, String.class);
     checkState(entityType.isPresent(), "entity type was not provided");
     final Optional<String> entitySpate = fetchNested("entity_spate", record, String.class);
@@ -111,10 +112,63 @@ public class DbiDraftRepository implements DraftRepository {
     });
   }
 
+  @Override
+  public List<Map<String, Object>> findDraftsByStatus(final String status) {
+    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+      @Override
+      public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+        final List<Map<String, Object>> draftsData = handle
+            .createQuery("SELECT * FROM " + DRAFTS_TABLE + " WHERE status=:status;")
+            .bind("status", status)
+            .list();
+        final List<Map<String, Object>> drafts = Lists.newArrayList();
+        for (Map<String, Object> record : draftsData) {
+          final Map<String, Object> draft = entityOf(record, DRAFT_FIELDS);
+          final Long draftId = Long.valueOf(draft.get("id").toString());
+          final Map<String, Object> links = draftLinks(draftId, handle);
+          if (!links.isEmpty()) {
+            draft.put("links", links);
+          }
+          drafts.add(draft);
+        }
+        return drafts;
+      }
+    });
+  }
+
+  @Override
+  public List<Map<String, Object>> findDraftsByOwnerAndStatus(
+                                                      final String owner,
+                                                      final String status) {
+
+    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+      @Override
+      public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+        final List<Map<String, Object>> draftsData = handle
+            .createQuery("SELECT * FROM " + DRAFTS_TABLE +
+                " WHERE owner=:owner AND status=:status;")
+            .bind("owner", owner)
+            .bind("status", status)
+            .list();
+        final List<Map<String, Object>> drafts = Lists.newArrayList();
+        for (Map<String, Object> record : draftsData) {
+          final Map<String, Object> draft = entityOf(record, DRAFT_FIELDS);
+          final Long draftId = Long.valueOf(draft.get("id").toString());
+          final Map<String, Object> links = draftLinks(draftId, handle);
+          if (!links.isEmpty()) {
+            draft.put("links", links);
+          }
+          drafts.add(draft);
+        }
+        return drafts;
+      }
+    });
+  }
+
   private Map<String, Object> getByDraftId(final long draftId,
                                            final Handle handle) {
     final Map<String, Object> entity =
-        entityOf(getRecord(DRAFTS_TABLE, draftId, handle), draftFields);
+        entityOf(getRecord(DRAFTS_TABLE, draftId, handle), DRAFT_FIELDS);
     final Map<String, Object> links = draftLinks(draftId, handle);
     if (!links.isEmpty()) {
       entity.put("links", links);

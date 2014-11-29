@@ -96,7 +96,7 @@ public class CrmService extends Application<CrmConfiguration> {
 		jersey.register(new ContractResource(dbi));
 		jersey.register(new BaseResource());
 		final DbiDraftRepository draftRepository = new DbiDraftRepository(dbi, mapper);
-		jersey.register(new DraftResource2(draftRepository));
+		jersey.register(new DraftResource2(draftRepository, crmRepository));
 		jersey.register(new RuntimeExceptionMapper());
 	}
 

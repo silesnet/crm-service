@@ -22,10 +22,7 @@ class DraftResourceTest extends Specification {
 	public static final int SERVICE_ID = 10466601
 	public static final int CUSTOMER_ID = 297
 	public static final int AGREEMENT_ID = 104666
-	public static final int DRAFT_ID = 1234
-
-	CrmRepository crmRepository
-	DraftDAO draftDAO;
+	public static final int DRAFT_ID = 1234 CrmRepository crmRepository DraftDAO draftDAO;
 
 	@ClassRule
 	@Shared
