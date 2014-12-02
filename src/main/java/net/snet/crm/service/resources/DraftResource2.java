@@ -1,18 +1,17 @@
 package net.snet.crm.service.resources;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
+import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import net.snet.crm.service.bo.Draft;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
+import javax.annotation.Nonnull;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -21,9 +20,8 @@ import javax.ws.rs.core.UriInfo;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 import static net.snet.crm.service.utils.Entities.*;
+import static net.snet.crm.service.utils.Resources.*;
 
 @Path("/drafts2")
 @Produces({"application/json; charset=UTF-8"})
@@ -42,40 +40,21 @@ public class DraftResource2 {
   }
 
   @GET
-  public Response retrieveDraftsByOwner(@QueryParam("owner") final
-                                          Optional<String> ownerParam,
-                                        @QueryParam("entityType") final
-                                          Optional<String> entityType) {
-    if (!ownerParam.isPresent()) {
-      throw new WebApplicationException(
-          new IllegalArgumentException("'owner' query parameter not provided"),
-          400);
-    }
+  public Response retrieveDraftsByOwner(
+      @QueryParam("owner") final Optional<String> ownerParam,
+      @QueryParam("entityType") final Optional<String> entityType) {
+    checkParam(ownerParam.isPresent(), "'owner' query parameter is mandatory");
     final String owner = ownerParam.get();
     logger.debug("retrieving drafts by owner '{}'", owner);
-    final LinkedHashSet<Map<String, ?>> drafts = Sets.newLinkedHashSet();
-    final Map<String, Object> ownerData = crmRepository.findUserByLogin(owner);
-    if (ownerData == null) {
-      throw new WebApplicationException(
-          new IllegalArgumentException("unknown user '" + owner + "'"),
-          400);
-    }
-    final String roles = ownerData.get("roles").toString();
-    for (String role : Splitter.on(',').trimResults().split(roles)) {
+    final Set<Map<String, Object>> drafts = Sets.newLinkedHashSet();
+    for (String role : userRoles(owner)) {
       if ("ROLE_TECH_ADMIN".equals(role)) {
-        final List<Map<String, Object>> subordinatesData =
-            crmRepository.findUserSubordinates(owner);
-        final Set<Object> subordinates = Sets.newHashSet();
-        for (Map<String, Object> subordinate : subordinatesData) {
-          subordinates.add(subordinate.get("login").toString());
-        }
-        final List<Map<String, Object>> submitted = draftRepository.findDraftsByStatus("SUBMITTED");
-        for (Map<String, Object> draft : submitted) {
-          final Object submittedDraftOwner = draft.get("owner");
-          if (subordinates.contains(submittedDraftOwner) || owner.equals(submittedDraftOwner)) {
-            drafts.add(draft);
-          }
-        }
+        final Set<String> subordinatesPlusOwner = userSubordinatesPlusOwner(owner);
+        final List<Map<String, Object>> submittedDrafts =
+            draftRepository.findDraftsByStatus("SUBMITTED");
+        drafts.addAll(
+            FluentIterable.from(submittedDrafts)
+                .filter(ownedByOneOf(subordinatesPlusOwner)).toSet());
       }
       if ("ROLE_ACCOUNTING".equals(role)) {
         drafts.addAll(draftRepository.findDraftsByStatus("APPROVED"));
@@ -83,13 +62,7 @@ public class DraftResource2 {
     }
     drafts.addAll(draftRepository.findDraftsByOwnerAndStatus(owner, "DRAFT"));
     if (entityType.isPresent()) {
-      final Iterator<Map<String, ?>> draftsIterator = drafts.iterator();
-      while (draftsIterator.hasNext()) {
-        Map<String, ?> draft = draftsIterator.next();
-        if (!entityType.get().equals(draft.get("entityType"))) {
-          draftsIterator.remove();
-        }
-      }
+      filterInPlaceByEntityType(drafts, entityType.get());
     }
     return Response.ok(ImmutableMap.of("drafts", drafts)).build();
   }
@@ -127,6 +100,45 @@ public class DraftResource2 {
         .ok(ImmutableMap.of("drafts",
             draftRepository.getByType(entityType, entityId)))
         .build();
+  }
+
+  private Iterable<String> userRoles(final String user) {
+    final Map<String, Object> ownerData = crmRepository.findUserByLogin(user);
+    checkParam(ownerData != null, "unknown user '%s'", user);
+    final String roles = String.valueOf(ownerData.get("roles"));
+    return Splitter.on(',').trimResults().split(roles);
+  }
+
+  private Set<String> userSubordinatesPlusOwner(final String owner) {
+    final List<Map<String, Object>> subordinatesData =
+        crmRepository.findUserSubordinates(owner);
+    final Set<String> subordinates = Sets.newHashSet();
+    for (Map<String, Object> subordinate : subordinatesData) {
+      subordinates.add(String.valueOf(subordinate.get("login")));
+    }
+    subordinates.add(owner);
+    return subordinates;
+  }
+
+  private Predicate<Map<String, Object>> ownedByOneOf(final Set<String> subordinates) {
+    return new Predicate<Map<String, Object>>() {
+      @Override
+      public boolean apply(final Map<String, Object> draft) {
+        final String submittedDraftOwner = String.valueOf(draft.get("owner"));
+        return subordinates.contains(submittedDraftOwner);
+      }
+    };
+  }
+
+  private void filterInPlaceByEntityType(final Set<Map<String, Object>> drafts,
+                                         @Nonnull final String entityType) {
+    final Iterator<Map<String, Object>> draftsIterator = drafts.iterator();
+    while (draftsIterator.hasNext()) {
+      Map<String, Object> draft = draftsIterator.next();
+      if (!entityType.equals(draft.get("entityType"))) {
+        draftsIterator.remove();
+      }
+    }
   }
 
 }
