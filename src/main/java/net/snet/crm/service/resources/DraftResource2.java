@@ -42,8 +42,10 @@ public class DraftResource2 {
   }
 
   @GET
-  public Response retrieveDraftsByOwner(@QueryParam("owner")
-                                        final Optional<String> ownerParam) {
+  public Response retrieveDraftsByOwner(@QueryParam("owner") final
+                                          Optional<String> ownerParam,
+                                        @QueryParam("entityType") final
+                                          Optional<String> entityType) {
     if (!ownerParam.isPresent()) {
       throw new WebApplicationException(
           new IllegalArgumentException("'owner' query parameter not provided"),
@@ -80,6 +82,15 @@ public class DraftResource2 {
       }
     }
     drafts.addAll(draftRepository.findDraftsByOwnerAndStatus(owner, "DRAFT"));
+    if (entityType.isPresent()) {
+      final Iterator<Map<String, ?>> draftsIterator = drafts.iterator();
+      while (draftsIterator.hasNext()) {
+        Map<String, ?> draft = draftsIterator.next();
+        if (!entityType.get().equals(draft.get("entityType"))) {
+          draftsIterator.remove();
+        }
+      }
+    }
     return Response.ok(ImmutableMap.of("drafts", drafts)).build();
   }
 
