@@ -20,7 +20,7 @@ class DraftResource2Test extends Specification {
   private static final long AGREEMENT_DRAFT_ID = 10L
 
   @Shared
-  DraftResource2 draftResource = new DraftResource2(null);
+  DraftResource2 draftResource = new DraftResource2(null, null);
 
   @Shared
   @ClassRule
@@ -35,7 +35,7 @@ class DraftResource2Test extends Specification {
       def postData = postCustomerDraft()
     and:
       def draftRepository = wiredDraftRepositoryStub()
-      draftRepository.createDraft(_) >> CUSTOMER_DRAFT_ID
+      draftRepository.create(_) >> CUSTOMER_DRAFT_ID
       draftRepository.get(CUSTOMER_DRAFT_ID) >> createdCustomerDraft()
     when:
       def res = post("/${DRAFTS}", postData)

@@ -50,14 +50,14 @@ public class DraftResource2 {
       if ("ROLE_TECH_ADMIN".equals(role)) {
         final Set<String> subordinatesPlusOwner = userSubordinatesPlusOwner(owner);
         drafts.addAll(
-            FluentIterable.from(draftRepository.findDraftsByStatus("SUBMITTED"))
+            FluentIterable.from(draftRepository.findByStatus("SUBMITTED"))
                 .filter(ownedByOneOf(subordinatesPlusOwner)).toSet());
       }
       if ("ROLE_ACCOUNTING".equals(role)) {
-        drafts.addAll(draftRepository.findDraftsByStatus("APPROVED"));
+        drafts.addAll(draftRepository.findByStatus("APPROVED"));
       }
     }
-    drafts.addAll(draftRepository.findDraftsByOwnerAndStatus(owner, "DRAFT"));
+    drafts.addAll(draftRepository.findByOwnerAndStatus(owner, "DRAFT"));
     if (entityType.isPresent()) {
       filterInPlaceByEntityType(drafts, entityType.get());
     }
@@ -70,7 +70,7 @@ public class DraftResource2 {
     checkParam(draftData.isPresent(), "cannot create draft, data not sent");
     logger.debug("creating '{}' draft",
         fetchNested("entityType", draftData.get()).get());
-    final long draftId = draftRepository.createDraft(draftData.get());
+    final long draftId = draftRepository.create(draftData.get());
     final Map<String, Object> draft = draftRepository.get(draftId);
     return Response
         .created(uriInfo.getRequestUriBuilder().path("{id}").build(draftId))
@@ -94,8 +94,24 @@ public class DraftResource2 {
     logger.debug("retrieving draft by type '{}/{}'", entityType, entityId);
     return Response
         .ok(ImmutableMap.of("drafts",
-            draftRepository.getByType(entityType, entityId)))
+            draftRepository.getEntity(entityType, entityId)))
         .build();
+  }
+
+  @PUT
+  @Path("/{draftId}")
+  public Response updateDraft(LinkedHashMap<String, Object> body,
+                              @PathParam("entityId") long draftId) {
+    final Optional<Map<String, Object>> draftData = fetchNestedMap("drafts", body);
+    checkParam(draftData.isPresent(), "cannot update draft, data not sent");
+    logger.debug("updating '{}' draft '{}'",
+        fetchNested("entityType", draftData.get()).get(), draftId);
+    draftRepository.update(draftData.get());
+    final Map<String, Object> draft = draftRepository.get(draftId);
+    return Response
+        .ok(ImmutableMap.of("drafts", draft))
+        .build();
+
   }
 
   private Iterable<String> userRoles(final String user) {
@@ -117,12 +133,12 @@ public class DraftResource2 {
     return subordinates;
   }
 
-  private Predicate<Map<String, Object>> ownedByOneOf(final Set<String> subordinates) {
+  private Predicate<Map<String, Object>> ownedByOneOf(final Set<String> users) {
     return new Predicate<Map<String, Object>>() {
       @Override
       public boolean apply(final Map<String, Object> draft) {
         final String submittedDraftOwner = String.valueOf(draft.get("owner"));
-        return subordinates.contains(submittedDraftOwner);
+        return users.contains(submittedDraftOwner);
       }
     };
   }
