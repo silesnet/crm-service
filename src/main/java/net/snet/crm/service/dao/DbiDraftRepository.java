@@ -47,7 +47,7 @@ public class DbiDraftRepository implements DraftRepository {
   }
 
   @Override
-  public long createDraft(final Map<String, Object> draft) {
+  public long create(final Map<String, Object> draft) {
     logger.debug("creating draft");
     final Map<String, Object> record = recordOf(draft, DRAFT_FIELDS);
 	  final Optional<String> entityType = fetchNested("entity_type", record, String.class);
@@ -87,6 +87,41 @@ public class DbiDraftRepository implements DraftRepository {
   }
 
   @Override
+  public void update(Map<String, Object> update) {
+    logger.debug("updating draft");
+    final Map<String, Object> record = recordOf(update, DRAFT_FIELDS);
+    record.put("data", toJson(record.get("data")));
+//    final Optional<Map<String, Object>> links = fetchNestedMap("links", draft);
+//    return dbi.withHandle(new HandleCallback<Long>() {
+//      @Override
+//      public Long withHandle(Handle handle) throws Exception {
+//        final long draftId;
+//        final Optional<Long> availableDraftId = availableDraftIdOfType(entityType.get(), handle);
+//        if (availableDraftId.isPresent()) {
+//          draftId = availableDraftId.get();
+//          updateRecord(DRAFTS_TABLE, draftId, record, handle);
+//        } else {
+//          final EntityId entityId =
+//              entityIdFor(entityType.get(), entitySpate.get(), handle);
+//          record.put("entity_id", entityId.nextId());
+//          draftId = insertRecord(DRAFTS_TABLE, record, handle);
+//        }
+//        if (links.isPresent()) {
+//          for (String entity : links.get().keySet()) {
+//            final Long linkedEntityId =
+//                Long.valueOf(links.get().get(entity).toString());
+//            final Map<String, Object> linkRecord =
+//                ImmutableMap.of("draft_id", draftId, "entity", entity,
+//                    "entity_id", (Object) linkedEntityId);
+//            insertRecordWithoutKey(DRAFTS_LINKS_TABLE, linkRecord, handle);
+//          }
+//        }
+//        return draftId;
+//      }
+//    });
+  }
+
+  @Override
   public Map<String, Object> get(final long draftId) {
     logger.debug("getting draft '{}'", draftId);
     return dbi.withHandle(new HandleCallback<Map<String, Object>>() {
@@ -98,7 +133,7 @@ public class DbiDraftRepository implements DraftRepository {
   }
 
   @Override
-  public Map<String, Object> getByType(final String entityType,
+  public Map<String, Object> getEntity(final String entityType,
                                        final long entityId) {
     logger.debug("getting draft by type '{}/{}'", entityType, entityId);
     return dbi.withHandle(new HandleCallback<Map<String, Object>>() {
@@ -113,7 +148,7 @@ public class DbiDraftRepository implements DraftRepository {
   }
 
   @Override
-  public List<Map<String, Object>> findDraftsByStatus(final String status) {
+  public List<Map<String, Object>> findByStatus(final String status) {
     return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
       @Override
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
@@ -137,9 +172,9 @@ public class DbiDraftRepository implements DraftRepository {
   }
 
   @Override
-  public List<Map<String, Object>> findDraftsByOwnerAndStatus(
-                                                      final String owner,
-                                                      final String status) {
+  public List<Map<String, Object>> findByOwnerAndStatus(
+      final String owner,
+      final String status) {
 
     return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
       @Override

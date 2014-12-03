@@ -1,13 +1,15 @@
 package net.snet.crm.service.dao
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.common.collect.Maps
 import com.google.common.io.Resources
 import org.skife.jdbi.v2.DBI
 import org.skife.jdbi.v2.Handle
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static net.snet.crm.service.dao.DbiDraftRepository.*
+import static net.snet.crm.service.dao.DbiDraftRepository.DRAFTS_LINKS_TABLE
+import static net.snet.crm.service.dao.DbiDraftRepository.DRAFTS_TABLE
 
 class DbiDraftRepositoryTest extends Specification {
   @Shared DBI dbi = new DBI("jdbc:h2:mem:customerRepositoryTest")
@@ -22,14 +24,44 @@ class DbiDraftRepositoryTest extends Specification {
     handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
   }
 
+  def 'should update draft'() {
+    given: 'draft with links'
+      def draftData = createServiceDraftData()
+      draftData.links = ['customers': 100]
+      def draft = repo.get(repo.create(draftData))
+    and: 'draft update'
+      def draftUpdate = Maps.newHashMap(draft)
+      draftUpdate.entityType = 'not change'
+      draftUpdate.entityId = -1
+      draftUpdate.entityName = 'Updated Name'
+      draftUpdate.status = 'OK'
+      draftUpdate.put('owner', 'foo')
+      draftUpdate.data = [name: 'name']
+      draftUpdate.links = ['services': 200]
+    when:
+      repo.update(draftUpdate as Map)
+    then:
+      def updated = repo.get(draft.id as Long)
+      with(updated) {
+        entityType == draft.entityType // NO CHANGE
+        entityId == draft.entityId // NO CHANGE
+        entityName == draftUpdate.entityName
+        status == draftUpdate.status
+        data == draftUpdate.data
+        get('owner') == draftUpdate.get('owner')
+        links.customers == null // REMOVED
+        links.services == 200
+      }
+  }
+
   def 'should reuse available typed draft on insert'() {
     given:
       def draftData = createCustomerDraftData()
-      def customer = repo.get(repo.createDraft(draftData))
+      def customer = repo.get(repo.create(draftData))
       handle.update("UPDATE $DRAFTS_TABLE SET status='AVAILABLE' WHERE " +
                     "id=:id", customer.id as Long)
     when:
-      def draft = repo.get(repo.createDraft(draftData))
+      def draft = repo.get(repo.create(draftData))
     then:
       with(draft) {
         id == customer.id
@@ -39,10 +71,10 @@ class DbiDraftRepositoryTest extends Specification {
 
   def 'should fetch draft with links from repository'() {
     given:
-      def customer = repo.get(repo.createDraft(createCustomerDraftData()))
+      def customer = repo.get(repo.create(createCustomerDraftData()))
       def draftData = createServiceDraftData()
       draftData.links = ['drafts.customers': customer.entityId]
-      def draftId = repo.createDraft(draftData)
+      def draftId = repo.create(draftData)
     when:
       def draft = repo.get(draftId)
     then:
@@ -54,11 +86,11 @@ class DbiDraftRepositoryTest extends Specification {
 
   def 'should create draft with links in database'() {
     given:
-      def customer = repo.get(repo.createDraft(createCustomerDraftData()))
+      def customer = repo.get(repo.create(createCustomerDraftData()))
       def draftData = createServiceDraftData()
       draftData.links = ['drafts.customers': customer.entityId]
     when:
-      def draftId = repo.createDraft(draftData)
+      def draftId = repo.create(draftData)
     then:
       def links = handle.select("SELECT * from $DRAFTS_LINKS_TABLE where " +
                                   'draft_id=:draft_id', draftId)
@@ -74,7 +106,7 @@ class DbiDraftRepositoryTest extends Specification {
     given:
       def draftData = createServiceDraftData()
     when:
-      def draftId = repo.createDraft(draftData)
+      def draftId = repo.create(draftData)
     then:
       def draft = handle.select("SELECT * from $DRAFTS_TABLE where id=:id", draftId)
       with(draft[0]) {
@@ -91,7 +123,7 @@ class DbiDraftRepositoryTest extends Specification {
 
   def 'should fetch draft from repository'() {
     given: 'existing draft'
-      def draftId = repo.createDraft(createServiceDraftData())
+      def draftId = repo.create(createServiceDraftData())
     when:
       def draft = repo.get(draftId)
     then:
