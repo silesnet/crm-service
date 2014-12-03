@@ -19,7 +19,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.*;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static net.snet.crm.service.utils.Entities.*;
 import static net.snet.crm.service.utils.Resources.*;
 
@@ -50,10 +49,8 @@ public class DraftResource2 {
     for (String role : userRoles(owner)) {
       if ("ROLE_TECH_ADMIN".equals(role)) {
         final Set<String> subordinatesPlusOwner = userSubordinatesPlusOwner(owner);
-        final List<Map<String, Object>> submittedDrafts =
-            draftRepository.findDraftsByStatus("SUBMITTED");
         drafts.addAll(
-            FluentIterable.from(submittedDrafts)
+            FluentIterable.from(draftRepository.findDraftsByStatus("SUBMITTED"))
                 .filter(ownedByOneOf(subordinatesPlusOwner)).toSet());
       }
       if ("ROLE_ACCOUNTING".equals(role)) {
@@ -69,9 +66,8 @@ public class DraftResource2 {
 
   @POST
   public Response createDraft(LinkedHashMap<String, Object> body) {
-    final Optional<Map<String, Object>> draftData =
-        fetchNestedMap("drafts", body);
-    checkArgument(draftData.isPresent(), "cannot create draft, data not sent");
+    final Optional<Map<String, Object>> draftData = fetchNestedMap("drafts", body);
+    checkParam(draftData.isPresent(), "cannot create draft, data not sent");
     logger.debug("creating '{}' draft",
         fetchNested("entityType", draftData.get()).get());
     final long draftId = draftRepository.createDraft(draftData.get());
@@ -105,6 +101,7 @@ public class DraftResource2 {
   private Iterable<String> userRoles(final String user) {
     final Map<String, Object> ownerData = crmRepository.findUserByLogin(user);
     checkParam(ownerData != null, "unknown user '%s'", user);
+    assert ownerData != null; // just for intellij not to produce warning
     final String roles = String.valueOf(ownerData.get("roles"));
     return Splitter.on(',').trimResults().split(roles);
   }
