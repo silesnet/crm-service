@@ -57,7 +57,7 @@ public class Entities {
   }
 
   @Nonnull
-  @SuppressWarnings("unused")
+  @SuppressWarnings("unchecked unused")
   public static <T> Optional<T> optionalOf(@Nonnull String path,
                                            @Nonnull Map<String, ?> map,
                                            @Nonnull Class<T> klazz) {
@@ -69,13 +69,17 @@ public class Entities {
   public static <T> T valueOf(@Nonnull String path,
                               @Nonnull Map<String, ?> map,
                               @Nonnull Class<T> klazz) {
-    final Object value = fetchNestedInternal(path, map);
+    Object value = fetchNestedInternal(path, map);
     if (value == null) {
       throw new WebApplicationException(
           new IllegalArgumentException(
               "value of '" + path + "' does not exist or is null"),
           Response.Status.BAD_REQUEST
       );
+    } else {
+      if (Long.class.equals(klazz) && value instanceof Integer) {
+        value = ((Integer) value).longValue();
+      }
     }
     return (T) value;
   }

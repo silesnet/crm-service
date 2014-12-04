@@ -10,7 +10,8 @@ class EntitiesTest extends Specification {
 
   def 'should provide long from integer value'() {
     expect:
-      valueOf('id', [id: 10 as Integer], Long.class).is(Long)
+      valueOf('id', [id: 10], Long.class) instanceof Long
+      valueOf('id', [id: 10 as Integer], Long.class) instanceof Long
   }
 
   def 'should provide value of nested map'() {
