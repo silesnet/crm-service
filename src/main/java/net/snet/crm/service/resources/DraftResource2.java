@@ -72,10 +72,10 @@ public class DraftResource2 {
 
   @POST
   public Response createDraft(LinkedHashMap<String, Object> body) {
-    final Optional<Map<String, Object>> draftData = fetchNestedMap("drafts", body);
+    final Optional<Map<String, Object>> draftData = optionalMapOf("drafts", body);
     checkParam(draftData.isPresent(), "cannot create draft, data not sent");
     logger.debug("creating '{}' draft",
-        fetchNested("entityType", draftData.get()).get());
+        optionalOf("entityType", draftData.get()).get());
     final long draftId = draftRepository.create(draftData.get());
     final Map<String, Object> draft = draftRepository.get(draftId);
     return Response
@@ -108,10 +108,10 @@ public class DraftResource2 {
   @Path("/{draftId}")
   public Response updateDraft(LinkedHashMap<String, Object> body,
                               @PathParam("entityId") long draftId) {
-    final Optional<Map<String, Object>> draftData = fetchNestedMap("drafts", body);
+    final Optional<Map<String, Object>> draftData = optionalMapOf("drafts", body);
     checkParam(draftData.isPresent(), "can't update draft, data not sent");
     logger.debug("updating '{}' draft '{}'",
-        fetchNested("entityType", draftData.get()).get(), draftId);
+        optionalOf("entityType", draftData.get()).get(), draftId);
     draftRepository.update(draftData.get());
     final Map<String, Object> draft = draftRepository.get(draftId);
     return Response
