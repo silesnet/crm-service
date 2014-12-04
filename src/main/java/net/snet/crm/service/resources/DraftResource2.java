@@ -119,6 +119,13 @@ public class DraftResource2 {
         .build();
   }
 
+  @DELETE
+  @Path("/{draftId}")
+  public Response deleteDraft(@PathParam("entityId") long draftId) {
+    draftRepository.delete(draftId);
+    return Response.noContent().build();
+  }
+
   private Iterable<String> userRoles(final String user) {
     final Map<String, Object> ownerData = crmRepository.findUserByLogin(user);
     checkParam(ownerData != null, "unknown user '%s'", user);

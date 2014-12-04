@@ -24,6 +24,22 @@ class DbiDraftRepositoryTest extends Specification {
     handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
   }
 
+  def 'should delete draft'() {
+    given: 'draft with links'
+      def draftData = createServiceDraftData()
+      draftData.links = ['customers': 100]
+      def draftId = repo.create(draftData)
+    when:
+      repo.delete(draftId)
+    then:
+      handle.select("SELECT * FROM ${DRAFTS_TABLE} WHERE id=${draftId}")
+          .size() == 0
+      handle.select("SELECT * FROM ${DRAFTS_LINKS_TABLE} WHERE draft_id=${draftId}")
+          .size() == 0
+  }
+
+
+
   def 'should update draft'() {
     given: 'draft with links'
       def draftData = createServiceDraftData()
