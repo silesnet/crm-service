@@ -1,9 +1,11 @@
 package net.snet.crm.service.utils;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @SuppressWarnings("unchecked")
@@ -55,6 +57,16 @@ public class Entities {
     return Optional.fromNullable((T) fetchNestedInternal(path, map));
   }
 
+  public static Function<Map<String, Object>, String> getValueOf(final String key) {
+    return new Function<Map<String,Object>, String>() {
+      @Nullable
+      @Override
+      public String apply(Map<String, Object> userData) {
+        return String.valueOf(userData.get(key));
+      }
+    };
+  }
+
   private static Object fetchNestedInternal(String path,
                                             Map<String, ?> map) {
     Object value = map;
@@ -66,6 +78,4 @@ public class Entities {
     }
     return value;
   }
-
-
 }

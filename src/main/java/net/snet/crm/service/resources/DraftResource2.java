@@ -1,5 +1,6 @@
 package net.snet.crm.service.resources;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
@@ -17,18 +18,24 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static net.snet.crm.service.utils.Entities.*;
-import static net.snet.crm.service.utils.Resources.*;
+import static net.snet.crm.service.utils.Resources.checkParam;
 
 @Path("/drafts2")
 @Produces({"application/json; charset=UTF-8"})
 @Consumes(MediaType.APPLICATION_JSON)
 public class DraftResource2 {
-  public static final Logger logger = LoggerFactory.getLogger(DraftResource2.class);
-  private final CrmRepository crmRepository;
+  private static final Logger
+      logger = LoggerFactory.getLogger(DraftResource2.class);
+  private static final Function<Map<String, Object>, String>
+      getLoginValue = getValueOf("login");
 
+  private final CrmRepository crmRepository;
   @Context
   private UriInfo uriInfo;
   private DraftRepository draftRepository;
@@ -48,10 +55,9 @@ public class DraftResource2 {
     final Set<Map<String, Object>> drafts = Sets.newLinkedHashSet();
     for (String role : userRoles(owner)) {
       if ("ROLE_TECH_ADMIN".equals(role)) {
-        final Set<String> subordinatesPlusOwner = userSubordinatesPlusOwner(owner);
         drafts.addAll(
             FluentIterable.from(draftRepository.findByStatus("SUBMITTED"))
-                .filter(ownedByOneOf(subordinatesPlusOwner)).toSet());
+                .filter(ownedByOneOf(userSubordinatesPlusOwner(owner))).toSet());
       }
       if ("ROLE_ACCOUNTING".equals(role)) {
         drafts.addAll(draftRepository.findByStatus("APPROVED"));
@@ -91,7 +97,7 @@ public class DraftResource2 {
   @Path("/{entityType}/{entityId}")
   public Response retrieveDraftByType(@PathParam("entityType") String entityType,
                                       @PathParam("entityId") long entityId) {
-    logger.debug("retrieving draft by type '{}/{}'", entityType, entityId);
+    logger.debug("retrieving entity draft '{}/{}'", entityType, entityId);
     return Response
         .ok(ImmutableMap.of("drafts",
             draftRepository.getEntity(entityType, entityId)))
@@ -103,7 +109,7 @@ public class DraftResource2 {
   public Response updateDraft(LinkedHashMap<String, Object> body,
                               @PathParam("entityId") long draftId) {
     final Optional<Map<String, Object>> draftData = fetchNestedMap("drafts", body);
-    checkParam(draftData.isPresent(), "cannot update draft, data not sent");
+    checkParam(draftData.isPresent(), "can't update draft, data not sent");
     logger.debug("updating '{}' draft '{}'",
         fetchNested("entityType", draftData.get()).get(), draftId);
     draftRepository.update(draftData.get());
@@ -111,7 +117,6 @@ public class DraftResource2 {
     return Response
         .ok(ImmutableMap.of("drafts", draft))
         .build();
-
   }
 
   private Iterable<String> userRoles(final String user) {
@@ -123,14 +128,11 @@ public class DraftResource2 {
   }
 
   private Set<String> userSubordinatesPlusOwner(final String owner) {
-    final List<Map<String, Object>> subordinatesData =
-        crmRepository.findUserSubordinates(owner);
-    final Set<String> subordinates = Sets.newHashSet();
-    for (Map<String, Object> subordinate : subordinatesData) {
-      subordinates.add(String.valueOf(subordinate.get("login")));
-    }
-    subordinates.add(owner);
-    return subordinates;
+    return FluentIterable
+        .from(crmRepository.findUserSubordinates(owner))
+        .transform(getLoginValue)
+        .append(owner)
+        .toSet();
   }
 
   private Predicate<Map<String, Object>> ownedByOneOf(final Set<String> users) {

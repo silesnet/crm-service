@@ -19,10 +19,13 @@ project.ext {
 }
 
 dependencies {
-  compile "io.dropwizard:dropwizard-core:$dropwizardVersion"
+  compile ("io.dropwizard:dropwizard-core:$dropwizardVersion") {
+    exclude group: 'com.google.guava'
+  }
 	compile "io.dropwizard:dropwizard-client:$dropwizardVersion"
 	compile "io.dropwizard:dropwizard-jdbi:$dropwizardVersion"
 	compile "io.dropwizard:dropwizard-migrations:$dropwizardVersion"
+  compile "com.google.guava:guava:18.0"
   compile 'postgresql:postgresql:9.1-901.jdbc4'
   testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
   testCompile 'cglib:cglib-nodep:3.1'
