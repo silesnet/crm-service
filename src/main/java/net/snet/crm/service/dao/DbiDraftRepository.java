@@ -83,7 +83,7 @@ public class DbiDraftRepository implements DraftRepository {
   @Override
   public void update(@Nonnull Map<String, Object> update) {
     final Map<String, Object> record = recordOf(update, DRAFT_FIELDS);
-    final long draftId = valueOf("id", record, Integer.class).longValue();
+    final long draftId = valueOf("id", record, Long.class);
     logger.debug("updating draft '{}'", draftId);
     record.remove("id");
     record.remove("entity_type");
