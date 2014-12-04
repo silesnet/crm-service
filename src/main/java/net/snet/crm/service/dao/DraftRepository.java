@@ -16,4 +16,6 @@ public interface DraftRepository {
   List<Map<String,Object>> findByOwnerAndStatus(String owner, String draft);
 
   void update(Map<String, Object> update);
+
+  void delete(long draftId);
 }

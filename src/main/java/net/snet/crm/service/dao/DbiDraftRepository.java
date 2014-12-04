@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Map;
 
@@ -100,6 +102,27 @@ public class DbiDraftRepository implements DraftRepository {
           deleteLinks(draftId, handle);
           insertLinks(draftId, links.get(), handle);
         }
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public void delete(final long draftId) {
+    logger.debug("deleting draft '{}'", draftId);
+    dbi.withHandle(new HandleCallback<Void>() {
+      @Override
+      public Void withHandle(Handle handle) throws Exception {
+        int deleted = handle
+            .createStatement("DELETE FROM " + DRAFTS_TABLE + " WHERE id=:id")
+            .bind("id", draftId)
+            .execute();
+        if (deleted == 0) {
+          throw new WebApplicationException(new IllegalArgumentException(
+                "can't delete draft '" + draftId + "'"),
+              Response.Status.BAD_REQUEST);
+        }
+        deleteLinks(draftId, handle);
         return null;
       }
     });
