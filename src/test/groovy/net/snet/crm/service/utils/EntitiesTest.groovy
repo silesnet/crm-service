@@ -2,28 +2,55 @@ package net.snet.crm.service.utils
 
 import spock.lang.Specification
 
+import javax.ws.rs.WebApplicationException
+
 import static net.snet.crm.service.utils.Entities.*
 
 class EntitiesTest extends Specification {
+
+  def 'should provide long from integer value'() {
+    expect:
+      valueOf('id', [id: 10 as Integer], Long.class).is(Long)
+  }
+
+  def 'should provide value of nested map'() {
+    expect:
+      valueOf('entities', [entities: [id: 10]], Map.class).id == 10
+  }
+
+  def 'should throw when value is null'() {
+    when:
+      valueOf('entities', [entities: null], Map.class)
+    then:
+      thrown WebApplicationException
+  }
+
+  def 'should throw when path does not exist'() {
+    when:
+      valueOf('entities', [:], Map.class)
+    then:
+      thrown WebApplicationException
+  }
+
   def 'should fetch nested value'() {
     expect:
-      fetchNested('entities.id', [entities: [id: 10]]).get() == 10
-      !fetchNested('entities.name', [entities: [:]]).isPresent()
+      optionalOf('entities.id', [entities: [id: 10]]).get() == 10
+      !optionalOf('entities.name', [entities: [:]]).isPresent()
   }
 
   def 'should fetch nested map'() {
     expect:
-      fetchNestedMap('entities', [entities: [id: 10]]).get().id == 10
-      !fetchNestedMap('entities.name', [entities: [:]]).isPresent()
+      optionalMapOf('entities', [entities: [id: 10]]).get().id == 10
+      !optionalMapOf('entities.name', [entities: [:]]).isPresent()
   }
 
   def 'should map entity to record'() {
     given:
       def entity = [
-          id: 10,
+          id         : 10,
           entity_name: 'Name',
-          entityType: 'Type',
-          unknown: 'foo'
+          entityType : 'Type',
+          unknown    : 'foo'
       ]
     and:
       def mapping = mapping()
@@ -44,10 +71,10 @@ class EntitiesTest extends Specification {
   def 'should map record to entity'() {
     given:
       def record = [
-          id: 10,
+          id         : 10,
           entity_name: 'Name',
           entity_type: 'Type',
-          unknown: 'foo'
+          unknown    : 'foo'
       ]
     and:
       def mapping = mapping()

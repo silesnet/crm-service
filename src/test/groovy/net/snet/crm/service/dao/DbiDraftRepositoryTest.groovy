@@ -47,7 +47,7 @@ class DbiDraftRepositoryTest extends Specification {
         entityId == draft.entityId // NO CHANGE
         entityName == draftUpdate.entityName
         status == draftUpdate.status
-        data == draftUpdate.data
+        data == '{"name":"name"}'
         get('owner') == draftUpdate.get('owner')
         links.customers == null // REMOVED
         links.services == 200

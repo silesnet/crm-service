@@ -13,13 +13,14 @@ import org.skife.jdbi.v2.util.LongMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
 import static net.snet.crm.service.dao.EntityIdFactory.entityIdFor;
-import static net.snet.crm.service.utils.Entities.*;
 import static net.snet.crm.service.utils.Databases.*;
+import static net.snet.crm.service.utils.Entities.*;
 
 public class DbiDraftRepository implements DraftRepository {
   private static final Logger logger =
@@ -50,36 +51,29 @@ public class DbiDraftRepository implements DraftRepository {
   public long create(final Map<String, Object> draft) {
     logger.debug("creating draft");
     final Map<String, Object> record = recordOf(draft, DRAFT_FIELDS);
-	  final Optional<String> entityType = fetchNested("entity_type", record, String.class);
-    checkState(entityType.isPresent(), "entity type was not provided");
-    final Optional<String> entitySpate = fetchNested("entity_spate", record, String.class);
-    checkState(entitySpate.isPresent(), "entity spate was not provided");
-    logger.debug("entity type.spate: {}.{}", entityType.get(), entitySpate.get());
-    record.put("data", toJson(record.get("data")));
-    final Optional<Map<String, Object>> links = fetchNestedMap("links", draft);
+	  final String entityType = valueOf("entity_type", record, String.class);
+    final String entitySpate = valueOf("entity_spate", record, String.class);
+    logger.debug("entity type.spate: {}.{}", entityType, entitySpate);
+    if (record.containsKey("data")) {
+      record.put("data", toJson(record.get("data")));
+    }
+    final Optional<Map<String, Object>> links = optionalMapOf("links", draft);
     return dbi.withHandle(new HandleCallback<Long>() {
       @Override
       public Long withHandle(Handle handle) throws Exception {
         final long draftId;
-        final Optional<Long> availableDraftId = availableDraftIdOfType(entityType.get(), handle);
+        final Optional<Long> availableDraftId = availableDraftIdOfType(entityType, handle);
         if (availableDraftId.isPresent()) {
           draftId = availableDraftId.get();
           updateRecord(DRAFTS_TABLE, draftId, record, handle);
         } else {
           final EntityId entityId =
-              entityIdFor(entityType.get(), entitySpate.get(), handle);
+              entityIdFor(entityType, entitySpate, handle);
           record.put("entity_id", entityId.nextId());
           draftId = insertRecord(DRAFTS_TABLE, record, handle);
         }
         if (links.isPresent()) {
-          for (String entity : links.get().keySet()) {
-            final Long linkedEntityId =
-                Long.valueOf(links.get().get(entity).toString());
-            final Map<String, Object> linkRecord =
-                ImmutableMap.of("draft_id", draftId, "entity", entity,
-                    "entity_id", (Object) linkedEntityId);
-            insertRecordWithoutKey(DRAFTS_LINKS_TABLE, linkRecord, handle);
-          }
+          insertLinks(draftId, links.get(), handle);
         }
         return draftId;
       }
@@ -87,38 +81,28 @@ public class DbiDraftRepository implements DraftRepository {
   }
 
   @Override
-  public void update(Map<String, Object> update) {
-    logger.debug("updating draft");
+  public void update(@Nonnull Map<String, Object> update) {
     final Map<String, Object> record = recordOf(update, DRAFT_FIELDS);
-    record.put("data", toJson(record.get("data")));
-//    final Optional<Map<String, Object>> links = fetchNestedMap("links", draft);
-//    return dbi.withHandle(new HandleCallback<Long>() {
-//      @Override
-//      public Long withHandle(Handle handle) throws Exception {
-//        final long draftId;
-//        final Optional<Long> availableDraftId = availableDraftIdOfType(entityType.get(), handle);
-//        if (availableDraftId.isPresent()) {
-//          draftId = availableDraftId.get();
-//          updateRecord(DRAFTS_TABLE, draftId, record, handle);
-//        } else {
-//          final EntityId entityId =
-//              entityIdFor(entityType.get(), entitySpate.get(), handle);
-//          record.put("entity_id", entityId.nextId());
-//          draftId = insertRecord(DRAFTS_TABLE, record, handle);
-//        }
-//        if (links.isPresent()) {
-//          for (String entity : links.get().keySet()) {
-//            final Long linkedEntityId =
-//                Long.valueOf(links.get().get(entity).toString());
-//            final Map<String, Object> linkRecord =
-//                ImmutableMap.of("draft_id", draftId, "entity", entity,
-//                    "entity_id", (Object) linkedEntityId);
-//            insertRecordWithoutKey(DRAFTS_LINKS_TABLE, linkRecord, handle);
-//          }
-//        }
-//        return draftId;
-//      }
-//    });
+    final long draftId = valueOf("id", record, Integer.class).longValue();
+    logger.debug("updating draft '{}'", draftId);
+    record.remove("id");
+    record.remove("entity_type");
+    record.remove("entity_id");
+    if (record.containsKey("data")) {
+      record.put("data", toJson(record.get("data")));
+    }
+    final Optional<Map<String, Object>> links = optionalMapOf("links", update);
+    dbi.withHandle(new HandleCallback<Void>() {
+      @Override
+      public Void withHandle(Handle handle) throws Exception {
+        updateRecord(DRAFTS_TABLE, draftId, record, handle);
+        if (links.isPresent()) {
+          deleteLinks(draftId, handle);
+          insertLinks(draftId, links.get(), handle);
+        }
+        return null;
+      }
+    });
   }
 
   @Override
@@ -250,6 +234,23 @@ public class DbiDraftRepository implements DraftRepository {
       links.put(record.get("entity").toString(), record.get("entity_id"));
     }
     return links;
+  }
+
+  private void insertLinks(long draftId, Map<String, Object> links, Handle handle) {
+    for (Map.Entry<?, ?> link : links.entrySet()) {
+      final Map<String, Object> linkRecord = ImmutableMap.of(
+          "draft_id", draftId,
+          "entity", link.getKey(),
+          "entity_id", link.getValue());
+      insertRecordWithoutKey(DRAFTS_LINKS_TABLE, linkRecord, handle);
+    }
+  }
+
+  private void deleteLinks(long draftId, Handle handle) {
+    handle.createStatement(
+        "DELETE FROM " + DRAFTS_LINKS_TABLE + " WHERE draft_id=:draft_id")
+        .bind("draft_id", draftId)
+        .execute();
   }
 
   private String toJson(Object data) {
