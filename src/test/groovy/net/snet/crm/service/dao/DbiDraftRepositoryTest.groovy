@@ -38,8 +38,6 @@ class DbiDraftRepositoryTest extends Specification {
           .size() == 0
   }
 
-
-
   def 'should update draft'() {
     given: 'draft with links'
       def draftData = createServiceDraftData()
@@ -55,7 +53,7 @@ class DbiDraftRepositoryTest extends Specification {
       draftUpdate.data = [name: 'name']
       draftUpdate.links = ['services': 200]
     when:
-      repo.update(draftUpdate as Map)
+      repo.update(draft.id as Long, draftUpdate as Map)
     then:
       def updated = repo.get(draft.id as Long)
       with(updated) {
@@ -63,7 +61,7 @@ class DbiDraftRepositoryTest extends Specification {
         entityId == draft.entityId // NO CHANGE
         entityName == draftUpdate.entityName
         status == draftUpdate.status
-        data == '{"name":"name"}'
+        data == draftUpdate.data
         get('owner') == draftUpdate.get('owner')
         links.customers == null // REMOVED
         links.services == 200
@@ -151,7 +149,7 @@ class DbiDraftRepositoryTest extends Specification {
         entityName == 'LanAccess'
         status == 'DRAFT'
         get('owner') == 'test'
-        data == '{"name":"LanAccess"}'
+        data == [name: 'LanAccess']
       }
   }
 
