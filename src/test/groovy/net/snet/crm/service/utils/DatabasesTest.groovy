@@ -1,5 +1,4 @@
 package net.snet.crm.service.utils
-
 import com.google.common.io.Resources
 import org.skife.jdbi.v2.DBI
 import org.skife.jdbi.v2.Handle

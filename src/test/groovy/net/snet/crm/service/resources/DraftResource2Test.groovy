@@ -1,5 +1,4 @@
 package net.snet.crm.service.resources
-
 import ch.qos.logback.classic.Level
 import com.sun.jersey.api.client.ClientResponse
 import com.sun.jersey.api.client.PartialRequestBuilder
@@ -11,7 +10,6 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import javax.ws.rs.core.MediaType
-
 
 class DraftResource2Test extends Specification {
 

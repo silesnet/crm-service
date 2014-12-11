@@ -107,12 +107,11 @@ public class DraftResource2 {
   @PUT
   @Path("/{draftId}")
   public Response updateDraft(LinkedHashMap<String, Object> body,
-                              @PathParam("entityId") long draftId) {
+                              @PathParam("draftId") long draftId) {
     final Optional<Map<String, Object>> draftData = optionalMapOf("drafts", body);
     checkParam(draftData.isPresent(), "can't update draft, data not sent");
-    logger.debug("updating '{}' draft '{}'",
-        optionalOf("entityType", draftData.get()).get(), draftId);
-    draftRepository.update(draftData.get());
+    logger.debug("updating draft '{}'", draftId);
+    draftRepository.update(draftId, draftData.get());
     final Map<String, Object> draft = draftRepository.get(draftId);
     return Response
         .ok(ImmutableMap.of("drafts", draft))
@@ -121,7 +120,7 @@ public class DraftResource2 {
 
   @DELETE
   @Path("/{draftId}")
-  public Response deleteDraft(@PathParam("entityId") long draftId) {
+  public Response deleteDraft(@PathParam("draftId") long draftId) {
     draftRepository.delete(draftId);
     return Response.noContent().build();
   }

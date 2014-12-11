@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,7 @@ public class DbiDraftRepository implements DraftRepository {
   private final DBI dbi;
   private final ObjectMapper objectMapper;
 
-  public DbiDraftRepository(final DBI dbi, ObjectMapper objectMapper) {
+  public DbiDraftRepository(final DBI dbi, final ObjectMapper objectMapper) {
     this.dbi = dbi;
     this.objectMapper = objectMapper;
   }
@@ -83,9 +84,8 @@ public class DbiDraftRepository implements DraftRepository {
   }
 
   @Override
-  public void update(@Nonnull Map<String, Object> update) {
+  public void update(@Nonnull final long draftId, @Nonnull Map<String, Object> update) {
     final Map<String, Object> record = recordOf(update, DRAFT_FIELDS);
-    final long draftId = valueOf("id", record, Long.class);
     logger.debug("updating draft '{}'", draftId);
     record.remove("id");
     record.remove("entity_type");
@@ -97,7 +97,9 @@ public class DbiDraftRepository implements DraftRepository {
     dbi.withHandle(new HandleCallback<Void>() {
       @Override
       public Void withHandle(Handle handle) throws Exception {
-        updateRecord(DRAFTS_TABLE, draftId, record, handle);
+        if (!record.isEmpty()) {
+          updateRecord(DRAFTS_TABLE, draftId, record, handle);
+        }
         if (links.isPresent()) {
           deleteLinks(draftId, handle);
           insertLinks(draftId, links.get(), handle);
@@ -211,11 +213,28 @@ public class DbiDraftRepository implements DraftRepository {
                                            final Handle handle) {
     final Map<String, Object> entity =
         entityOf(getRecord(DRAFTS_TABLE, draftId, handle), DRAFT_FIELDS);
+    if (entity.containsKey("data")) {
+      Optional<Map<String, Object>> map = toMap(String.valueOf(entity.get("data")));
+      if (map.isPresent()) {
+        entity.put("data", map.get());
+      }
+    }
     final Map<String, Object> links = draftLinks(draftId, handle);
     if (!links.isEmpty()) {
       entity.put("links", links);
     }
     return entity;
+  }
+
+  @Nonnull
+  @SuppressWarnings("unchecked")
+  private Optional<Map<String, Object>> toMap(@Nonnull String json) {
+    try {
+      final Map<String, Object> map = objectMapper.readValue(json, Map.class);
+      return Optional.of(map);
+    } catch (IOException e) {
+      return Optional.absent();
+    }
   }
 
   private Optional<Long> availableDraftIdOfType(final String entityType,
