@@ -53,11 +53,11 @@ buildscript {
   }
 }
 
-//import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 
 shadow {
   artifactAttached false
-//  transformer(ServiceFileTransformer)
+  transformer(ServiceFileTransformer)
   exclude 'META-INF/*.DSA'
   exclude 'META-INF/*.RSA'
 }
