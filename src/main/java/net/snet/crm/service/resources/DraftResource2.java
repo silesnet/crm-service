@@ -7,6 +7,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
+import net.snet.crm.domain.model.agreement.*;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
 import org.slf4j.Logger;
@@ -39,6 +40,9 @@ public class DraftResource2 {
   @Context
   private UriInfo uriInfo;
   private DraftRepository draftRepository;
+  private CustomerRepository customerRepository;
+  private AgreementRepository agreementRepository;
+  private ServiceRepository serviceRepository;
 
   public DraftResource2(DraftRepository draftRepository, CrmRepository crmRepository) {
     this.draftRepository = draftRepository;
@@ -111,11 +115,44 @@ public class DraftResource2 {
     final Optional<Map<String, Object>> draftData = optionalMapOf("drafts", body);
     checkParam(draftData.isPresent(), "can't update draft, data not sent");
     logger.debug("updating draft '{}'", draftId);
+    final Map<String, Object> originalDraft = draftRepository.get(draftId);
     draftRepository.update(draftId, draftData.get());
     final Map<String, Object> draft = draftRepository.get(draftId);
+    if (isDraftToImport(originalDraft, draft)) {
+      importDraft(draft);
+    }
     return Response
         .ok(ImmutableMap.of("drafts", draft))
         .build();
+  }
+
+  private boolean isDraftToImport(Map<String, Object> original, Map<String, Object> current) {
+    final String originalStatus = valueOf("status", original, String.class);
+    final String currentStatus = valueOf("status", current, String.class);
+    return
+        !originalStatus.equals(currentStatus)
+            && "IMPORTED".equals(currentStatus);
+  }
+
+  private void importDraft(Map<String, Object> draft) {
+    final long draftId = valueOf("id", draft, Long.class);
+    final String entityType = valueOf("entityType", draft, String.class);
+    final long entityId = valueOf("entityId", draft, Long.class);
+    if ("customers".equals(entityType)) {
+      logger.info("importing draft '{}' into 'customers/{}'...", draftId, entityId);
+//      final Customer customer = new Customer(draft);
+//      customerRepository.add(customer);
+    } else if ("agreements".equals(entityType)) {
+      logger.info("importing draft '{}' into 'agreements/{}'...", draftId, entityId);
+//      final Agreement agreement = new Agreement(draft);
+//      agreementRepository.add(agreement);
+    } else if ("services".equals(entityType)) {
+      logger.info("importing draft '{}' into 'services/{}'...", draftId, entityId);
+//      final Service service = new Service(draft);
+//      serviceRepository.add(service);
+    } else {
+      logger.info("can't import draft '{}' unknown entity type '{}/{}'", draftId, entityType, entityId);
+    }
   }
 
   @DELETE
