@@ -132,5 +132,6 @@ CREATE TABLE users
   roles character varying(255),
   key character varying(255),
   reports_to bigint NOT NULL DEFAULT 0,
-  operation_country character(2) NOT NULL DEFAULT 'CZ'
+  operation_country character(2) NOT NULL DEFAULT 'CZ',
+  full_name character varying(255) NOT NULL DEFAULT ''
 );

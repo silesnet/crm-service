@@ -1,7 +1,7 @@
 package net.snet.crm.domain.shared;
 
 public abstract class GenericLongId<E> implements Id<E> {
-  private final long id;
+  final long id;
 
   public GenericLongId(long id) {
     this.id = id;
@@ -14,5 +14,9 @@ public abstract class GenericLongId<E> implements Id<E> {
   @Override
   public boolean exist() {
     return id != 0;
+  }
+
+  public long value() {
+    return id;
   }
 }

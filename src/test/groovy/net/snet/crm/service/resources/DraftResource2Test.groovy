@@ -18,7 +18,7 @@ class DraftResource2Test extends Specification {
   private static final long AGREEMENT_DRAFT_ID = 10L
 
   @Shared
-  DraftResource2 draftResource = new DraftResource2(null, null);
+  DraftResource2 draftResource = new DraftResource2(null, null, null);
 
   @Shared
   @ClassRule
