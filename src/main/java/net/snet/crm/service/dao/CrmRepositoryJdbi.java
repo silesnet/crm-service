@@ -423,7 +423,8 @@ public class CrmRepositoryJdbi implements CrmRepository {
 						.bind("login", login)
 						.map(LongMapper.FIRST)
 						.first();
-				return handle.createQuery("SELECT id, login, name, roles, operation_country FROM users WHERE reports_to=:manager_id")
+				return handle.createQuery("SELECT id, login, name, full_name, roles, operation_country " +
+            "FROM users WHERE reports_to=:manager_id")
 						.bind("manager_id", managerId)
 						.list();
 			}
@@ -435,7 +436,11 @@ public class CrmRepositoryJdbi implements CrmRepository {
 		return db.withHandle(new HandleCallback<Map<String, Object>>() {
 			@Override
 			public Map<String, Object> withHandle(Handle handle) throws Exception {
-				return handle.createQuery("SELECT id, login, name, roles, operation_country FROM users where login=:login")
+				return handle
+            .createQuery(
+                "SELECT id, login, name, full_name, roles, operation_country FROM users where " +
+                    "login=:login"
+            )
 						.bind("login", login)
 						.first();
 			}

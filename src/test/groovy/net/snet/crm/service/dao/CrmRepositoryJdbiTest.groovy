@@ -45,7 +45,7 @@ class CrmRepositoryJdbiTest extends Specification {
       insertedCustomer.public_id == '9999999'
       insertedCustomer.is_active == false
       insertedCustomer.customer_status == 'DRAFT'
-      new DateTime().isAfter(insertedCustomer.inserted_on.getTime() as Long)
+      !(new DateTime().isBefore(insertedCustomer.inserted_on.getTime() as Long))
     and: 'customers table contains new row'
       handle.select('SELECT count(*) AS cnt FROM customers').first().cnt == 1
   }

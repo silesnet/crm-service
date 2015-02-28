@@ -37,6 +37,8 @@ public class Entities {
       final String column = mapping.getValue();
       if (record.containsKey(column)) {
         entity.put(property, record.get(column));
+      } else if (record.containsKey(property)) {
+        entity.put(property, record.get(property));
       }
     }
     return entity;
@@ -82,6 +84,18 @@ public class Entities {
       }
     }
     return (T) value;
+  }
+
+  public static <T> T cast(@Nonnull Object obj, @Nonnull Class<T> klazz) {
+    T value = null;
+    if (obj != null) {
+      if (Integer.class.equals(klazz)) {
+        value = (T) Integer.valueOf("" + obj);
+      } else {
+        value = (T) obj;
+      }
+    }
+    return value;
   }
 
   @Nonnull

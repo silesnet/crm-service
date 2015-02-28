@@ -7,7 +7,11 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import net.snet.crm.domain.model.agreement.*;
+import net.snet.crm.domain.model.agreement.Agreement;
+import net.snet.crm.domain.model.agreement.AgreementRepository;
+import net.snet.crm.domain.model.agreement.Customer;
+import net.snet.crm.domain.model.agreement.Service;
+import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
 import org.slf4j.Logger;
@@ -40,13 +44,13 @@ public class DraftResource2 {
   @Context
   private UriInfo uriInfo;
   private DraftRepository draftRepository;
-  private CustomerRepository customerRepository;
   private AgreementRepository agreementRepository;
-  private ServiceRepository serviceRepository;
 
-  public DraftResource2(DraftRepository draftRepository, CrmRepository crmRepository) {
+  public DraftResource2(DraftRepository draftRepository, CrmRepository crmRepository,
+                        AgreementRepository agreementRepository) {
     this.draftRepository = draftRepository;
     this.crmRepository = crmRepository;
+    this.agreementRepository = agreementRepository;
   }
 
   @GET
@@ -140,16 +144,19 @@ public class DraftResource2 {
     final long entityId = valueOf("entityId", draft, Long.class);
     if ("customers".equals(entityType)) {
       logger.info("importing draft '{}' into 'customers/{}'...", draftId, entityId);
-//      final Customer customer = new Customer(draft);
-//      customerRepository.add(customer);
+      final Customer customer = new Customer(draft);
+      final Customer addedCustomer = agreementRepository.addCustomer(customer);
+      logger.info("added new customer '{}'", addedCustomer.id());
     } else if ("agreements".equals(entityType)) {
       logger.info("importing draft '{}' into 'agreements/{}'...", draftId, entityId);
-//      final Agreement agreement = new Agreement(draft);
-//      agreementRepository.add(agreement);
+      final Agreement agreement = new Agreement(draft);
+      final Agreement addedAgreement = agreementRepository.add(agreement);
+      logger.info("added new agreement '{}'", addedAgreement.id());
     } else if ("services".equals(entityType)) {
       logger.info("importing draft '{}' into 'services/{}'...", draftId, entityId);
-//      final Service service = new Service(draft);
-//      serviceRepository.add(service);
+      final Service service = new Service(new Draft(draft));
+      final Service addedService = agreementRepository.addService(service);
+      logger.info("added new service '{}'", addedService.id());
     } else {
       logger.info("can't import draft '{}' unknown entity type '{}/{}'", draftId, entityType, entityId);
     }

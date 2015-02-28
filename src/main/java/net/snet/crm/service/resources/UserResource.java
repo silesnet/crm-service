@@ -4,7 +4,6 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import net.snet.crm.service.bo.User;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.UserDAO;
@@ -22,7 +21,6 @@ import javax.ws.rs.core.UriInfo;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 
 @Path("/users")
 public class UserResource {
@@ -71,6 +69,7 @@ public class UserResource {
 			Map<String, Object> user = Maps.newHashMap();
 			user.put("user", "test");
 			user.put("name", "Test");
+			user.put("full_name", "Test Anonymous");
 			user.put("roles", "ANONYMOUS_ROLE");
 			user.put("operation_country", "PL");
 			return Response.ok(ImmutableMap.of("users", user)).build();
