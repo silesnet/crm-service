@@ -100,6 +100,16 @@ public class Databases {
     checkState(updatedRows == 1, "failed to update record '%s' in '%s'", id, table);
   }
 
+  public static long lastValueOf(final String table, final String column, final Handle handle) {
+    checkTableName(table);
+    checkColumnName(column);
+    final Map<String, Object> last = handle
+        .createQuery("SELECT " + column + " FROM " + table + " ORDER BY " + column + " DESC LIMIT 1")
+        .first();
+    if (last == null) return 0;
+    return Long.valueOf(last.get(column).toString());
+  }
+
   public static String insertSql(final String table, final Collection<String> columns) {
     checkTableName(table);
     final Collection<String> references = Collections2.transform(columns, columnToReference);
@@ -149,6 +159,11 @@ public class Databases {
   private static void checkTableName(final String table) {
     checkArgument(TABLE_NAME.matcher(table).matches(),
         "illegal table name provided '%s'", table);
+  }
+
+  private static void checkColumnName(final String column) {
+    checkArgument(TABLE_NAME.matcher(column).matches(),
+        "illegal column name provided '%s'", column);
   }
 
 

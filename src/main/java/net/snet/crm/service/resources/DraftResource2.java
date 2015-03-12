@@ -116,11 +116,13 @@ public class DraftResource2 {
   @Path("/{draftId}")
   public Response updateDraft(LinkedHashMap<String, Object> body,
                               @PathParam("draftId") long draftId) {
+    logger.debug("PUT /drafts2 '{}'", body);
     final Optional<Map<String, Object>> draftData = optionalMapOf("drafts", body);
     checkParam(draftData.isPresent(), "can't update draft, data not sent");
     logger.debug("updating draft '{}'", draftId);
     final Map<String, Object> originalDraft = draftRepository.get(draftId);
     draftRepository.update(draftId, draftData.get());
+    logger.debug("draft '{}' updated", draftId);
     final Map<String, Object> draft = draftRepository.get(draftId);
     if (isDraftToImport(originalDraft, draft)) {
       importDraft(draft);
@@ -144,19 +146,19 @@ public class DraftResource2 {
     final long entityId = valueOf("entityId", draft, Long.class);
     if ("customers".equals(entityType)) {
       logger.info("importing draft '{}' into 'customers/{}'...", draftId, entityId);
-      final Customer customer = new Customer(draft);
+      final Customer customer = new Customer(new Draft(draft));
       final Customer addedCustomer = agreementRepository.addCustomer(customer);
-      logger.info("added new customer '{}'", addedCustomer.id());
+      logger.info("added new customer '{}'", addedCustomer.id().value());
     } else if ("agreements".equals(entityType)) {
       logger.info("importing draft '{}' into 'agreements/{}'...", draftId, entityId);
-      final Agreement agreement = new Agreement(draft);
+      final Agreement agreement = new Agreement(new Draft(draft));
       final Agreement addedAgreement = agreementRepository.add(agreement);
-      logger.info("added new agreement '{}'", addedAgreement.id());
+      logger.info("added new agreement '{}'", addedAgreement.id().value());
     } else if ("services".equals(entityType)) {
       logger.info("importing draft '{}' into 'services/{}'...", draftId, entityId);
       final Service service = new Service(new Draft(draft));
       final Service addedService = agreementRepository.addService(service);
-      logger.info("added new service '{}'", addedService.id());
+      logger.info("added new service '{}'", addedService.id().value());
     } else {
       logger.info("can't import draft '{}' unknown entity type '{}/{}'", draftId, entityType, entityId);
     }
@@ -167,6 +169,31 @@ public class DraftResource2 {
   public Response deleteDraft(@PathParam("draftId") long draftId) {
     draftRepository.delete(draftId);
     return Response.noContent().build();
+  }
+
+  @POST
+  @Path("/{draftId}")
+  public Response importServiceDraft(@PathParam("draftId") final long draftId) {
+    logger.debug("import service draft '{}'", draftId);
+    final Draft serviceDraft = new Draft(draftRepository.get(draftId));
+    final Optional<Draft> customerDraft = customerDraftOf(serviceDraft.links());
+    final Optional<Draft> agreementDraft = agreementDraftOf(serviceDraft.links());
+    agreementRepository.addService(customerDraft, agreementDraft, serviceDraft);
+    logger.info("service draft '{}' was imported", draftId);
+    return Response.created(uriInfo.getRequestUri()).build();
+  }
+
+  private Optional<Draft> customerDraftOf(final Map<String, String> links) {
+    final String customerId = links.get("drafts.customers");
+    if (customerId == null) return Optional.absent();
+    final Draft draft = new Draft(draftRepository.getEntity("customers", Long.valueOf(customerId)));
+    return Optional.of(draft);
+  }
+
+  private Optional<Draft> agreementDraftOf(final Map<String, String> links) {
+    final String agreementId = links.get("drafts.agreements");
+    if (agreementId == null) return Optional.absent();
+    return Optional.of(new Draft(draftRepository.getEntity("agreements", Long.valueOf(agreementId))));
   }
 
   private Iterable<String> userRoles(final String user) {

@@ -20,3 +20,7 @@ logging:
       currentLogFilename: log/crm-service.log
       archivedLogFilenamePattern: log/crm-service-%d{yyyy-MM-dd}.log.gz
       archivedFileCount: 30
+
+server:
+  gzip:
+    enabled: false

@@ -1,5 +1,6 @@
 package net.snet.crm.service.utils
 
+import org.joda.time.DateTime
 import spock.lang.Specification
 
 import javax.ws.rs.WebApplicationException
@@ -7,6 +8,48 @@ import javax.ws.rs.WebApplicationException
 import static net.snet.crm.service.utils.Entities.*
 
 class EntitiesTest extends Specification {
+
+  def 'should return numeric string property value'() {
+    def value = valueOf('prop', [prop: '100'])
+    expect:
+      value instanceof Value
+      !value.isNull()
+      value.asLong() == 100 as Long
+      value.asInteger() == 100 as Integer
+      value.asString() == '100'
+      value.toString() == '100'
+  }
+
+  def 'should return numeric property value'() {
+    def value = valueOf('prop', [prop: 100])
+    expect:
+      value instanceof Value
+      !value.isNull()
+      value.asLong() == 100 as Long
+      value.asInteger() == 100 as Integer
+      value.asString() == '100'
+      value.toString() == '100'
+  }
+
+  def 'should return date string property value'() {
+    def value = valueOf('prop', [prop: '2015-01-13T12:45:55.123'])
+    expect:
+      value instanceof Value
+      !value.isNull()
+      value.asDateTime() == DateTime.parse('2015-01-13T12:45:55.123')
+  }
+
+  def 'should return default on non existing property value'() {
+    def value = valueOf('prop', [:])
+    expect:
+      value instanceof Value
+      value.isNull()
+      value.asLongOr(10) == 10 as Long
+      value.asIntegerOr(10) == 10 as Integer
+      value.asDateTimeOr(null) == null
+      value.asStringOr('A') == 'A'
+      value.toString() == ''
+  }
 
   def 'should provide long from integer value'() {
     expect:
@@ -100,5 +143,4 @@ class EntitiesTest extends Specification {
         entityName: 'entity_name'
     ] as LinkedHashMap
   }
-
 }
