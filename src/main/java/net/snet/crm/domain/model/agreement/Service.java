@@ -11,7 +11,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Preconditions.checkArgument;
 import static net.snet.crm.service.utils.Entities.*;
 
 public class Service implements Entity<Service, ServiceId> {
@@ -43,7 +43,7 @@ public class Service implements Entity<Service, ServiceId> {
   private final Map<String, Object> record;
 
   public Service(Draft draft) {
-    checkState(Draft.Entity.SERVICES.equals(draft.entity()),
+    checkArgument(Draft.Entity.SERVICES.equals(draft.entity()),
         "expected SERVICES draft, but got %s", draft.entity());
     this.id = new ServiceId(draft.entityId());
     this.props = propsFromDraft(draft);
@@ -53,7 +53,7 @@ public class Service implements Entity<Service, ServiceId> {
   public Service(Map<String, Object> record) {
     this.props = entityOf(record, PROP_NAMES);
     this.id = new ServiceId(valueOf("id", props, Long.class));
-    this.record = recordFromProps();
+    this.record = record;
   }
 
   @Override
@@ -80,15 +80,16 @@ public class Service implements Entity<Service, ServiceId> {
         props.put("agreementId", Long.valueOf(link.getValue()));
       }
     }
-    final Map<String, Object> data = draft.data();
+//    final Map<String, Object> data = draft.data();
+    final ValueMap data = valueMapOf(draft.data());
     final DateTime periodStart = DRAFT_DATE_FORMATTER
         .parseDateTime(String.valueOf(data.get("activate_on")));
     props.put("periodStart", periodStart);
     props.put("periodEnd", null);
-    props.put("productName", data.get("product_name"));
-    props.put("chargingAmount", cast(valueOf("price", data), Integer.class));
-    props.put("connectionDownload", cast(valueOf("downlink", data), Integer.class));
-    props.put("connectionUpload", cast(valueOf("uplink", data), Integer.class));
+    props.put("productName", data.get("product_name").toString());
+    props.put("chargingAmount", data.get("price").asIntegerOr(0));
+    props.put("connectionDownload", data.get("downlink").asIntegerOr(null));
+    props.put("connectionUpload", data.get("uplink").asIntegerOr(null));
     return Collections.unmodifiableMap(props);
   }
 

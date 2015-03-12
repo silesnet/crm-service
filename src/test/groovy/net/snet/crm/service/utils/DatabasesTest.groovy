@@ -23,6 +23,18 @@ class DatabasesTest extends Specification {
       )'''.stripIndent())
   }
 
+  def 'should return last id value of empty table'() {
+    expect:
+      lastValueOf("entities", "id", handle) == 0
+  }
+
+  def 'should return last id value'() {
+    handle.execute("INSERT INTO entities (id, name) VALUES (1, 'name');")
+    handle.execute("INSERT INTO entities (id, name) VALUES (2, 'name2');")
+    expect:
+      lastValueOf("entities", "id", handle) == 2
+  }
+
   def 'should create updated sql statement'() {
     given:
       def table = 'table'

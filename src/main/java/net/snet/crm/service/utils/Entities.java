@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
+import org.joda.time.DateTime;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -51,12 +52,12 @@ public class Entities {
     return optionalOf(path, map, Object.class);
   }
 
-  @Nonnull
-  public static Object valueOf(
-      @Nonnull String path,
-      @Nonnull Map<String, Object> map) {
-    return valueOf(path, map, Object.class);
-  }
+//  @Nonnull
+//  public static Object valueOf(
+//      @Nonnull String path,
+//      @Nonnull Map<String, Object> map) {
+//    return valueOf(path, map, Object.class);
+//  }
 
   @Nonnull
   @SuppressWarnings("unchecked unused")
@@ -131,6 +132,101 @@ public class Entities {
     };
   }
 
+  public static Value valueOf(final @Nonnull String path,
+                              final @Nonnull Map<String, ?> map) {
+    return new Value(fetchNestedInternal(path, map));
+  }
+
+  public static ValueMap valueMapOf(final @Nonnull Map<String, ?> map) {
+    return new ValueMap(map);
+  }
+
+  public static class Value {
+    private final Object original;
+
+    public Value(@Nullable Object value) {
+      this.original = value;
+    }
+
+    @Nonnull
+    public String asString() {
+      return original.toString();
+    }
+
+    @Nullable
+    public String asStringOr(@Nullable final String fallBack) {
+      return isNull() ? fallBack : asString();
+    }
+
+    @Nonnull
+    public long asLong() {
+      return Long.valueOf(original.toString());
+    }
+
+    @Nullable
+    public Long asLongOr(@Nullable final Long fallBack) {
+     return isNullOrEmpty() ? fallBack : asLong();
+    }
+
+    @Nonnull
+    public Integer asInteger() {
+      return Integer.valueOf(original.toString());
+    }
+
+    @Nullable
+    public Integer asIntegerOr(@Nullable final Integer fallBack) {
+      return isNullOrEmpty() ? fallBack : asInteger();
+    }
+
+    @Nonnull
+    public DateTime asDateTime() {
+      return DateTime.parse(original.toString());
+    }
+
+    @Nullable
+    public DateTime asDateTimeOr(@Nullable final DateTime fallBack) {
+      return isNullOrEmpty() ? fallBack : asDateTime();
+    }
+
+    public boolean isNull() {
+      return original == null;
+    }
+
+    private boolean isNullOrEmpty() {
+      return original == null || original.toString().trim().length() == 0;
+    }
+
+    @Override
+    public String toString() {
+      return isNull() ? "" : original.toString();
+    }
+
+  }
+
+  public static class ValueMap {
+    private final Map<String, ?> map;
+
+    private ValueMap(@Nonnull final Map<String, ?> map) {
+      this.map = map;
+    }
+
+    @Nonnull
+    public Value get(@Nonnull final String path) {
+      return valueOf(path, map);
+    }
+
+    @Nullable
+    public Object getRaw(@Nonnull final String path) {
+      return fetchNestedInternal(path, map);
+    }
+
+    @Nullable
+    public Object getRawOr(@Nonnull final String path, @Nullable final Object fallBack) {
+      final Object value = fetchNestedInternal(path, map);
+      return value == null ? fallBack : value;
+    }
+  }
+
   private static Object fetchNestedInternal(@Nonnull String path,
                                             @Nonnull Map<String, ?> map) {
     Object value = map;
@@ -142,4 +238,5 @@ public class Entities {
     }
     return value;
   }
+
 }

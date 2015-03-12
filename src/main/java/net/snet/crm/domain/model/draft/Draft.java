@@ -11,6 +11,7 @@ import static net.snet.crm.service.utils.Entities.*;
 public class Draft implements Entity<Draft, DraftId> {
 
   public enum Entity { AGREEMENTS, SERVICES, CUSTOMERS, CONNECTIONS };
+  public enum Status { DRAFT, SUBMITTED, APPROVED, IMPORTED }
 
   private static final Map<String, String> PROP_NAMES =
       ImmutableMap.<String, String>builder()
@@ -28,7 +29,9 @@ public class Draft implements Entity<Draft, DraftId> {
   private final Map<String, Object> props;
   private final DraftId id;
   private final Entity entity;
+  private final String entitySpate;
   private final long entityId;
+  private final Status status;
   private final Map<String, Object> data;
   private final Map<String, String> links;
 
@@ -36,7 +39,9 @@ public class Draft implements Entity<Draft, DraftId> {
     this.props = entityOf(record, PROP_NAMES);
     this.id = new DraftId(valueOf("id", props, Long.class));
     this.entity = Entity.valueOf(valueOf("entityType", props, String.class).toUpperCase());
+    this.entitySpate = valueOf("entitySpate", props, String.class);
     this.entityId = valueOf("entityId", props, Long.class);
+    this.status = Status.valueOf(valueOf("status", props, String.class).toUpperCase());
     this.data = mapOf("data", props);
     this.links = linksOf(optionalMapOf("links", props));
   }
@@ -60,9 +65,15 @@ public class Draft implements Entity<Draft, DraftId> {
     return entity;
   }
 
+  public String entitySpate() {
+    return entitySpate;
+  }
+
   public long entityId() {
     return entityId;
   }
+
+  public Status status() { return  status; }
 
   public Map<String, Object> data() {
     return data;
