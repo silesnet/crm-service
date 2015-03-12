@@ -24,3 +24,8 @@ logging:
 server:
   gzip:
     enabled: false
+  requestLog:
+    appenders:
+      - type: file
+        currentLogFilename: log/crm-service-req.log
+        archive: false
