@@ -180,7 +180,7 @@ public class DraftResource2 {
     final Optional<Draft> agreementDraft = agreementDraftOf(serviceDraft.links());
     agreementRepository.addService(customerDraft, agreementDraft, serviceDraft);
     logger.info("service draft '{}' was imported", draftId);
-    return Response.created(uriInfo.getRequestUri()).build();
+    return Response.created(uriInfo.getRequestUri()).entity(ImmutableMap.of()).build();
   }
 
   private Optional<Draft> customerDraftOf(final Map<String, String> links) {
