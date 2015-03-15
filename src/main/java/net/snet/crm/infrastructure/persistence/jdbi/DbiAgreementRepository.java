@@ -68,7 +68,8 @@ public class DbiAgreementRepository implements AgreementRepository {
         }
         insertServiceOf(serviceDraft, handle);
         updateDraftStatusTo(IMPORTED, serviceDraft.id(), handle);
-        return null;
+        throw new UnsupportedOperationException("not supported, during AT testing...");
+//        return null;
       }
     });
   }
