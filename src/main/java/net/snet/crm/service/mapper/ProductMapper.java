@@ -17,6 +17,7 @@ public class ProductMapper implements ResultSetMapper<Product> {
                 r.getInt("uplink"),
                 r.getInt("price"),
                 r.getString("channel"),
-                r.getBoolean("is_dedicated"));
+                r.getBoolean("is_dedicated"),
+                r.getString("country"));
     }
 }
