@@ -13,8 +13,10 @@ public class Product {
     private int price;
     private String channel;
     private boolean isDedicated;
+    private String country;
 
-    public Product(long id, String name, int downlink, int uplink, int price, String channel, boolean isDedicated) {
+    public Product(long id, String name, int downlink, int uplink, int price, String channel,
+                   boolean isDedicated, String country) {
         this.id = id;
         this.name = name;
         this.downlink = downlink;
@@ -22,6 +24,7 @@ public class Product {
         this.price = price;
         this.channel = channel;
         this.isDedicated = isDedicated;
+        this.country = country;
     }
 
     public long getId() {
@@ -80,5 +83,13 @@ public class Product {
     @JsonProperty("isDedicated")
     public void setDedicated(boolean isDedicated) {
         this.isDedicated = isDedicated;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 }
