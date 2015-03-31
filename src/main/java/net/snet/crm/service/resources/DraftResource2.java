@@ -65,10 +65,13 @@ public class DraftResource2 {
       if ("ROLE_TECH_ADMIN".equals(role)) {
         drafts.addAll(
             FluentIterable.from(draftRepository.findByStatus("SUBMITTED"))
-                .filter(ownedByOneOf(userSubordinatesPlusOwner(owner))).toSet());
+                .filter(ownedByOneOf(subordinatesOrSelf(owner))).toSet());
       }
       if ("ROLE_ACCOUNTING".equals(role)) {
-        drafts.addAll(draftRepository.findByStatus("APPROVED"));
+        String ownerOperationCountry = userOperationCountry(owner);
+        drafts.addAll(
+            FluentIterable.from(draftRepository.findByStatus("APPROVED"))
+                .filter(draftCountryOf(ownerOperationCountry)).toList());
       }
     }
     drafts.addAll(draftRepository.findByOwnerAndStatus(owner, "DRAFT"));
@@ -76,6 +79,17 @@ public class DraftResource2 {
       filterInPlaceByEntityType(drafts, entityType.get());
     }
     return Response.ok(ImmutableMap.of("drafts", drafts)).build();
+  }
+
+  private Predicate<? super Map<String, Object>> draftCountryOf(final String operationCountry) {
+    final String countryPrefix = "CZ".equals(operationCountry) ? "1" : "2";
+    return new Predicate<Map<String, Object>>() {
+      @Override
+      public boolean apply(Map<String, Object> draft) {
+        final String spate = "" + draft.get("entitySpate") + "X";
+        return spate.startsWith(countryPrefix);
+      }
+    };
   }
 
   @POST
@@ -197,14 +211,21 @@ public class DraftResource2 {
   }
 
   private Iterable<String> userRoles(final String user) {
-    final Map<String, Object> ownerData = crmRepository.findUserByLogin(user);
-    checkParam(ownerData != null, "unknown user '%s'", user);
-    assert ownerData != null; // just for intellij not to produce warning
-    final String roles = String.valueOf(ownerData.get("roles"));
+    final Map<String, Object> userData = crmRepository.findUserByLogin(user);
+    checkParam(userData != null, "unknown user '%s'", user);
+    assert userData != null; // just for intellij not to produce warning
+    final String roles = String.valueOf(userData.get("roles"));
     return Splitter.on(',').trimResults().split(roles);
   }
 
-  private Set<String> userSubordinatesPlusOwner(final String owner) {
+  private String userOperationCountry(final String user) {
+    final Map<String, Object> userData = crmRepository.findUserByLogin(user);
+    checkParam(userData != null, "unknown user '%s'", user);
+    assert userData != null; // just for intellij not to produce warning
+    return String.valueOf(userData.get("operation_country"));
+  }
+
+  private Set<String> subordinatesOrSelf(final String owner) {
     return FluentIterable
         .from(crmRepository.findUserSubordinates(owner))
         .transform(getLoginValue)
