@@ -66,11 +66,21 @@ public class DbiAgreementRepository implements AgreementRepository {
           insertAgreementOf(agreementDraft, handle);
           updateDraftStatusTo(IMPORTED, agreementDraft.id(), handle);
         }
+        if (customerDraftOptional.isPresent() && agreementDraftOptional.isPresent()) {
+          updateCustomerSymbol(customerDraftOptional.get(), agreementDraftOptional.get(), handle);
+        }
         insertServiceOf(serviceDraft, handle);
         updateDraftStatusTo(IMPORTED, serviceDraft.id(), handle);
         return null;
       }
     });
+  }
+
+  private void updateCustomerSymbol(final Draft customer, final Draft agreement, final Handle handle) {
+    if ("PL".equals(agreement.entitySpate())) {
+      final Object symbol = "PL-" + (agreement.entityId() - 200000);
+      updateRecord(CUSTOMERS_TABLE, customer.entityId(), ImmutableMap.of("symbol", symbol), handle);
+    }
   }
 
   private void checkDraftEntityIs(final Draft.Entity entity, final Draft draft) {
