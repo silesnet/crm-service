@@ -4,8 +4,8 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import net.snet.crm.service.bo.CustomerSearch;
-import net.snet.crm.service.dao.CustomerDAO;
 import net.snet.crm.service.dao.CrmRepository;
+import net.snet.crm.service.dao.CustomerDAO;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
@@ -64,7 +64,9 @@ public class CustomerResource {
 	@GET
 	@Produces({"application/json; charset=UTF-8"})
 	@Timed(name = "get-requests")
-	public Map<String, Object> getCustomersByQuery(@QueryParam("qn") Optional<String> queryName, @QueryParam("q") Optional<String> name) {
+	public Map<String, Object> getCustomersByQuery(@QueryParam("qn") Optional<String> queryName,
+																								 @QueryParam("q") Optional<String> name,
+																								 @QueryParam("country") Optional<String> country) {
 		logger.debug("customers called");
 
 		final HashMap<String, Object> customersMap = new HashMap<String, Object>();
@@ -75,10 +77,10 @@ public class CustomerResource {
 			Iterator<Map<String, Object>> customers = Iterators.emptyIterator();
 			Matcher ledgerMatcher = LEDGER_IMPORT.matcher(query);
 			if (ledgerMatcher.matches()) {
-				String country = ledgerMatcher.group(1);
-				final long countryId = country.equals("cs") ? 10 : (country.equals("pl") ? 20: 0);
+				String ledgerCountry = ledgerMatcher.group(1);
+				final long countryId = ledgerCountry.equals("cs") ? 10 : (ledgerCountry.equals("pl") ? 20: 0);
 				if (countryId > 0) {
-					logger.debug("customers import query for country '{}:{}'", country, countryId);
+					logger.debug("customers import query for country '{}:{}'", ledgerCountry, countryId);
 					customers = dbi.withHandle(new HandleCallback<Iterator<Map<String, Object>>>() {
 						@Override
 						public Iterator<Map<String, Object>> withHandle(Handle handle) throws Exception {
@@ -97,22 +99,32 @@ public class CustomerResource {
 						}
 					});
 				} else {
-					logger.debug("customers import query for unknown country '{}:{}'", country, countryId);
+					logger.debug("customers import query for unknown country '{}:{}'", ledgerCountry, countryId);
 				}
 			}
 			customersMap.put("customers", Lists.newArrayList(customers));
 		} else {
 			if (name.isPresent()) {
-				Iterator<CustomerSearch> customers = customerDAO.getCustomersByName("%" + Utils.replaceChars(name.get(), FROM_CHARS, TO_CHARS) + "%", FROM_CHARS, TO_CHARS);
+				Iterator<CustomerSearch> customers;
+				if (country.isPresent()) {
+					final String countryLabel = country.get().toLowerCase();
+					final long countryId = "cz".equals(countryLabel) ? 10 : ("pl".equals(countryLabel) ? 20 : 0);
+					customers = customerDAO.getCustomersByNameAndCountry(
+							"%" + Utils.replaceChars(name.get(), FROM_CHARS, TO_CHARS) + "%",
+							FROM_CHARS, TO_CHARS, countryId);
+				} else {
+					customers = customerDAO.getCustomersByName(
+							"%" + Utils.replaceChars(name.get(), FROM_CHARS, TO_CHARS) + "%",FROM_CHARS, TO_CHARS);
+				}
 				List<Map<String, Object>> retCustomers = new ArrayList<Map<String, Object>>();
 				while (customers.hasNext()) {
 					CustomerSearch customer = customers.next();
 					Map<String, Object> customerMap = Maps.newLinkedHashMap();
 					customerMap.put("id", customer.getId());
 					customerMap.put("name", customer.getName());
-                    customerMap.put("street", customer.getStreet());
-                    customerMap.put("city", customer.getCity());
-                    customerMap.put("postal_code", customer.getPostalCode());
+					customerMap.put("street", customer.getStreet());
+					customerMap.put("city", customer.getCity());
+					customerMap.put("postal_code", customer.getPostalCode());
 					List<Long> agreementIds = Lists.newArrayList();
 					List<Map<String, Object>> agreements = repository.findAgreementsByCustomerId(customer.getId());
 					for (Map<String, Object> agreement : agreements) {
