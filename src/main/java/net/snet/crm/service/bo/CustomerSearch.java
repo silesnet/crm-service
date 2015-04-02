@@ -8,13 +8,16 @@ public class CustomerSearch {
     private String street;
     private String city;
     private String postalCode;
+    private long country;
 
-    public CustomerSearch(long id, String name, String street, String city, String postalCode) {
+    public CustomerSearch(long id, String name, String street, String city, String postalCode,
+                          long country) {
         this.id = id;
         this.name = name;
         this.street = street;
         this.city = city;
         this.postalCode = postalCode;
+        this.country = country;
     }
 
     public long getId() {
@@ -57,6 +60,14 @@ public class CustomerSearch {
     @JsonProperty("postalCode")
     public void setPostalCode(String postalCode) {
         this.postalCode = postalCode;
+    }
+
+    public long getCountry() {
+        return country;
+    }
+
+    public void setCountry(long country) {
+        this.country = country;
     }
 }
 

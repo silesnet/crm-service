@@ -15,7 +15,8 @@ public class CustomerSearchMapper implements ResultSetMapper<CustomerSearch> {
                 r.getString("name"),
                 r.getString("street"),
                 r.getString("city"),
-                r.getString("postal_code")
+                r.getString("postal_code"),
+                r.getLong("country")
         );
     }
 }
