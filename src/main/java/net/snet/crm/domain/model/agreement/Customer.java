@@ -80,6 +80,14 @@ public class Customer implements Entity<Customer, CustomerId> {
     return id;
   }
 
+  public boolean isResidential() {
+    return "".equals(props.get("taxId")) || props.get("taxId") == null;
+  }
+
+  public boolean isBusiness() {
+    return !isResidential();
+  }
+
   public Map<String, Object> props() {
     return props;
   }
@@ -92,9 +100,15 @@ public class Customer implements Entity<Customer, CustomerId> {
     final Map<String, Object> props = Maps.newLinkedHashMap();
     props.put("id", draft.entityId());
     final ValueMap data = valueMapOf(draft.data());
-    props.put("name", Joiner.on(" ").skipNulls()
-            .join(data.get("name").asStringOr(null), data.get("surname").asStringOr(null)));
-    props.put("nameExtra", data.getRaw("supplementary_name"));
+    final boolean isBusiness = "2".equals(data.get("customer_type").asString());
+    if (isBusiness) {
+      props.put("name", data.getRaw("supplementary_name"));
+      props.put("nameExtra", data.getRaw("representative"));
+    } else {
+      props.put("name", Joiner.on(" ").skipNulls()
+          .join(data.get("surname").asStringOr(null), data.get("name").asStringOr(null)));
+      props.put("nameExtra", "");
+    }
     props.put("addressStreet", streetAddress(
         data.getRaw("street"),
         data.getRaw("descriptive_number"),
@@ -102,11 +116,15 @@ public class Customer implements Entity<Customer, CustomerId> {
     props.put("addressTown", data.getRaw("town"));
     props.put("addressPostalCode", data.getRaw("postal_code"));
     props.put("addressCountryId", data.get("country").asLong());
-    props.put("contactName", data.getRaw("representative"));
+    props.put("contactName", data.getRaw("contact_name"));
     props.put("contactEmail", data.getRaw("email"));
     props.put("contactPhone", data.getRaw("phone"));
     props.put("publicId", data.getRaw("public_id"));
-    props.put("taxId", data.getRaw("dic"));
+    if (isBusiness) {
+      props.put("taxId", data.getRawOr("dic", data.getRawOr("public_id", System.currentTimeMillis())));
+    } else {
+      props.put("taxId", "");
+    }
     props.put("otherInfo", data.getRaw("info"));
     return Collections.unmodifiableMap(props);
   }
