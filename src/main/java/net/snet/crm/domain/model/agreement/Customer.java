@@ -121,7 +121,8 @@ public class Customer implements Entity<Customer, CustomerId> {
     props.put("contactPhone", data.getRaw("phone"));
     props.put("publicId", data.getRaw("public_id"));
     if (isBusiness) {
-      props.put("taxId", data.getRawOr("dic", data.getRawOr("public_id", System.currentTimeMillis())));
+      props.put("taxId", data.get("dic").asStringValueOr(
+          data.get("public_id").asStringValueOr("" + System.currentTimeMillis())));
     } else {
       props.put("taxId", "");
     }
