@@ -158,6 +158,10 @@ public class Entities {
       return isNull() ? fallBack : asString();
     }
 
+    public String asStringValueOr(@Nullable final String fallback) {
+      return isNullOrEmpty() ? fallback: asString();
+    }
+
     @Nonnull
     public long asLong() {
       return Long.valueOf(original.toString());
@@ -200,7 +204,6 @@ public class Entities {
     public String toString() {
       return isNull() ? "" : original.toString();
     }
-
   }
 
   public static class ValueMap {

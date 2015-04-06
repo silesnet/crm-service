@@ -31,7 +31,9 @@ public class Draft implements Entity<Draft, DraftId> {
   private final Entity entity;
   private final String entitySpate;
   private final long entityId;
+  private final String entityName;
   private final Status status;
+  private final String owner;
   private final Map<String, Object> data;
   private final Map<String, String> links;
 
@@ -41,7 +43,9 @@ public class Draft implements Entity<Draft, DraftId> {
     this.entity = Entity.valueOf(valueOf("entityType", props, String.class).toUpperCase());
     this.entitySpate = valueOf("entitySpate", props, String.class);
     this.entityId = valueOf("entityId", props, Long.class);
+    this.entityName = valueOf("entityName", props, String.class);
     this.status = Status.valueOf(valueOf("status", props, String.class).toUpperCase());
+    this.owner = valueOf("owner", props, String.class);
     this.data = mapOf("data", props);
     this.links = linksOf(optionalMapOf("links", props));
   }
@@ -73,7 +77,15 @@ public class Draft implements Entity<Draft, DraftId> {
     return entityId;
   }
 
+  public String entityName() {
+    return entityName;
+  }
+
   public Status status() { return  status; }
+
+  public String owner() {
+    return owner;
+  }
 
   public Map<String, Object> data() {
     return data;

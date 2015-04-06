@@ -68,12 +68,18 @@ public class DbiAgreementRepository implements AgreementRepository {
         }
         if (customerDraftOptional.isPresent() && agreementDraftOptional.isPresent()) {
           updateCustomerSymbol(customerDraftOptional.get(), agreementDraftOptional.get(), handle);
+          updateCustomerVariableSymbol(customerDraftOptional.get(), agreementDraftOptional.get(), handle);
         }
         insertServiceOf(serviceDraft, handle);
         updateDraftStatusTo(IMPORTED, serviceDraft.id(), handle);
         return null;
       }
     });
+  }
+
+  private void updateCustomerVariableSymbol(final Draft customer, final Draft agreement, final Handle handle) {
+    final Object variable = new Agreement(agreement).number();
+    updateRecord(CUSTOMERS_TABLE, customer.entityId(), ImmutableMap.of("variable", variable), handle);
   }
 
   private void updateCustomerSymbol(final Draft customer, final Draft agreement, final Handle handle) {
@@ -153,9 +159,26 @@ public class DbiAgreementRepository implements AgreementRepository {
     final DateTime now = DateTime.now();
     record.put("inserted_on", now);
     record.put("updated", now);
-    final long historyId = lastValueOf(AUDIT_TABLE, "history_id", handle) + 1;
+    final long historyId = insertCustomerAuditOf(draft, handle);
     record.put("history_id", historyId);
     insertRecordWithoutKey(CUSTOMERS_TABLE, record, handle);
+  }
+
+  private long insertCustomerAuditOf(final Draft draft, final Handle handle) {
+    final long auditId = lastValueOf(AUDIT_TABLE, "id", handle) + 1;
+    final long historyId = lastValueOf(AUDIT_TABLE, "history_id", handle) + 1;
+    final Map<String, Object> record = ImmutableMap.<String, Object>builder()
+        .put("id", auditId)
+        .put("history_id", historyId)
+        .put("history_type_label_id", 41L) // customer audit label id
+        .put("user_id", 2L) // system user
+        .put("time_stamp", DateTime.now())
+        .put("field_name", "name")
+        .put("old_value", Optional.absent())
+        .put("new_value", draft.entityName())
+        .build();
+    insertRecordWithoutKey(AUDIT_TABLE, record, handle);
+    return historyId;
   }
 
   private void insertServiceOf(final Draft draft, final Handle handle) {

@@ -57,6 +57,10 @@ public class Agreement implements Entity<Agreement, AgreementId> {
     return record;
   }
 
+  public int number() {
+    return (int) (id.value() % 100000);
+  }
+
   private Map<String, Object> propsFromDraft(final Draft draft) {
     final Map<String, Object> props = Maps.newLinkedHashMap();
     props.put("id", draft.entityId());
@@ -75,4 +79,8 @@ public class Agreement implements Entity<Agreement, AgreementId> {
     record.putAll(RECORD_DEFAULTS);
     return Collections.unmodifiableMap(record);  }
 
+  @Override
+  public String toString() {
+    return props.get("country") + "-" + number();
+  }
 }
