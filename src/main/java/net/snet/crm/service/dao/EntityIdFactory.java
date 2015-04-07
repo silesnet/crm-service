@@ -21,7 +21,6 @@ public class EntityIdFactory {
       "PL", 200000L
   );
 
-  // TODO: possible memory leak when returning anonymous class instance!!!
   public static EntityId nextEntityIdFor(
       final String type,
       final String spate,
@@ -31,48 +30,59 @@ public class EntityIdFactory {
     logger.debug("providing EntityId for '{}.{}'", type, spate);
     if ("agreements".equals(type)) {
       return new EntityId() {
+        final long nextAgreementId = nextAgreementId(spate, type, handle);
         @Override
         public long nextId() {
-          final String country = spate.toUpperCase();
-          checkState(AGREEMENT_COUNTRY.containsKey(country),
-              "unknown agreement country '%s'", country);
-          long lastId = lastEntityIdFor(
-              type, spate, "country='" + country + "'", handle);
-          if (lastId == 0) {
-            lastId = AGREEMENT_COUNTRY.get(country);
-          }
-          return lastId + 1;
+          return nextAgreementId;
         }
       };
     }
 
     if ("services".equals(type)) {
       return new EntityId() {
+        final long nextServiceId = nextServiceId(spate, type, handle);
         @Override
         public long nextId() {
-          final Long agreementId = Longs.tryParse(spate);
-          checkNotNull(agreementId,
-              "not numeric agreement id '%s'", spate);
-          final String constrain = String.format("(id/100)=%d", agreementId);
-          long lastId = lastEntityIdFor(type, spate, constrain, handle);
-          if (lastId == 0) {
-            lastId = agreementId * 100;
-          }
-          checkState((lastId % 100) < 99,
-              "no free service id for agreement '%s', last service id found '%s'",
-              agreementId, lastId);
-          final long nextId = lastId + 1;
-          logger.debug("nextId for '{}.{}' is '{}'", type, spate, nextId);
-          return nextId;
+          return nextServiceId;
         }
       };
     }
 
     return new EntityId() {
+      final long nextEntityId = lastEntityIdFor(type, spate, handle) + 1;
       @Override
       public long nextId() {
-        return lastEntityIdFor(type, spate, handle) + 1;
+        return nextEntityId;
      }
     };
+  }
+
+  private static long nextAgreementId(String spate, String type, Handle handle) {
+    final String country = spate.toUpperCase();
+    checkState(AGREEMENT_COUNTRY.containsKey(country),
+        "unknown agreement country '%s'", country);
+    long lastId = lastEntityIdFor(
+        type, spate, "country='" + country + "'", handle);
+    if (lastId == 0) {
+      lastId = AGREEMENT_COUNTRY.get(country);
+    }
+    return lastId + 1;
+  }
+
+  private static long nextServiceId(String spate, String type, Handle handle) {
+    final Long agreementId = Longs.tryParse(spate);
+    checkNotNull(agreementId,
+        "not numeric agreement id '%s'", spate);
+    final String constrain = String.format("(id/100)=%d", agreementId);
+    long lastId = lastEntityIdFor(type, spate, constrain, handle);
+    if (lastId == 0) {
+      lastId = agreementId * 100;
+    }
+    checkState((lastId % 100) < 99,
+        "no free service id for agreement '%s', last service id found '%s'",
+        agreementId, lastId);
+    final long nextId = lastId + 1;
+    logger.debug("nextId for '{}.{}' is '{}'", type, spate, nextId);
+    return nextId;
   }
 }
