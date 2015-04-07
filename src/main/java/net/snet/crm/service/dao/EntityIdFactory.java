@@ -21,13 +21,13 @@ public class EntityIdFactory {
       "PL", 200000L
   );
 
-  public static EntityId entityIdFor(final String type,
-                                     final String spate,
-                                     final Handle handle) {
-
+  // TODO: possible memory leak when returning anonymous class instance!!!
+  public static EntityId nextEntityIdFor(
+      final String type,
+      final String spate,
+      final Handle handle) {
     checkNotNull(type, "entity type can't be null");
     checkNotNull(type, "entity spate can't be null");
-
     logger.debug("providing EntityId for '{}.{}'", type, spate);
     if ("agreements".equals(type)) {
       return new EntityId() {

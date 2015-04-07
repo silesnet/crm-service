@@ -6,8 +6,11 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.snet.crm.domain.model.draft.Draft;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.TransactionCallback;
+import org.skife.jdbi.v2.TransactionStatus;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.util.LongMapper;
 import org.slf4j.Logger;
@@ -21,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
-import static net.snet.crm.service.dao.EntityIdFactory.entityIdFor;
+import static net.snet.crm.domain.model.draft.Draft.Entity.AGREEMENTS;
+import static net.snet.crm.service.dao.EntityIdFactory.nextEntityIdFor;
 import static net.snet.crm.service.utils.Databases.*;
 import static net.snet.crm.service.utils.Entities.*;
 
@@ -65,13 +69,14 @@ public class DbiDraftRepository implements DraftRepository {
       @Override
       public Long withHandle(Handle handle) throws Exception {
         final long draftId;
-        final Optional<Long> availableDraftId = availableDraftIdOfType(entityType, handle);
+        final Optional<Long> availableDraftId =
+            availableDraftIdByEntityTypeAndSpate(entityType, entitySpate, handle);
         if (availableDraftId.isPresent()) {
           draftId = availableDraftId.get();
           updateRecord(DRAFTS_TABLE, draftId, record, handle);
         } else {
           final EntityId entityId =
-              entityIdFor(entityType, entitySpate, handle);
+              nextEntityIdFor(entityType, entitySpate, handle);
           record.put("entity_id", entityId.nextId());
           draftId = insertRecord(DRAFTS_TABLE, record, handle);
         }
@@ -112,17 +117,15 @@ public class DbiDraftRepository implements DraftRepository {
   @Override
   public void delete(final long draftId) {
     logger.debug("deleting draft '{}'", draftId);
-    dbi.withHandle(new HandleCallback<Void>() {
+    final Draft draft = new Draft(get(draftId));
+    dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
-      public Void withHandle(Handle handle) throws Exception {
-        int deleted = handle
-            .createStatement("DELETE FROM " + DRAFTS_TABLE + " WHERE id=:id")
-            .bind("id", draftId)
-            .execute();
-        if (deleted == 0) {
-          throw new WebApplicationException(new IllegalArgumentException(
-                "can't delete draft '" + draftId + "'"),
-              Response.Status.BAD_REQUEST);
+      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
+        if (AGREEMENTS.equals(draft.entity())) {
+          updateRecord(
+              DRAFTS_TABLE, draftId, ImmutableMap.<String, Object>of("status", "AVAILABLE"), handle);
+        } else {
+          deleteDraft(draftId, handle);
         }
         deleteLinks(draftId, handle);
         return null;
@@ -148,7 +151,7 @@ public class DbiDraftRepository implements DraftRepository {
     return dbi.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
-        final Optional<Long> draftId = draftIdOfType(entityType, entityId, handle);
+        final Optional<Long> draftId = draftIdByEntityTypeAndId(entityType, entityId, handle);
         checkState(draftId.isPresent(),
             "can't find draft by entity '%s/%s'", entityType, entityId);
         return getByDraftId(draftId.get(), handle);
@@ -237,30 +240,41 @@ public class DbiDraftRepository implements DraftRepository {
     }
   }
 
-  private Optional<Long> availableDraftIdOfType(final String entityType,
-                                                final Handle handle) {
+  private Optional<Long> availableDraftIdByEntityTypeAndSpate(
+      final String entityType,
+      final String entitySpate,
+      final Handle handle) {
     final Long availableId = handle.createQuery(
         "SELECT id FROM " + DRAFTS_TABLE +
-            " WHERE status='AVAILABLE' AND " + "entity_type=:entity_type" +
-            " ORDER BY id")
+            " WHERE 1=1" +
+              " AND entity_type=:entity_type" +
+              " AND entity_spate=:entity_spate" +
+              " AND status='AVAILABLE'" +
+            " ORDER BY entity_id" +
+            " LIMIT 1")
         .bind("entity_type", entityType)
+        .bind("entity_spate", entitySpate)
         .map(LongMapper.FIRST)
         .first();
     return Optional.fromNullable(availableId);
   }
 
-  private Optional<Long> draftIdOfType(final String entityType,
-                                       final long entityId,
-                                       final Handle handle) {
-    final Long availableId = handle.createQuery(
+  private Optional<Long> draftIdByEntityTypeAndId(
+      final String entityType,
+      final long entityId,
+      final Handle handle) {
+    final Long draftId = handle.createQuery(
         "SELECT id FROM " + DRAFTS_TABLE +
-            " WHERE entity_type=:entity_type AND entity_id=:entity_id" +
-            " ORDER BY id")
+            " WHERE 1=1" +
+              " AND entity_type=:entity_type" +
+              " AND entity_id=:entity_id" +
+            " ORDER BY id" +
+            " LIMIT 1")
         .bind("entity_type", entityType)
         .bind("entity_id", entityId)
         .map(LongMapper.FIRST)
         .first();
-    return Optional.fromNullable(availableId);
+    return Optional.fromNullable(draftId);
   }
 
   private Map<String, Object> draftLinks(final long draftId,
@@ -285,6 +299,18 @@ public class DbiDraftRepository implements DraftRepository {
           "entity", link.getKey(),
           "entity_id", link.getValue());
       insertRecordWithoutKey(DRAFTS_LINKS_TABLE, linkRecord, handle);
+    }
+  }
+
+  private void deleteDraft(final long draftId, final Handle handle) {
+    int deleted = handle
+        .createStatement("DELETE FROM " + DRAFTS_TABLE + " WHERE id=:id")
+        .bind("id", draftId)
+        .execute();
+    if (deleted == 0) {
+      throw new WebApplicationException(new IllegalArgumentException(
+          "can't delete draft '" + draftId + "'"),
+          Response.Status.BAD_REQUEST);
     }
   }
 
