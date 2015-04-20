@@ -72,6 +72,7 @@ public class DraftResource2 {
         drafts.addAll(
             FluentIterable.from(draftRepository.findByStatus("APPROVED"))
                 .filter(draftCountryOf(ownerOperationCountry)).toList());
+        drafts.addAll(draftRepository.findByOwnerAndStatus(owner, "SUBMITTED"));
       }
     }
     drafts.addAll(draftRepository.findByOwnerAndStatus(owner, "DRAFT"));
