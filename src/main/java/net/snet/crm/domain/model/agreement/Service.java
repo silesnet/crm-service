@@ -100,4 +100,11 @@ public class Service implements Entity<Service, ServiceId> {
     return Collections.unmodifiableMap(record);
   }
 
+  public long customerId() {
+    return (Long) props.get("customerId");
+  }
+
+  public DateTime periodStart() {
+    return (DateTime) props.get("periodStart");
+  }
 }

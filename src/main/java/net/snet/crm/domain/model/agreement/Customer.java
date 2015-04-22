@@ -39,23 +39,23 @@ public class Customer implements Entity<Customer, CustomerId> {
           .put("connection_spot", "")
           .put("inserted_on", Optional.absent()) // would be populated on insert
           .put("frequency", 40)
-          .put("lastly_billed", Optional.absent())
+          .put("lastly_billed", Optional.absent()) // would be overridden on insert
           .put("deliver_by_email", true)
           .put("deliver_copy_email", "")
           .put("deliver_by_mail", false)
-          .put("status", 10)
+          .put("status", 10)  // would be overridden on insert
           .put("shire_id", Optional.absent())
           .put("format", 10)
           .put("deliver_signed", false)
-          .put("symbol", "")
+          .put("symbol", "") // would be populated on insert
           .put("updated", Optional.absent()) // would be populated on update and insert
           .put("account_no", Optional.absent())
           .put("bank_no", Optional.absent())
-          .put("variable", Optional.absent())
-          .put("customer_status", "CREATED")
+          .put("variable", Optional.absent()) // would be overridden on insert
+          .put("customer_status", "CREATED")  // would be overridden on insert
           .put("is_billed_after", false)
           .put("is_auto_billing", true)
-          .put("is_active", false)
+          .put("is_active", false) // would be overridden on insert
           .build();
 
   final CustomerId id;

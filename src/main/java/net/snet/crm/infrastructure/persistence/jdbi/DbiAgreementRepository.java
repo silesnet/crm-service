@@ -66,27 +66,46 @@ public class DbiAgreementRepository implements AgreementRepository {
           insertAgreementOf(agreementDraft, handle);
           updateDraftStatusTo(IMPORTED, agreementDraft.id(), handle);
         }
-        if (customerDraftOptional.isPresent() && agreementDraftOptional.isPresent()) {
-          updateCustomerSymbol(customerDraftOptional.get(), agreementDraftOptional.get(), handle);
-          updateCustomerVariableSymbol(customerDraftOptional.get(), agreementDraftOptional.get(), handle);
-        }
         insertServiceOf(serviceDraft, handle);
         updateDraftStatusTo(IMPORTED, serviceDraft.id(), handle);
+        updateCustomerStatusOf(
+            customerDraftOptional,
+            agreementDraftOptional,
+            serviceDraft,
+            handle
+        );
         return null;
       }
     });
   }
 
-  private void updateCustomerVariableSymbol(final Draft customer, final Draft agreement, final Handle handle) {
-    final Object variable = new Agreement(agreement).number();
-    updateRecord(CUSTOMERS_TABLE, customer.entityId(), ImmutableMap.of("variable", variable), handle);
-  }
-
-  private void updateCustomerSymbol(final Draft customer, final Draft agreement, final Handle handle) {
-    if ("PL".equals(agreement.entitySpate())) {
-      final Object symbol = "PL-" + (agreement.entityId() - 200000);
-      updateRecord(CUSTOMERS_TABLE, customer.entityId(), ImmutableMap.of("symbol", symbol), handle);
+  private void updateCustomerStatusOf(
+      final Optional<Draft> customerDraftOptional,
+      final Optional<Draft> agreementDraftOptional,
+      final Draft serviceDraft,
+      final Handle handle) {
+    final Map<String, Object> customerUpdate = Maps.newHashMap();
+    final long customerId;
+    final Service service = new Service(serviceDraft);
+    if (customerDraftOptional.isPresent() && agreementDraftOptional.isPresent()) {
+      customerId = customerDraftOptional.get().entityId();
+      final Draft agreementDraft = agreementDraftOptional.get();
+      final Agreement agreement = new Agreement(agreementDraft);
+      if ("PL".equals(agreementDraft.entitySpate())) {
+        final Object symbol = "PL-" + (agreementDraft.entityId() - 200000);
+        customerUpdate.put("symbol", symbol);
+      }
+      final Object variable = agreement.number();
+      customerUpdate.put("variable", variable);
     }
+    else {
+      customerId = service.customerId();
+    }
+    customerUpdate.put("lastly_billed", service.periodStart().minusDays(1));
+    customerUpdate.put("status", 20);
+    customerUpdate.put("customer_status", "ACTIVE");
+    customerUpdate.put("is_active", true);
+    updateRecord(CUSTOMERS_TABLE, customerId, customerUpdate, handle);
   }
 
   private void checkDraftEntityIs(final Draft.Entity entity, final Draft draft) {
