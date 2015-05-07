@@ -135,3 +135,58 @@ CREATE TABLE users
   operation_country character(2) NOT NULL DEFAULT 'CZ',
   full_name character varying(255) NOT NULL DEFAULT ''
 );
+
+CREATE TABLE dhcp
+(
+  service_id bigint,
+  dns character varying(30) NOT NULL,
+  port smallint NOT NULL,
+  flat character varying(30) NOT NULL,
+  ip character varying(15) NOT NULL DEFAULT 'AUTO'
+);
+
+
+CREATE TABLE network (
+    id integer NOT NULL,
+    name character varying(50) NOT NULL,
+    info character varying(500),
+    active boolean,
+    type integer,
+    mode integer,
+    wds boolean,
+    frequency integer,
+    vendor character varying(50),
+    azimuth character varying(50),
+    ssid character varying(50),
+    auth character varying(50),
+    polarization integer,
+    country integer,
+    norm character varying(50),
+    area character varying(50),
+    aggregation boolean,
+    width character varying(50),
+    antenna character varying(50),
+    power character varying(50),
+    master character varying(50),
+    linkto character varying(50),
+    hardware character varying(50),
+    tdma boolean,
+    latitude character varying(50),
+    longitude character varying(50),
+    r_updatetime timestamp,
+    r_firmware character varying(50),
+    r_platform character varying(50),
+    r_signal character varying(50),
+    r_ccq character varying(50),
+    r_txrate character varying(50),
+    r_rxrate character varying(50),
+    r_quality character varying(50),
+    r_capacity character varying(50),
+    r_lanspeed character varying(50),
+    r_txpower character varying(50),
+    monitoring character varying(50),
+    traceroute text,
+    ping character varying(50),
+    r_frequency integer
+);
+
