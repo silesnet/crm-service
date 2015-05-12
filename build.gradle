@@ -25,6 +25,7 @@ dependencies {
 	compile "io.dropwizard:dropwizard-client:$dropwizardVersion"
 	compile "io.dropwizard:dropwizard-jdbi:$dropwizardVersion"
 	compile "io.dropwizard:dropwizard-migrations:$dropwizardVersion"
+  compile "io.dropwizard:dropwizard-assets:$dropwizardVersion"
   compile "com.google.guava:guava:18.0"
   compile 'postgresql:postgresql:9.1-901.jdbc4'
   testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'

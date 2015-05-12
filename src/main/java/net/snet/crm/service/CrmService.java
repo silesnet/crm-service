@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.sun.jersey.api.client.Client;
 import io.dropwizard.Application;
+import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
@@ -55,11 +56,12 @@ public class CrmService extends Application<CrmConfiguration> {
 		bootstrap.getObjectMapper().registerModule(new JodaModule());
 		bootstrap.getObjectMapper().setDateFormat(new ISO8601DateFormat());
 		bootstrap.addBundle(new MigrationsBundle<CrmConfiguration>() {
-			@Override
-			public DataSourceFactory getDataSourceFactory(CrmConfiguration configuration) {
-				return configuration.getDataSourceFactory();
-			}
-		});
+      @Override
+      public DataSourceFactory getDataSourceFactory(CrmConfiguration configuration) {
+        return configuration.getDataSourceFactory();
+      }
+    });
+		bootstrap.addBundle(new AssetsBundle("/favicon.ico"));
 	}
 
 	@Override
