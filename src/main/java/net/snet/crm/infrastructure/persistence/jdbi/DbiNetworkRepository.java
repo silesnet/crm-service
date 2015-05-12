@@ -28,8 +28,9 @@ public class DbiNetworkRepository implements NetworkRepository {
       @Override
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
-                "SELECT id, name FROM network" + "" +
-                    " WHERE type = :type AND name ~ '^.+-br$' AND country = :country")
+                "SELECT id, name FROM network" +
+                    " WHERE type = :type AND name ~ '^.+-br$' AND country = :country" +
+                    " ORDER BY name")
             .bind("type", deviceTypeId)
             .bind("country", countryId)
             .list();
