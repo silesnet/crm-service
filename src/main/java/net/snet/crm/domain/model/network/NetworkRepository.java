@@ -8,4 +8,8 @@ public interface NetworkRepository {
   enum DeviceType { SWITCH, ROUTER }
 
   List<Map<String, Object>> findDevicesByCountryAndType(Country country, DeviceType deviceType);
+
+  void enableDhcp(long serviceId, int switchId, int port);
+
+  void disableDhcp(int switchId, int port);
 }

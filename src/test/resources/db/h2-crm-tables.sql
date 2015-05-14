@@ -136,16 +136,6 @@ CREATE TABLE users
   full_name character varying(255) NOT NULL DEFAULT ''
 );
 
-CREATE TABLE dhcp
-(
-  service_id bigint,
-  dns character varying(30) NOT NULL,
-  port smallint NOT NULL,
-  flat character varying(30) NOT NULL,
-  ip character varying(15) NOT NULL DEFAULT 'AUTO'
-);
-
-
 CREATE TABLE network (
     id integer NOT NULL,
     name character varying(50) NOT NULL,
@@ -188,5 +178,23 @@ CREATE TABLE network (
     traceroute text,
     ping character varying(50),
     r_frequency integer
+);
+
+CREATE TABLE dhcp
+(
+  service_id    BIGINT,
+  network_id    INT NOT NULL,
+  port          SMALLINT NOT NULL,
+  location_id   INT,
+  ip            TEXT NOT NULL DEFAULT 'AUTO',
+  t_switch      TEXT NOT NULL DEFAULT '',
+  a_street      TEXT,
+  a_descriptive_number TEXT,
+  a_orientation_number TEXT,
+  a_flat      TEXT,
+  a_town      TEXT NOT NULL DEFAULT 'Èeský Tìšín',
+  a_postal_code TEXT NOT NULL DEFAULT '73701',
+  a_country   TEXT NOT NULL DEFAULT 'CZ',
+  a_location2 TEXT NOT NULL DEFAULT ''
 );
 
