@@ -2,6 +2,7 @@ package net.snet.crm.service.dao;
 
 import net.snet.crm.service.bo.Network;
 import net.snet.crm.service.mapper.NetworkMapper;
+import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapper;
 
@@ -15,6 +16,9 @@ public interface NetworkDAO {
 
     @SqlQuery("SELECT * FROM network WHERE ssid IS NOT NULL AND ssid NOT LIKE '%-%' ORDER BY ssid")
     Iterator<Network> allSsids();
+
+    @SqlQuery("SELECT * FROM network WHERE type = 40 AND name ~ '^.+-br$' AND country = :country")
+    Iterator<Network> allSwitches(@Bind("country") long country);
 
     void close();
 }
