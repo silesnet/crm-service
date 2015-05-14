@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -54,24 +53,6 @@ public class NetworkResource {
         Iterator<Network> networks = networkDAO.allSsids();
 
         networksMap.put("ssids", networks);
-
-        return networksMap;
-    }
-
-    @GET
-    @Path("/switches")
-    @Produces({"application/json; charset=UTF-8"})
-    @Timed(name = "get-requests")
-    public Map<String, Object> getAllSwitches(@QueryParam("country") String country) {
-        LOGGER.debug("switch called");
-
-        final long countryId = country.equals("CS") ? 10 : (country.equals("PL") ? 20: 0);
-
-        final HashMap<String, Object> networksMap = new HashMap<String, Object>();
-
-        Iterator<Network> networks = networkDAO.allSwitches(countryId);
-
-        networksMap.put("switches", networks);
 
         return networksMap;
     }
