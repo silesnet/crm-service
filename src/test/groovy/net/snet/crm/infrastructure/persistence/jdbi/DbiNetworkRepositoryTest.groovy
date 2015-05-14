@@ -20,6 +20,34 @@ class DbiNetworkRepositoryTest extends Specification {
     handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
   }
 
+  def 'should enable dhcp when record exist'() {
+    given:
+      def service = [id: 11234501, switchId: 15, port: 20]
+      handle.insert('INSERT INTO dhcp (service_id, network_id, port) VALUES (10, 15, 20)')
+    when:
+      repo.enableDhcp(service.id, service.switchId, service.port)
+    then:
+      def dhcp = handle.select(
+          'SELECT service_id, network_id, port FROM dhcp' +
+              ' WHERE network_id=15 AND port=20 ORDER BY service_id').first()
+      dhcp.service_id == 11234501
+      dhcp.network_id == 15
+      dhcp.port == 20
+  }
+
+  def 'should enable dhcp when record does not exist'() {
+    given:
+      def service = [id: 11234501, switchId: 15, port: 20]
+    when:
+      repo.enableDhcp(service.id, service.switchId, service.port)
+    then:
+      def dhcp = handle.select(
+          'SELECT service_id, network_id, port FROM dhcp WHERE network_id=15 AND port=20').first()
+      dhcp.service_id == 11234501
+      dhcp.network_id == 15
+      dhcp.port == 20
+  }
+
   def 'should find all devices for country'() {
     given:
       handle.execute("INSERT INTO network (id, name, type, country) VALUES (1, 'a-br', 40, 10)")
@@ -44,6 +72,8 @@ class DbiNetworkRepositoryTest extends Specification {
     handle.execute('DROP TABLE drafts')
     handle.execute('DROP TABLE drafts2')
     handle.execute('DROP TABLE draft_links')
+    handle.execute('DROP TABLE network')
+    handle.execute('DROP TABLE dhcp')
     handle.close()
     repo = null
   }
