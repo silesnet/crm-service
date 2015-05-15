@@ -7,6 +7,8 @@ import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.TransactionCallback;
 import org.skife.jdbi.v2.TransactionStatus;
 import org.skife.jdbi.v2.tweak.HandleCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -16,6 +18,7 @@ import static net.snet.crm.domain.model.network.NetworkRepository.Country.PL;
 import static net.snet.crm.service.utils.Databases.insertRecordWithoutKey;
 
 public class DbiNetworkRepository implements NetworkRepository {
+  private static final Logger logger = LoggerFactory.getLogger(DbiNetworkRepository.class);
   private static final String DHCP_TABLE = "dhcp";
   private static final String NETWORK_TABLE = "network";
   private final DBI dbi;
@@ -74,13 +77,30 @@ public class DbiNetworkRepository implements NetworkRepository {
               .build();
           insertRecordWithoutKey(DHCP_TABLE, record, handle);
         }
+        logger.info("DHCP switch/port '{}/{}' was enabled", switchId, port);
         return null;
       }
     });
   }
 
   @Override
-  public void disableDhcp(int switchId, int port) {
-
+  public void disableDhcp(final int switchId, final int port) {
+    dbi.inTransaction(new TransactionCallback<Void>() {
+      @Override
+      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
+        final int updatedCount = handle.createStatement(
+            "UPDATE " + DHCP_TABLE + " SET service_id=NULL" +
+                " WHERE network_id=:switch_id AND port=:port")
+            .bind("switch_id", switchId)
+            .bind("port", port)
+            .execute();
+        if (updatedCount == 0) {
+          logger.warn("DHCP switch/port '{}/{}' was not disabled, its missing in database",
+              switchId, port);
+        }
+        logger.info("DHCP switch/port '{}/{}' was disabled", switchId, port);
+        return null;
+      }
+    });
   }
 }
