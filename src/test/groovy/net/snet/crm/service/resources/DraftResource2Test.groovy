@@ -4,6 +4,7 @@ import com.sun.jersey.api.client.ClientResponse
 import com.sun.jersey.api.client.PartialRequestBuilder
 import io.dropwizard.logging.LoggingFactory
 import io.dropwizard.testing.junit.ResourceTestRule
+import net.snet.crm.domain.model.network.NetworkRepository
 import net.snet.crm.service.dao.DraftRepository
 import org.junit.ClassRule
 import spock.lang.Shared
@@ -18,7 +19,7 @@ class DraftResource2Test extends Specification {
   private static final long AGREEMENT_DRAFT_ID = 10L
 
   @Shared
-  DraftResource2 draftResource = new DraftResource2(null, null, null);
+  DraftResource2 draftResource = new DraftResource2(null, null, null, null);
 
   @Shared
   @ClassRule
@@ -26,6 +27,70 @@ class DraftResource2Test extends Specification {
 
   def setupSpec() {
     LoggingFactory.bootstrap(Level.DEBUG)
+  }
+
+  def 'should disable dhcp when deleting dhcp draft'() {
+    given:
+      def original = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
+                      status: 'DRAFT', owner: 'test',
+                      data: [auth_type: '1', auth_a: '11', auth_b: '3']]
+    and:
+      def draftRepository = wiredDraftRepositoryStub()
+      draftRepository.get(_) >> original
+      def networkRepository = wiredNetworRepositoryMock()
+    when:
+      def res = reqTo("/${DRAFTS}/1234", '').delete(ClientResponse.class)
+    then:
+      with(res) {
+        status == 204
+      }
+    and:
+      1 * networkRepository.disableDhcp(11, 3)
+  }
+
+  def 'should disable/enable dhcp when updating dhcp draft'() {
+    given:
+      def original = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
+                      status: 'DRAFT', owner: 'test',
+                      data: [auth_type: '1', auth_a: '11', auth_b: '3']]
+      def current = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
+                     status: 'DRAFT', owner: 'test',
+                     data: [auth_type: '1', auth_a: '11', auth_b: '2']] // auth_type == 1 => DHCP
+    and:
+      def draftRepository = wiredDraftRepositoryStub()
+      draftRepository.get(_) >>> [original, current]
+      def networkRepository = wiredNetworRepositoryMock()
+    when:
+      def res = reqTo("/${DRAFTS}/1234", '{"drafts":{}}').put(ClientResponse.class)
+    then:
+      with(res) {
+        status == 200
+      }
+    and:
+      1 * networkRepository.disableDhcp(11, 3)
+    and:
+      1 * networkRepository.enableDhcp(10, 11, 2)
+  }
+
+  def 'should enable dhcp when updating new dhcp draft'() {
+    given:
+      def original = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
+                      status: 'DRAFT', owner: 'test', data: [:]]
+      def current = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
+                     status: 'DRAFT', owner: 'test',
+                     data: [auth_type: '1', auth_a: '11', auth_b: '2']] // auth_type == 1 => DHCP
+    and:
+      def draftRepository = wiredDraftRepositoryStub()
+      draftRepository.get(_) >>> [original, current]
+      def networkRepository = wiredNetworRepositoryMock()
+
+    when:
+      def res = reqTo("/${DRAFTS}/1234", '{"drafts":{}}').put(ClientResponse.class)
+    then:
+      with(res) {
+        status == 200
+      }
+      1 * networkRepository.enableDhcp(10, 11, 2)
   }
 
   def 'should create new customer draft resource'() {
@@ -78,6 +143,12 @@ class DraftResource2Test extends Specification {
   DraftRepository wiredDraftRepositoryStub() {
     DraftRepository repo = Stub(DraftRepository.class)
     draftResource.draftRepository = repo
+  }
+
+  @SuppressWarnings("all")
+  NetworkRepository wiredNetworRepositoryMock() {
+    NetworkRepository repo = Mock(NetworkRepository.class)
+    draftResource.networkRepository = repo
   }
 
   ClientResponse post(String path, String json) {

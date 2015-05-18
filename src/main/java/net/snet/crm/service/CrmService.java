@@ -16,6 +16,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
+import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.service.dao.CrmRepositoryJdbi;
 import net.snet.crm.service.dao.DbiDraftRepository;
 import net.snet.crm.service.dao.DraftDAO;
@@ -100,7 +101,9 @@ public class CrmService extends Application<CrmConfiguration> {
 		jersey.register(new BaseResource());
 		final DbiDraftRepository draftRepository = new DbiDraftRepository(dbi, mapper);
     final AgreementRepository agreementRepository = new DbiAgreementRepository(dbi, mapper);
-    jersey.register(new DraftResource2(draftRepository, crmRepository, agreementRepository));
+		final DbiNetworkRepository networkRepository = new DbiNetworkRepository(dbi);
+		jersey.register(new DraftResource2(draftRepository, crmRepository,
+				agreementRepository, networkRepository));
 		jersey.register(new RuntimeExceptionMapper());
 	}
 

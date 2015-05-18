@@ -7,11 +7,9 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import net.snet.crm.domain.model.agreement.Agreement;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
-import net.snet.crm.domain.model.agreement.Customer;
-import net.snet.crm.domain.model.agreement.Service;
 import net.snet.crm.domain.model.draft.Draft;
+import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
 import org.slf4j.Logger;
@@ -28,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static net.snet.crm.domain.model.draft.Draft.Entity.SERVICES;
 import static net.snet.crm.service.utils.Entities.*;
 import static net.snet.crm.service.utils.Resources.checkParam;
 
@@ -35,22 +34,27 @@ import static net.snet.crm.service.utils.Resources.checkParam;
 @Produces({"application/json; charset=UTF-8"})
 @Consumes(MediaType.APPLICATION_JSON)
 public class DraftResource2 {
-  private static final Logger
-      logger = LoggerFactory.getLogger(DraftResource2.class);
-  private static final Function<Map<String, Object>, String>
-      getLoginValue = getValueOf("login");
+  private static final Logger logger = LoggerFactory.getLogger(DraftResource2.class);
+  private static final Function<Map<String, Object>, String> getLoginValue = getValueOf("login");
+  private static final String AUTH_DHCP = "1";
 
   private final CrmRepository crmRepository;
   @Context
   private UriInfo uriInfo;
   private DraftRepository draftRepository;
   private AgreementRepository agreementRepository;
+  private NetworkRepository networkRepository;
 
-  public DraftResource2(DraftRepository draftRepository, CrmRepository crmRepository,
-                        AgreementRepository agreementRepository) {
+  public DraftResource2(
+      DraftRepository draftRepository,
+      CrmRepository crmRepository,
+      AgreementRepository agreementRepository,
+      NetworkRepository networkRepository)
+  {
     this.draftRepository = draftRepository;
     this.crmRepository = crmRepository;
     this.agreementRepository = agreementRepository;
+    this.networkRepository = networkRepository;
   }
 
   @GET
@@ -139,49 +143,50 @@ public class DraftResource2 {
     draftRepository.update(draftId, draftData.get());
     logger.debug("draft '{}' updated", draftId);
     final Map<String, Object> draft = draftRepository.get(draftId);
-    if (isDraftToImport(originalDraft, draft)) {
-      importDraft(draft);
-    }
+    populateDhcp(originalDraft, draft);
     return Response
         .ok(ImmutableMap.of("drafts", draft))
         .build();
   }
 
-  private boolean isDraftToImport(Map<String, Object> original, Map<String, Object> current) {
-    final String originalStatus = valueOf("status", original, String.class);
-    final String currentStatus = valueOf("status", current, String.class);
-    return
-        !originalStatus.equals(currentStatus)
-            && "IMPORTED".equals(currentStatus);
-  }
-
-  private void importDraft(Map<String, Object> draft) {
-    final long draftId = valueOf("id", draft, Long.class);
-    final String entityType = valueOf("entityType", draft, String.class);
-    final long entityId = valueOf("entityId", draft, Long.class);
-    if ("customers".equals(entityType)) {
-      logger.info("importing draft '{}' into 'customers/{}'...", draftId, entityId);
-      final Customer customer = new Customer(new Draft(draft));
-      final Customer addedCustomer = agreementRepository.addCustomer(customer);
-      logger.info("added new customer '{}'", addedCustomer.id().value());
-    } else if ("agreements".equals(entityType)) {
-      logger.info("importing draft '{}' into 'agreements/{}'...", draftId, entityId);
-      final Agreement agreement = new Agreement(new Draft(draft));
-      final Agreement addedAgreement = agreementRepository.add(agreement);
-      logger.info("added new agreement '{}'", addedAgreement.id().value());
-    } else if ("services".equals(entityType)) {
-      logger.info("importing draft '{}' into 'services/{}'...", draftId, entityId);
-      final Service service = new Service(new Draft(draft));
-      final Service addedService = agreementRepository.addService(service);
-      logger.info("added new service '{}'", addedService.id().value());
-    } else {
-      logger.info("can't import draft '{}' unknown entity type '{}/{}'", draftId, entityType, entityId);
+  private void populateDhcp(Map<String, Object> originalDraftMap, Map<String, Object> currentDraftMap) {
+    final Draft originalDraft = new Draft(originalDraftMap);
+    final Draft currentDraft = new Draft(currentDraftMap);
+    if (SERVICES.equals(originalDraft.entity()) && SERVICES.equals(currentDraft.entity())) {
+      final ValueMap original = valueMapOf(originalDraft.data());
+      final ValueMap current = valueMapOf(currentDraft.data());
+      final String originalAuth = original.get("auth_type").asStringOr("0");
+      final String currentAuth = current.get("auth_type").asStringOr("0");
+      if (AUTH_DHCP.equals(originalAuth)) {
+        final int originalSwitchId = original.get("auth_a").asInteger();
+        final int originalPort = original.get("auth_b").asInteger();
+        final int currentSwitchId = current.get("auth_a").asInteger();
+        final int currentPort = current.get("auth_b").asInteger();
+        if (originalSwitchId != currentSwitchId || originalPort != currentPort) {
+          networkRepository.disableDhcp(originalSwitchId, originalPort);
+        }
+      }
+      if (AUTH_DHCP.equals(currentAuth)) {
+        final int switchId = current.get("auth_a").asInteger();
+        final int port = current.get("auth_b").asInteger();
+        networkRepository.enableDhcp(currentDraft.entityId(), switchId, port);
+      }
     }
   }
 
   @DELETE
   @Path("/{draftId}")
   public Response deleteDraft(@PathParam("draftId") long draftId) {
+    final Draft original = new Draft(draftRepository.get(draftId));
+    if (SERVICES.equals(original.entity())) {
+      final ValueMap service = valueMapOf(original.data());
+      final String authentication = service.get("auth_type").asStringOr("0");
+      if (AUTH_DHCP.equals(authentication)) {
+        final int switchId = service.get("auth_a").asInteger();
+        final int port = service.get("auth_b").asInteger();
+        networkRepository.disableDhcp(switchId, port);
+      }
+    }
     draftRepository.delete(draftId);
     return Response.noContent().build();
   }
