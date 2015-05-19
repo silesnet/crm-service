@@ -167,8 +167,8 @@ public class Entities {
       return Long.valueOf(original.toString());
     }
 
-    @Nullable
-    public Long asLongOr(@Nullable final Long fallBack) {
+    @Nonnull
+    public Long asLongOr(@Nonnull final Long fallBack) {
      return isNullOrEmpty() ? fallBack : asLong();
     }
 
@@ -177,8 +177,8 @@ public class Entities {
       return Integer.valueOf(original.toString());
     }
 
-    @Nullable
-    public Integer asIntegerOr(@Nullable final Integer fallBack) {
+    @Nonnull
+    public Integer asIntegerOr(@Nonnull final Integer fallBack) {
       return isNullOrEmpty() ? fallBack : asInteger();
     }
 
