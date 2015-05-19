@@ -158,18 +158,22 @@ public class DraftResource2 {
       final String originalAuth = original.get("auth_type").asStringOr("0");
       final String currentAuth = current.get("auth_type").asStringOr("0");
       if (AUTH_DHCP.equals(originalAuth)) {
-        final int originalSwitchId = original.get("auth_a").asInteger();
-        final int originalPort = original.get("auth_b").asInteger();
-        final int currentSwitchId = current.get("auth_a").asInteger();
-        final int currentPort = current.get("auth_b").asInteger();
+        final int originalSwitchId = original.get("auth_a").asIntegerOr(-1);
+        final int originalPort = original.get("auth_b").asIntegerOr(-1);
+        final int currentSwitchId = current.get("auth_a").asIntegerOr(-1);
+        final int currentPort = current.get("auth_b").asIntegerOr(-1);
         if (originalSwitchId != currentSwitchId || originalPort != currentPort) {
-          networkRepository.disableDhcp(originalSwitchId, originalPort);
+          if (originalSwitchId != -1 && originalPort != -1) {
+            networkRepository.disableDhcp(originalSwitchId, originalPort);
+          }
         }
       }
       if (AUTH_DHCP.equals(currentAuth)) {
-        final int switchId = current.get("auth_a").asInteger();
-        final int port = current.get("auth_b").asInteger();
-        networkRepository.enableDhcp(currentDraft.entityId(), switchId, port);
+        final int switchId = current.get("auth_a").asIntegerOr(-1);
+        final int port = current.get("auth_b").asIntegerOr(-1);
+        if (switchId != -1 && port != -1) {
+          networkRepository.enableDhcp(currentDraft.entityId(), switchId, port);
+        }
       }
     }
   }
