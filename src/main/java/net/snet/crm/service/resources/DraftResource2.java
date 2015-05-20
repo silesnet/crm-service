@@ -160,9 +160,16 @@ public class DraftResource2 {
       if (AUTH_DHCP.equals(originalAuth)) {
         final int originalSwitchId = original.get("auth_a").asIntegerOr(-1);
         final int originalPort = original.get("auth_b").asIntegerOr(-1);
-        final int currentSwitchId = current.get("auth_a").asIntegerOr(-1);
-        final int currentPort = current.get("auth_b").asIntegerOr(-1);
-        if (originalSwitchId != currentSwitchId || originalPort != currentPort) {
+        if (AUTH_DHCP.equals(currentAuth)) {
+          final int currentSwitchId = current.get("auth_a").asIntegerOr(-1);
+          final int currentPort = current.get("auth_b").asIntegerOr(-1);
+          if (originalSwitchId != currentSwitchId || originalPort != currentPort) {
+            if (originalSwitchId != -1 && originalPort != -1) {
+              networkRepository.disableDhcp(originalSwitchId, originalPort);
+            }
+          }
+        }
+        else {
           if (originalSwitchId != -1 && originalPort != -1) {
             networkRepository.disableDhcp(originalSwitchId, originalPort);
           }
