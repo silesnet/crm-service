@@ -39,7 +39,7 @@ public class DbiNetworkRepository implements NetworkRepository {
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
                 "SELECT id, name FROM "+ NETWORK_TABLE +
-                    " WHERE type = :type AND name ~ '^.+-br$' AND country = :country" +
+                    " WHERE type = :type AND name ~ '^.+-br.?.?$' AND country = :country" +
                     " ORDER BY name")
             .bind("type", deviceTypeId)
             .bind("country", countryId)
