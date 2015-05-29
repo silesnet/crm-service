@@ -27,6 +27,21 @@ public class DbiNetworkRepository implements NetworkRepository {
     this.dbi = dbi;
   }
 
+
+  @Override
+  public Map<String, Object> findDevice(final int deviceId) {
+    final Map<String, Object> device = dbi.withHandle(new HandleCallback<Map<String, Object>>() {
+      @Override
+      public Map<String, Object> withHandle(Handle handle) throws Exception {
+        return handle.createQuery(
+              "SELECT * FROM " + NETWORK_TABLE + " WHERE id=:id")
+            .bind("id", deviceId)
+            .first();
+      }
+    });
+    return device != null ? device : ImmutableMap.<String, Object>of();
+  }
+
   @Override
   public List<Map<String, Object>> findDevicesByCountryAndType(
       final Country country,
@@ -38,7 +53,7 @@ public class DbiNetworkRepository implements NetworkRepository {
       @Override
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
-                "SELECT id, name FROM "+ NETWORK_TABLE +
+                "SELECT id, name, master FROM "+ NETWORK_TABLE +
                     " WHERE type = :type AND name ~ '^.+-br.?.?$' AND country = :country" +
                     " ORDER BY name")
             .bind("type", deviceTypeId)
