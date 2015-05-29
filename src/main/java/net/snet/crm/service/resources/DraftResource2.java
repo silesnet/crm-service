@@ -10,6 +10,7 @@ import com.google.common.collect.Sets;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.domain.model.network.NetworkRepository;
+import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
 import org.slf4j.Logger;
@@ -44,17 +45,20 @@ public class DraftResource2 {
   private DraftRepository draftRepository;
   private AgreementRepository agreementRepository;
   private NetworkRepository networkRepository;
+  private NetworkService networkService;
 
   public DraftResource2(
       DraftRepository draftRepository,
       CrmRepository crmRepository,
       AgreementRepository agreementRepository,
-      NetworkRepository networkRepository)
+      NetworkRepository networkRepository,
+      NetworkService networkService)
   {
     this.draftRepository = draftRepository;
     this.crmRepository = crmRepository;
     this.agreementRepository = agreementRepository;
     this.networkRepository = networkRepository;
+    this.networkService = networkService;
   }
 
   @GET
@@ -164,23 +168,17 @@ public class DraftResource2 {
           final int currentSwitchId = current.get("auth_a").asIntegerOr(-1);
           final int currentPort = current.get("auth_b").asIntegerOr(-1);
           if (originalSwitchId != currentSwitchId || originalPort != currentPort) {
-            if (originalSwitchId != -1 && originalPort != -1) {
-              networkRepository.disableDhcp(originalSwitchId, originalPort);
-            }
+            disableDhcp(originalSwitchId, originalPort);
           }
         }
         else {
-          if (originalSwitchId != -1 && originalPort != -1) {
-            networkRepository.disableDhcp(originalSwitchId, originalPort);
-          }
+          disableDhcp(originalSwitchId, originalPort);
         }
       }
       if (AUTH_DHCP.equals(currentAuth)) {
         final int switchId = current.get("auth_a").asIntegerOr(-1);
         final int port = current.get("auth_b").asIntegerOr(-1);
-        if (switchId != -1 && port != -1) {
-          networkRepository.enableDhcp(currentDraft.entityId(), switchId, port);
-        }
+        enableDhcp(currentDraft.entityId(), switchId, port);
       }
     }
   }
@@ -195,7 +193,7 @@ public class DraftResource2 {
       if (AUTH_DHCP.equals(authentication)) {
         final int switchId = service.get("auth_a").asInteger();
         final int port = service.get("auth_b").asInteger();
-        networkRepository.disableDhcp(switchId, port);
+        disableDhcp(switchId, port);
       }
     }
     draftRepository.delete(draftId);
@@ -212,6 +210,26 @@ public class DraftResource2 {
     agreementRepository.addService(customerDraft, agreementDraft, serviceDraft);
     logger.info("service draft '{}' was imported", draftId);
     return Response.created(uriInfo.getRequestUri()).entity(ImmutableMap.of()).build();
+  }
+
+  private void disableDhcp(int switchId, int port) {
+    if (switchId != -1 && port != -1) {
+      networkRepository.disableDhcp(switchId, port);
+      final Object switchName = networkRepository.findDevice(switchId).get("name");
+      if (switchName != null) {
+        networkService.disableSwitchPort(switchName.toString(), port);
+      }
+    }
+  }
+
+  private void enableDhcp(long serviceId, int switchId, int port) {
+    if (switchId != -1 && port != -1) {
+      networkRepository.enableDhcp(serviceId, switchId, port);
+      final Object switchName = networkRepository.findDevice(switchId).get("name");
+      if (switchName != null) {
+        networkService.enableSwitchPort(switchName.toString(), port);
+      }
+    }
   }
 
   private Optional<Draft> customerDraftOf(final Map<String, String> links) {

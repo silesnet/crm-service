@@ -20,6 +20,27 @@ class DbiNetworkRepositoryTest extends Specification {
     handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
   }
 
+  def 'should find device by id'() {
+    given:
+      handle.execute("INSERT INTO network (id, name, type, country) VALUES (1, 'a-br', 40, 10)")
+    when:
+      def device = repo.findDevice(1)
+    then:
+      with(device) {
+        id == 1
+        name == 'a-br'
+        type == 40
+        country == 10
+      }
+  }
+
+  def 'should return empty map when device not found'() {
+    when:
+      def device = repo.findDevice(1)
+    then:
+      device.isEmpty()
+  }
+
   def 'should enable dhcp when record exist'() {
     given:
       def service = [id: 11234501, switchId: 15, port: 20]

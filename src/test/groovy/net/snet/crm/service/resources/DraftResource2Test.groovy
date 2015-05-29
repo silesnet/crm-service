@@ -5,6 +5,7 @@ import com.sun.jersey.api.client.PartialRequestBuilder
 import io.dropwizard.logging.LoggingFactory
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.crm.domain.model.network.NetworkRepository
+import net.snet.crm.domain.model.network.NetworkService
 import net.snet.crm.service.dao.DraftRepository
 import org.junit.ClassRule
 import spock.lang.Shared
@@ -19,7 +20,7 @@ class DraftResource2Test extends Specification {
   private static final long AGREEMENT_DRAFT_ID = 10L
 
   @Shared
-  DraftResource2 draftResource = new DraftResource2(null, null, null, null);
+  DraftResource2 draftResource = new DraftResource2(null, null, null, null, null);
 
   @Shared
   @ClassRule
@@ -38,6 +39,7 @@ class DraftResource2Test extends Specification {
       def draftRepository = wiredDraftRepositoryStub()
       draftRepository.get(_) >> original
       def networkRepository = wiredNetworRepositoryMock()
+      def networkService = wiredNetworServiceMock()
     when:
       def res = reqTo("/${DRAFTS}/1234", '').delete(ClientResponse.class)
     then:
@@ -46,6 +48,8 @@ class DraftResource2Test extends Specification {
       }
     and:
       1 * networkRepository.disableDhcp(11, 3)
+      1 * networkRepository.findDevice(11) >> [name: 'switch-11-br']
+      1 * networkService.disableSwitchPort('switch-11-br', 3)
   }
 
   def 'should disable/enable dhcp when updating dhcp draft'() {
@@ -60,6 +64,7 @@ class DraftResource2Test extends Specification {
       def draftRepository = wiredDraftRepositoryStub()
       draftRepository.get(_) >>> [original, current]
       def networkRepository = wiredNetworRepositoryMock()
+      def networkService = wiredNetworServiceMock()
     when:
       def res = reqTo("/${DRAFTS}/1234", '{"drafts":{}}').put(ClientResponse.class)
     then:
@@ -68,8 +73,12 @@ class DraftResource2Test extends Specification {
       }
     and:
       1 * networkRepository.disableDhcp(11, 3)
+      1 * networkRepository.findDevice(11) >> [name: 'switch-11-br']
+      1 * networkService.disableSwitchPort('switch-11-br', 3)
     and:
       1 * networkRepository.enableDhcp(10, 11, 2)
+      1 * networkRepository.findDevice(11) >> [name: 'switch-11-br']
+      1 * networkService.enableSwitchPort('switch-11-br', 2)
   }
 
   def 'should enable dhcp when updating new dhcp draft'() {
@@ -83,7 +92,7 @@ class DraftResource2Test extends Specification {
       def draftRepository = wiredDraftRepositoryStub()
       draftRepository.get(_) >>> [original, current]
       def networkRepository = wiredNetworRepositoryMock()
-
+      def networkService = wiredNetworServiceMock()
     when:
       def res = reqTo("/${DRAFTS}/1234", '{"drafts":{}}').put(ClientResponse.class)
     then:
@@ -91,6 +100,8 @@ class DraftResource2Test extends Specification {
         status == 200
       }
       1 * networkRepository.enableDhcp(10, 11, 2)
+      1 * networkRepository.findDevice(11) >> [name: 'switch-11-br']
+      1 * networkService.enableSwitchPort('switch-11-br', 2)
   }
 
   def 'should create new customer draft resource'() {
@@ -149,6 +160,12 @@ class DraftResource2Test extends Specification {
   NetworkRepository wiredNetworRepositoryMock() {
     NetworkRepository repo = Mock(NetworkRepository.class)
     draftResource.networkRepository = repo
+  }
+
+  @SuppressWarnings("all")
+  NetworkService wiredNetworServiceMock() {
+    NetworkService service = Mock(NetworkService.class)
+    draftResource.networkService = service
   }
 
   ClientResponse post(String path, String json) {

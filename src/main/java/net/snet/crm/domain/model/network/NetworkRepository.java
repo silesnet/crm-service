@@ -9,6 +9,8 @@ public interface NetworkRepository {
 
   List<Map<String, Object>> findDevicesByCountryAndType(Country country, DeviceType deviceType);
 
+  Map<String, Object> findDevice(int deviceId);
+
   void enableDhcp(long serviceId, int switchId, int port);
 
   void disableDhcp(int switchId, int port);
