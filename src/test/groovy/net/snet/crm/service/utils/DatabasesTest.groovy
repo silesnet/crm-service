@@ -23,6 +23,11 @@ class DatabasesTest extends Specification {
       )'''.stripIndent())
   }
 
+  def 'should return next value of sequence'() {
+    expect:
+      nextValOf('audit_item_id_seq', handle) < nextValOf('audit_item_id_seq', handle)
+  }
+
   def 'should return last id value of empty table'() {
     expect:
       lastValueOf("entities", "id", handle) == 0

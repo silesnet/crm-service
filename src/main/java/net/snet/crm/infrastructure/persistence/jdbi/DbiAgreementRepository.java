@@ -36,6 +36,7 @@ public class DbiAgreementRepository implements AgreementRepository {
   public static final String SERVICES_TABLE = "services";
   public static final String DRAFTS_TABLE = "drafts2";
   private static final String AUDIT_TABLE = "audit_items";
+  private static final String AUDIT_ITEM_ID_SEQ = "audit_item_id_seq";
 
   private final DBI dbi;
   private final ObjectMapper mapper;
@@ -184,7 +185,7 @@ public class DbiAgreementRepository implements AgreementRepository {
   }
 
   private long insertCustomerAuditOf(final Draft draft, final Handle handle) {
-    final long auditId = lastValueOf(AUDIT_TABLE, "id", handle) + 1;
+    final long auditId = nextValOf(AUDIT_ITEM_ID_SEQ, handle);
     final long historyId = lastValueOf(AUDIT_TABLE, "history_id", handle) + 1;
     final Map<String, Object> record = ImmutableMap.<String, Object>builder()
         .put("id", auditId)
