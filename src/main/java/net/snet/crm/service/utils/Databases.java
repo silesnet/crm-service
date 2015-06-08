@@ -110,6 +110,14 @@ public class Databases {
     return Long.valueOf(last.get(column).toString());
   }
 
+  public static long nextValOf(final String sequence, final Handle handle) {
+    checkColumnName(sequence);
+    return handle
+        .createQuery("SELECT nextval('" + sequence + "')")
+        .map(LongMapper.FIRST)
+        .first();
+  }
+
   public static String insertSql(final String table, final Collection<String> columns) {
     checkTableName(table);
     final Collection<String> references = Collections2.transform(columns, columnToReference);
