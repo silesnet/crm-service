@@ -82,6 +82,9 @@ public class DraftResource2 {
                 .filter(draftCountryOf(ownerOperationCountry)).toList());
         drafts.addAll(draftRepository.findByOwnerAndStatus(owner, "SUBMITTED"));
       }
+      if ("ROLE_NETWORK_ADMIN".equals(role)) {
+        drafts.addAll(FluentIterable.from(draftRepository.findByStatus("DRAFT")).toList());
+      }
     }
     drafts.addAll(draftRepository.findByOwnerAndStatus(owner, "DRAFT"));
     if (entityType.isPresent()) {
