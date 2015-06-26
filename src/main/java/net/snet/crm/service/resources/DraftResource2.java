@@ -84,6 +84,7 @@ public class DraftResource2 {
       }
       if ("ROLE_NETWORK_ADMIN".equals(role)) {
         drafts.addAll(FluentIterable.from(draftRepository.findByStatus("DRAFT")).toList());
+        drafts.addAll(FluentIterable.from(draftRepository.findByStatus("SUBMITTED")).toList());
       }
     }
     drafts.addAll(draftRepository.findByOwnerAndStatus(owner, "DRAFT"));
