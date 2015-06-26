@@ -148,6 +148,10 @@ public class DraftResource2 {
     checkParam(draftData.isPresent(), "can't update draft, data not sent");
     logger.debug("updating draft '{}'", draftId);
     final Map<String, Object> originalDraft = draftRepository.get(draftId);
+    if ("IMPORTED".equals(originalDraft.get("status"))) {
+      throw new WebApplicationException(new IllegalStateException("trying to updated IMPORTED " +
+          "draft '" + draftId + "'"));
+    }
     draftRepository.update(draftId, draftData.get());
     logger.debug("draft '{}' updated", draftId);
     final Map<String, Object> draft = draftRepository.get(draftId);
