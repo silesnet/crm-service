@@ -11,7 +11,7 @@ import static net.snet.crm.service.utils.Entities.*;
 public class Draft implements Entity<Draft, DraftId> {
 
   public enum Entity { AGREEMENTS, SERVICES, CUSTOMERS, CONNECTIONS };
-  public enum Status { DRAFT, SUBMITTED, APPROVED, IMPORTED }
+  public enum Status { DRAFT, SUBMITTED, APPROVED, IMPORTED, AVAILABLE }
 
   private static final Map<String, String> PROP_NAMES =
       ImmutableMap.<String, String>builder()
