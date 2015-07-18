@@ -22,6 +22,12 @@ logging:
       archivedFileCount: 30
 
 server:
+  type: simple
+  applicationContextPath: /
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: 8090
   gzip:
     enabled: false
   requestLog:
