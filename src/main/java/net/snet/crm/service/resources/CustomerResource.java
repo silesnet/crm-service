@@ -63,9 +63,11 @@ public class CustomerResource {
 	@GET
 	@Produces({"application/json; charset=UTF-8"})
 	@Timed(name = "get-requests")
-	public Map<String, Object> getCustomersByQuery(@QueryParam("qn") Optional<String> queryName,
-																								 @QueryParam("q") Optional<String> name,
-																								 @QueryParam("country") Optional<String> country) {
+	public Map<String, Object> getCustomersByQuery(
+			@QueryParam("qn") Optional<String> queryName,
+			@QueryParam("q") Optional<String> name,
+			@QueryParam("country") Optional<String> country)
+	{
 		logger.debug("customers called");
 
 		final HashMap<String, Object> customersMap = new HashMap<String, Object>();
