@@ -68,8 +68,6 @@ public class CustomerResource {
 			@QueryParam("q") Optional<String> name,
 			@QueryParam("country") Optional<String> country)
 	{
-		logger.debug("customers called");
-
 		final HashMap<String, Object> customersMap = new HashMap<String, Object>();
 		customersMap.put("customers", Lists.newArrayList());
 		if (queryName.isPresent()) {
