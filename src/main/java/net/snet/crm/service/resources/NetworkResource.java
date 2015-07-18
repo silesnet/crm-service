@@ -41,7 +41,6 @@ public class NetworkResource {
   {
     final Country country = Country.valueOf(countryParam.toUpperCase());
     final DeviceType deviceType = DeviceType.valueOf(deviceTypeParam.toUpperCase());
-    logger.debug("fetching {} of {} network", deviceType, country);
     final List<Map<String, Object>> devices =
         networkRepository.findDevicesByCountryAndType(country, deviceType);
     return Response.ok(ImmutableMap.of("devices", devices)).build();
@@ -52,7 +51,6 @@ public class NetworkResource {
   @Produces({"application/json; charset=UTF-8"})
   @Timed(name = "get-requests")
   public Map<String, Object> getAllNetworks() {
-    logger.debug("routers called");
 
     final HashMap<String, Object> coreRoutersMap = new HashMap<String, Object>();
 
@@ -68,7 +66,6 @@ public class NetworkResource {
   @Produces({"application/json; charset=UTF-8"})
   @Timed(name = "get-requests")
   public Map<String, Object> getAllSsids() {
-    logger.debug("ssid called");
 
     final HashMap<String, Object> networksMap = new HashMap<String, Object>();
 

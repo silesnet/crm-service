@@ -31,7 +31,6 @@ public class ProductResource {
   @Produces({"application/json; charset=UTF-8"})
   @Timed(name = "get-requests")
   public Map<String, Object> getAllProducts(@QueryParam("country") final Optional<String> country) {
-    LOGGER.debug("product called");
     final HashMap<String, Object> productsMap = new HashMap<String, Object>();
     Iterator<Product> productIterator = productDAO.allProducts();
     List<Product> products = new ArrayList<Product>();
