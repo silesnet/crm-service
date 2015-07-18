@@ -197,8 +197,8 @@ public class DraftResource2 {
       final ValueMap service = valueMapOf(original.data());
       final String authentication = service.get("auth_type").asStringOr("0");
       if (AUTH_DHCP.equals(authentication)) {
-        final int switchId = service.get("auth_a").asInteger();
-        final int port = service.get("auth_b").asInteger();
+        final int switchId = service.get("auth_a").asIntegerOr(-1);
+        final int port = service.get("auth_b").asIntegerOr(-1);
         disableDhcp(switchId, port);
       }
     }
