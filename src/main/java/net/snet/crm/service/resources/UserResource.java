@@ -47,8 +47,6 @@ public class UserResource {
 	@Produces({"application/json; charset=UTF-8"})
 	@Timed(name = "get-requests")
 	public Map<String, Object> getAllUsers() {
-		LOGGER.debug("users called");
-
 		final HashMap<String, Object> usersMap = new HashMap<String, Object>();
 
 		Iterator<User> users = userDAO.allUsers();

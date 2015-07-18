@@ -122,7 +122,6 @@ public class DraftResource2 {
   @GET
   @Path("/{draftId}")
   public Response retrieveDraft(@PathParam("draftId") long draftId) {
-    logger.debug("retrieving draft '{}'", draftId);
     return Response
         .ok(ImmutableMap.of("drafts", draftRepository.get(draftId)))
         .build();
@@ -132,7 +131,6 @@ public class DraftResource2 {
   @Path("/{entityType}/{entityId}")
   public Response retrieveDraftByType(@PathParam("entityType") String entityType,
                                       @PathParam("entityId") long entityId) {
-    logger.debug("retrieving entity draft '{}/{}'", entityType, entityId);
     return Response
         .ok(ImmutableMap.of("drafts",
             draftRepository.getEntity(entityType, entityId)))

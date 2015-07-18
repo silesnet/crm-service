@@ -52,7 +52,6 @@ public class CustomerResource {
 	@Path("/{customerId}")
 	@Timed(name = "get-requests")
 	public Map<String, Object> getCustomerById(@PathParam("customerId") long id) {
-		logger.debug("customers called");
 
 		final HashMap<String, Object> customersMap = new HashMap<String, Object>();
 

@@ -91,7 +91,6 @@ public class DbiDraftRepository implements DraftRepository {
   @Override
   public void update(@Nonnull final long draftId, @Nonnull Map<String, Object> update) {
     final Map<String, Object> record = recordOf(update, DRAFT_FIELDS);
-    logger.debug("updating draft '{}'", draftId);
     record.remove("id");
     record.remove("entity_type");
     record.remove("entity_id");
@@ -135,7 +134,6 @@ public class DbiDraftRepository implements DraftRepository {
 
   @Override
   public Map<String, Object> get(final long draftId) {
-    logger.debug("getting draft '{}'", draftId);
     return dbi.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
@@ -147,7 +145,6 @@ public class DbiDraftRepository implements DraftRepository {
   @Override
   public Map<String, Object> getEntity(final String entityType,
                                        final long entityId) {
-    logger.debug("getting draft by type '{}/{}'", entityType, entityId);
     return dbi.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
@@ -279,7 +276,6 @@ public class DbiDraftRepository implements DraftRepository {
 
   private Map<String, Object> draftLinks(final long draftId,
                                          final Handle handle) {
-    logger.debug("getting draft '{}' links", draftId);
     final List<Map<String, Object>> linkRecords = handle.createQuery(
         "SELECT draft_id, entity, entity_id FROM " + DRAFTS_LINKS_TABLE + " " +
             "WHERE draft_id=:draft_id")
