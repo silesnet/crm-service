@@ -28,6 +28,31 @@ class ServiceResourceTest extends Specification {
     CUSTOMER_REPO_DELEGATE.setRepository(null)
   }
 
+  def 'it should find services by query'() {
+    given:
+      def query = 'cus'
+      def country = 'cz'
+    when:
+      def response = resources.client().resource('/services')
+            .queryParam('q', query)
+            .queryParam('country', 'cz')
+            .type('application/json')
+            .get(ClientResponse.class)
+      def services = response.getEntity(Map.class).services
+    then:
+      1 * crmRepository.findService(query, country) >> [[id: 1, name: 'LAN1'], [id: 2, name: 'LAN2']]
+    and:
+      response.status == 200
+      response.type.toString().startsWith('application/json')
+    and:
+      services.size() == 2
+    and:
+      services[0].id == 1
+      services[0].name == 'LAN1'
+      services[1].id == 2
+      services[1].name == 'LAN2'
+  }
+
   def 'it should create new connection for service'() {
     given: 'new connection'
       def connectionData = [auth_type: 'PPPoE', auth_name: 'user', auth_value: 'password']

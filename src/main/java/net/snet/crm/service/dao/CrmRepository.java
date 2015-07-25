@@ -5,51 +5,53 @@ import java.util.Map;
 
 public interface CrmRepository {
 
-	// customer
+    // customer
 
-	Map<String, Object> insertCustomer(Map<String, Object> customer);
+    Map<String, Object> insertCustomer(Map<String, Object> customer);
 
-	Map<String, Object> findCustomerById(long customerId);
+    Map<String, Object> findCustomerById(long customerId);
 
-	void deleteCustomer(long customerId);
+    void deleteCustomer(long customerId);
 
-	Map<String, Object> updateCustomer(long customerId, Map<String, Object> updates);
+    Map<String, Object> updateCustomer(long customerId, Map<String, Object> updates);
 
-	void setCustomerAgreements(long customerId, String agreements);
+    void setCustomerAgreements(long customerId, String agreements);
 
-	// agreement
+    // agreement
 
-	Map<String,Object> insertAgreement(long customerId, String country);
+    Map<String, Object> insertAgreement(long customerId, String country);
 
-	Map<String, Object> findAgreementById(long agreementId);
+    Map<String, Object> findAgreementById(long agreementId);
 
-	List<Map<String, Object>> findAgreementsByCustomerId(long customerId);
+    List<Map<String, Object>> findAgreementsByCustomerId(long customerId);
 
-	Map<String, Object> updateAgreementStatus(long agreementId, String status);
+    Map<String, Object> updateAgreementStatus(long agreementId, String status);
 
-	// service
+    // service
 
-	Map<String, Object> insertService(long agreementId);
+    Map<String, Object> insertService(long agreementId);
 
-	Map<String, Object> findServiceById(long serviceId);
+    Map<String, Object> findServiceById(long serviceId);
 
-	void deleteService(long serviceId);
+    List<Map<String, Object>> findService(String query, String country);
 
-	Map<String, Object> updateService(long serviceId, Map<String, Object> updates);
+    void deleteService(long serviceId);
 
-	// connection
+    Map<String, Object> updateService(long serviceId, Map<String, Object> updates);
 
-	Map<String,Object> insertConnection(long serviceId);
+    // connection
 
-	Map<String,Object> findConnectionByServiceId(long serviceId);
+    Map<String, Object> insertConnection(long serviceId);
 
-	Map<String, Object> updateConnection(long serviceId, Iterable<Map.Entry<String, Object>> updates);
+    Map<String, Object> findConnectionByServiceId(long serviceId);
 
-	void deleteConnection(long serviceId);
+    Map<String, Object> updateConnection(long serviceId, Iterable<Map.Entry<String, Object>> updates);
 
-	// user
+    void deleteConnection(long serviceId);
 
-	List<Map<String, Object>> findUserSubordinates(String login);
+    // user
 
-	Map<String, Object> findUserByLogin(String login);
+    List<Map<String, Object>> findUserSubordinates(String login);
+
+    Map<String, Object> findUserByLogin(String login);
 }
