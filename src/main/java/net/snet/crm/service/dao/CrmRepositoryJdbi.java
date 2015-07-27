@@ -294,7 +294,9 @@ public class CrmRepositoryJdbi implements CrmRepository {
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   c.is_active\n" +
-                "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query OR (a.id % 100000)\\:\\:text ~ :query)\n" +
+                "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
+                "  OR s.id\\:\\:text ~ :query\n" +
+                "  OR (a.id % 100000)\\:\\:text ~ :query)\n" +
                 "ORDER BY c.name, s.id \n" +
                 "LIMIT 20")
             .bind("query", query)
