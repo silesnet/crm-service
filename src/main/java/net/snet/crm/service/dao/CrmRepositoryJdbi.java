@@ -35,6 +35,9 @@ public class CrmRepositoryJdbi implements CrmRepository {
 
   private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
   public static final int SERVICE_COUNTRY_MULTIPLIER = 100000;
+  private final String TRANSLATE_FROM_CHARS = "ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź.-,;:&+? ";
+  private final String TRANSLATE_TO_CHARS = "aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz";
+
   private static final Map<String, String> CONNECTION_FIELDS;
 
   static {
@@ -291,10 +294,12 @@ public class CrmRepositoryJdbi implements CrmRepository {
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   c.is_active\n" +
-                "AND   (c.name ~* :query OR (a.id % 100000)\\:\\:text ~ :query)\n" +
+                "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query OR (a.id % 100000)\\:\\:text ~ :query)\n" +
                 "ORDER BY c.name, s.id \n" +
                 "LIMIT 20")
             .bind("query", query)
+            .bind("fromChars", TRANSLATE_FROM_CHARS)
+            .bind("toChars", TRANSLATE_TO_CHARS)
             .list();
       }
     });
