@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
@@ -262,7 +263,8 @@ public class CrmRepositoryJdbi implements CrmRepository {
   }
 
   @Override
-  public List<Map<String, Object>> findService(final String query, final String country) {
+  public List<Map<String, Object>> findService(final String rawQuery, final String country) {
+    final String query = Utils.replaceChars(rawQuery, TRANSLATE_FROM_CHARS, TRANSLATE_TO_CHARS);
     if (query.isEmpty()) return Lists.newArrayList();
     final Long countryId = COUNTRIES.get(country.toUpperCase());
     final String countryRestriction;
