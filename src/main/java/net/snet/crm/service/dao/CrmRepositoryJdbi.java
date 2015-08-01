@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.snet.crm.service.utils.Databases;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
@@ -53,9 +54,11 @@ public class CrmRepositoryJdbi implements CrmRepository {
   }
 
   private final CrmDatabase db;
+  private final DBI dbi;
 
-  public CrmRepositoryJdbi(DBI dbi) {
-    db = dbi.onDemand(CrmDatabase.class);
+  public CrmRepositoryJdbi(final DBI dbi) {
+    this.dbi = dbi;
+    this.db = dbi.onDemand(CrmDatabase.class);
   }
 
   @Override
@@ -260,6 +263,24 @@ public class CrmRepositoryJdbi implements CrmRepository {
       service.put("status", serviceInfo.get("status"));
     }
     return service;
+  }
+
+  @Override
+  public Map<String, Object> serviceDhcp(final long serviceId) {
+    return Databases.getRecord(
+        "SELECT * FROM dhcp WHERE service_id:=:serviceId",
+        ImmutableMap.of("serviceId", (Object) serviceId),
+        dbi
+    ).or(new HashMap<String, Object>());
+  }
+
+  @Override
+  public Map<String, Object> servicePppoe(final long serviceId) {
+    return Databases.getRecord(
+        "SELECT * FROM radius WHERE id:=:serviceId",
+        ImmutableMap.of("serviceId", (Object) serviceId),
+        dbi
+    ).or(new HashMap<String, Object>());
   }
 
   @Override

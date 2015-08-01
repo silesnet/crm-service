@@ -32,6 +32,17 @@ public class ServiceResource {
     this.repository = repository;
   }
 
+  @GET
+  @Path("/{serviceId}/dhcp")
+  public Response serviceDhcp(@PathParam("serviceId") long serviceId) {
+    return Response.ok(ImmutableMap.of("dhcp", repository.serviceDhcp(serviceId))).build();
+  }
+
+  @GET
+  @Path("/{serviceId}/pppoe")
+  public Response servicePppoe(@PathParam("serviceId") long serviceId) {
+    return Response.ok(ImmutableMap.of("pppoe", repository.servicePppoe(serviceId))).build();
+  }
 
   @GET
   public Response servicesByQuery(

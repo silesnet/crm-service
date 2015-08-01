@@ -5,8 +5,10 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
+import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.Update;
+import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.util.LongMapper;
 
 import javax.annotation.Nullable;
@@ -86,6 +88,22 @@ public class Databases {
         .first();
     checkNotNull(record, "can't get record '%s' from '%s' table", id, table);
     return record;
+  }
+
+  public static Optional<Map<String, Object>> getRecord(
+      final String query,
+      final Map<String, Object> binding,
+      final DBI dbi)
+  {
+    return Optional.fromNullable(
+        dbi.withHandle(new HandleCallback<Map<String, Object>>() {
+          @Override
+          public Map<String, Object> withHandle(Handle handle) throws Exception {
+            return handle.createQuery(query)
+                .bindFromMap(binding)
+                .first();
+          }
+        }));
   }
 
   public static void updateRecord(final String table,
