@@ -37,14 +37,24 @@ public class NetworkResource {
   @Produces({"application/json; charset=UTF-8"})
   public Response findDevicesByCountry(
       @PathParam("country") String countryParam,
-      @QueryParam("deviceType") String deviceTypeParam)
-  {
+      @QueryParam("deviceType") String deviceTypeParam) {
     final Country country = Country.valueOf(countryParam.toUpperCase());
     final DeviceType deviceType = DeviceType.valueOf(deviceTypeParam.toUpperCase());
     final List<Map<String, Object>> devices =
         networkRepository.findDevicesByCountryAndType(country, deviceType);
     return Response.ok(ImmutableMap.of("devices", devices)).build();
   }
+
+
+  @GET
+  @Path("/devices/{deviceId}")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response findDeviceById(@PathParam("deviceId") int deviceId) {
+    return Response.ok(
+        ImmutableMap.of("devices", networkRepository.findDevice(deviceId)))
+        .build();
+  }
+
 
   @GET
   @Path("/routers")
