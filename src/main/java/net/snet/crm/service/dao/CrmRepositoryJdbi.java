@@ -268,7 +268,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
   @Override
   public Map<String, Object> serviceDhcp(final long serviceId) {
     return Databases.getRecord(
-        "SELECT * FROM dhcp WHERE service_id:=:serviceId",
+        "SELECT * FROM dhcp WHERE service_id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
     ).or(new HashMap<String, Object>());
@@ -277,7 +277,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
   @Override
   public Map<String, Object> servicePppoe(final long serviceId) {
     return Databases.getRecord(
-        "SELECT * FROM radius WHERE id:=:serviceId",
+        "SELECT * FROM radius WHERE id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
     ).or(new HashMap<String, Object>());

@@ -192,6 +192,11 @@ public class Entities {
       return isNullOrEmpty() ? fallBack : asDateTime();
     }
 
+    @Nonnull
+    public ValueMap asValueMap() {
+      return valueMapOf((Map<String, ?>) original);
+    }
+
     public boolean isNull() {
       return original == null;
     }
@@ -227,6 +232,10 @@ public class Entities {
     public Object getRawOr(@Nonnull final String path, @Nullable final Object fallBack) {
       final Object value = fetchNestedInternal(path, map);
       return value == null ? fallBack : value;
+    }
+
+    public Map<String, ?> map() {
+      return map;
     }
   }
 

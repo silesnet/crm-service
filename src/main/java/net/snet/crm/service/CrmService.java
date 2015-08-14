@@ -44,91 +44,91 @@ import java.util.EnumSet;
 
 public class CrmService extends Application<CrmConfiguration> {
 
-	public static void main(String[] args) throws Exception {
-		new CrmService().run(args);
-	}
+  public static void main(String[] args) throws Exception {
+    new CrmService().run(args);
+  }
 
-	@Override
-	public String getName() {
-		return "crm-service";
-	}
+  @Override
+  public String getName() {
+    return "crm-service";
+  }
 
-	@Override
-	public void initialize(Bootstrap<CrmConfiguration> bootstrap) {
-		bootstrap.getObjectMapper().registerModule(new JodaModule());
-		bootstrap.getObjectMapper().setDateFormat(new ISO8601DateFormat());
-		bootstrap.addBundle(new MigrationsBundle<CrmConfiguration>() {
+  @Override
+  public void initialize(Bootstrap<CrmConfiguration> bootstrap) {
+    bootstrap.getObjectMapper().registerModule(new JodaModule());
+    bootstrap.getObjectMapper().setDateFormat(new ISO8601DateFormat());
+    bootstrap.addBundle(new MigrationsBundle<CrmConfiguration>() {
       @Override
       public DataSourceFactory getDataSourceFactory(CrmConfiguration configuration) {
         return configuration.getDataSourceFactory();
       }
     });
-		bootstrap.addBundle(new AssetsBundle("/favicon.ico"));
-	}
+    bootstrap.addBundle(new AssetsBundle("/favicon.ico"));
+  }
 
-	@Override
-	public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, URISyntaxException {
-		final DBIFactory dbiFactory = new DBIFactory();
-		final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
-		final ObjectMapper mapper = environment.getObjectMapper();
-		if (configuration.getJsonPrettyPrint()) {
-			mapper.enable(SerializationFeature.INDENT_OUTPUT);
-		}
+  @Override
+  public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, URISyntaxException {
+    final DBIFactory dbiFactory = new DBIFactory();
+    final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
+    final ObjectMapper mapper = environment.getObjectMapper();
+    if (configuration.getJsonPrettyPrint()) {
+      mapper.enable(SerializationFeature.INDENT_OUTPUT);
+    }
 
-		FilterRegistration.Dynamic filters = environment.servlets().addFilter("CORS", new CrossOriginFilter());
-		filters.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-		filters.setInitParameter("allowedMethods", "GET,PUT,POST,DELETE");
+    FilterRegistration.Dynamic filters = environment.servlets().addFilter("CORS", new CrossOriginFilter());
+    filters.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
+    filters.setInitParameter("allowedMethods", "GET,PUT,POST,DELETE");
 
-		final Client httpClient =
-				new JerseyClientBuilder(environment)
-						.using(configuration.getHttpClientConfiguration())
-						.using(schemeRegistry())
-						.using(environment)
-						.build("crm-service-http-client");
+    final Client httpClient =
+        new JerseyClientBuilder(environment)
+            .using(configuration.getHttpClientConfiguration())
+            .using(schemeRegistry())
+            .using(environment)
+            .build("crm-service-http-client");
 
-		CrmRepositoryJdbi crmRepository = new CrmRepositoryJdbi(dbi);
-		final JerseyEnvironment jersey = environment.jersey();
-		jersey.register(new CustomerResource(dbi, crmRepository));
-		jersey.register(new AgreementResource(crmRepository));
-		jersey.register(new ServiceResource(crmRepository));
-		jersey.register(new ConnectionResource(crmRepository));
-		jersey.register(new DraftResource(dbi.onDemand(DraftDAO.class), mapper, crmRepository));
-		jersey.register(new RouterResource(dbi));
-		jersey.register(new NetworkResource(dbi));
-		jersey.register(new UserResource(dbi, crmRepository,
-				new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository)));
-		jersey.register(new ProductResource(dbi));
-		jersey.register(new ContractResource(dbi));
-		jersey.register(new BaseResource());
-		final DbiDraftRepository draftRepository = new DbiDraftRepository(dbi, mapper);
+    CrmRepositoryJdbi crmRepository = new CrmRepositoryJdbi(dbi);
+    final DbiDraftRepository draftRepository = new DbiDraftRepository(dbi, mapper);
     final AgreementRepository agreementRepository = new DbiAgreementRepository(dbi, mapper);
-		final DbiNetworkRepository networkRepository = new DbiNetworkRepository(dbi);
-		jersey.register(new DraftResource2(
-				draftRepository,
-				crmRepository,
-				agreementRepository,
-				networkRepository,
-				new SnmpNetworkService()));
-		jersey.register(new RuntimeExceptionMapper());
-	}
+    final DbiNetworkRepository networkRepository = new DbiNetworkRepository(dbi);
+    final JerseyEnvironment jersey = environment.jersey();
+    jersey.register(new CustomerResource(dbi, crmRepository));
+    jersey.register(new AgreementResource(crmRepository));
+    jersey.register(new ServiceResource(crmRepository, networkRepository));
+    jersey.register(new ConnectionResource(crmRepository));
+    jersey.register(new DraftResource(dbi.onDemand(DraftDAO.class), mapper, crmRepository));
+    jersey.register(new RouterResource(dbi));
+    jersey.register(new NetworkResource(dbi));
+    jersey.register(new UserResource(dbi, crmRepository,
+        new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository)));
+    jersey.register(new ProductResource(dbi));
+    jersey.register(new ContractResource(dbi));
+    jersey.register(new BaseResource());
+    jersey.register(new DraftResource2(
+        draftRepository,
+        crmRepository,
+        agreementRepository,
+        networkRepository,
+        new SnmpNetworkService()));
+    jersey.register(new RuntimeExceptionMapper());
+  }
 
-	private SchemeRegistry schemeRegistry() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-		SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy(), SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-		SchemeRegistry schemeRegistry = new SchemeRegistry();
-		schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-		schemeRegistry.register(new Scheme("https", 443, socketFactory));
-		schemeRegistry.register(new Scheme("https", 8443, socketFactory));
-		return schemeRegistry;
-	}
+  private SchemeRegistry schemeRegistry() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy(), SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    SchemeRegistry schemeRegistry = new SchemeRegistry();
+    schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
+    schemeRegistry.register(new Scheme("https", 443, socketFactory));
+    schemeRegistry.register(new Scheme("https", 8443, socketFactory));
+    return schemeRegistry;
+  }
 
-	private TrustStrategy trustStrategy() {
-		return new TrustStrategy() {
-			@Override
-			public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-				return true;
-			}
-		};
-	}
+  private TrustStrategy trustStrategy() {
+    return new TrustStrategy() {
+      @Override
+      public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        return true;
+      }
+    };
+  }
 
 
 }
