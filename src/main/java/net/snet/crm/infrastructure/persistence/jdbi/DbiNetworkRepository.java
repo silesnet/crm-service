@@ -2,11 +2,14 @@ package net.snet.crm.infrastructure.persistence.jdbi;
 
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.model.network.NetworkRepository;
+import net.snet.crm.service.utils.Entities;
+import net.snet.crm.service.utils.Entities.ValueMap;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.TransactionCallback;
 import org.skife.jdbi.v2.TransactionStatus;
 import org.skife.jdbi.v2.tweak.HandleCallback;
+import org.skife.jdbi.v2.util.LongMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
+import static java.lang.Enum.valueOf;
 import static net.snet.crm.domain.model.network.NetworkRepository.Country.PL;
 import static net.snet.crm.service.utils.Databases.insertRecordWithoutKey;
+import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 public class DbiNetworkRepository implements NetworkRepository {
   private static final Logger logger = LoggerFactory.getLogger(DbiNetworkRepository.class);
@@ -26,7 +31,6 @@ public class DbiNetworkRepository implements NetworkRepository {
   public DbiNetworkRepository(DBI dbi) {
     this.dbi = dbi;
   }
-
 
   @Override
   public Map<String, Object> findDevice(final int deviceId) {
@@ -64,35 +68,32 @@ public class DbiNetworkRepository implements NetworkRepository {
   }
 
   @Override
+  public void bindDhcp(final long serviceId, final int switchId, final int port) {
+    dbi.inTransaction(new TransactionCallback<Object>() {
+      @Override
+      public Object inTransaction(Handle handle, TransactionStatus status) throws Exception {
+        ValueMap currentDhcp = valueMapOf(handle
+            .createQuery("SELECT network_id, port FROM dhcp WHERE service_id=:serviceId")
+            .bind("serviceId", serviceId)
+            .first());
+        if (!currentDhcp.map().isEmpty()) {
+          disableDhcpInternal(
+              currentDhcp.get("network_id").asInteger(),
+              currentDhcp.get("port").asInteger(),
+              handle);
+        }
+        enableDhcpInternal(serviceId, switchId, port, handle);
+        return null;
+      }
+    });
+  }
+
+  @Override
   public void enableDhcp(final long serviceId, final int switchId, final int port) {
     dbi.inTransaction(new TransactionCallback<Object>() {
       @Override
       public Object inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        final int existingCount = handle.createQuery(
-            "SELECT service_id FROM " + DHCP_TABLE + " WHERE network_id=:switch_id AND port=:port")
-            .bind("switch_id", switchId)
-            .bind("port", port)
-            .list()
-            .size();
-        if (existingCount > 0) {
-          final int updatedCount = handle.createStatement(
-              "UPDATE " + DHCP_TABLE + " SET service_id=:service_id" +
-                  " WHERE network_id=:switch_id AND port=:port")
-              .bind("service_id", serviceId)
-              .bind("switch_id", switchId)
-              .bind("port", port)
-              .execute();
-          checkState(updatedCount > 0, "failed to updated dhcp record for " +
-              "network_id='%s' and port='%s'", switchId, port);
-        } else {
-          final Map<String, Object> record = ImmutableMap.<String, Object>builder()
-              .put("service_id", serviceId)
-              .put("network_id", switchId)
-              .put("port", port)
-              .build();
-          insertRecordWithoutKey(DHCP_TABLE, record, handle);
-        }
-        logger.info("DHCP switch/port '{}/{}' was enabled", switchId, port);
+        enableDhcpInternal(serviceId, switchId, port, handle);
         return null;
       }
     });
@@ -103,19 +104,55 @@ public class DbiNetworkRepository implements NetworkRepository {
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        final int updatedCount = handle.createStatement(
-            "UPDATE " + DHCP_TABLE + " SET service_id=NULL" +
-                " WHERE network_id=:switch_id AND port=:port")
-            .bind("switch_id", switchId)
-            .bind("port", port)
-            .execute();
-        if (updatedCount == 0) {
-          logger.warn("DHCP switch/port '{}/{}' was not disabled, its missing in database",
-              switchId, port);
-        }
-        logger.info("DHCP switch/port '{}/{}' was disabled", switchId, port);
+        disableDhcpInternal(switchId, port, handle);
         return null;
       }
     });
   }
+
+  private void disableDhcpInternal(int switchId, int port, Handle handle) {
+    final int updatedCount = handle.createStatement(
+        "UPDATE " + DHCP_TABLE + " SET service_id=NULL" +
+            " WHERE network_id=:switch_id AND port=:port")
+        .bind("switch_id", switchId)
+        .bind("port", port)
+        .execute();
+    if (updatedCount == 0) {
+      logger.warn("DHCP switch/port '{}/{}' was not disabled, its missing in database",
+          switchId, port);
+    }
+    logger.info("DHCP switch/port '{}/{}' was disabled", switchId, port);
+  }
+
+  private void enableDhcpInternal(long serviceId, int switchId, int port, Handle handle) {
+    final Long currentServiceId = handle.createQuery(
+        "SELECT service_id FROM " + DHCP_TABLE + " WHERE network_id=:switch_id AND port=:port")
+        .bind("switch_id", switchId)
+        .bind("port", port)
+        .map(LongMapper.FIRST)
+        .first();
+    if (currentServiceId != null) {
+      checkState(currentServiceId == 0 || currentServiceId == serviceId,
+          "can't enable DHCP [%s, %s] for %s as it is already in use by %s",
+          switchId, port, serviceId, currentServiceId);
+      final int updatedCount = handle.createStatement(
+          "UPDATE " + DHCP_TABLE + " SET service_id=:service_id" +
+              " WHERE network_id=:switch_id AND port=:port")
+          .bind("service_id", serviceId)
+          .bind("switch_id", switchId)
+          .bind("port", port)
+          .execute();
+      checkState(updatedCount > 0, "failed to updated dhcp record for " +
+          "network_id='%s' and port='%s'", switchId, port);
+    } else {
+      final Map<String, Object> record = ImmutableMap.<String, Object>builder()
+          .put("service_id", serviceId)
+          .put("network_id", switchId)
+          .put("port", port)
+          .build();
+      insertRecordWithoutKey(DHCP_TABLE, record, handle);
+    }
+    logger.info("DHCP switch/port '{}/{}' was enabled", switchId, port);
+  }
+
 }
