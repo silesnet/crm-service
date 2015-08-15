@@ -48,40 +48,9 @@ class DraftResource2Test extends Specification {
       }
     and:
       1 * networkRepository.disableDhcp(11, 3)
-      1 * networkRepository.findDevice(11) >> [name: 'switch-11-br']
-      1 * networkService.disableSwitchPort('switch-11-br', 3)
   }
 
-  def 'should disable/enable dhcp when updating dhcp draft'() {
-    given:
-      def original = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
-                      status: 'DRAFT', owner: 'test',
-                      data: [auth_type: '1', auth_a: '11', auth_b: '3']]
-      def current = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
-                     status: 'DRAFT', owner: 'test',
-                     data: [auth_type: '1', auth_a: '11', auth_b: '2']] // auth_type == 1 => DHCP
-    and:
-      def draftRepository = wiredDraftRepositoryStub()
-      draftRepository.get(_) >>> [original, current]
-      def networkRepository = wiredNetworRepositoryMock()
-      def networkService = wiredNetworServiceMock()
-    when:
-      def res = reqTo("/${DRAFTS}/1234", '{"drafts":{}}').put(ClientResponse.class)
-    then:
-      with(res) {
-        status == 200
-      }
-    and:
-      1 * networkRepository.disableDhcp(11, 3)
-      1 * networkRepository.findDevice(11) >> [name: 'switch-11-br']
-      1 * networkService.disableSwitchPort('switch-11-br', 3)
-    and:
-      1 * networkRepository.enableDhcp(10, 11, 2)
-      1 * networkRepository.findDevice(11) >> [name: 'switch-11-br']
-      1 * networkService.enableSwitchPort('switch-11-br', 2)
-  }
-
-  def 'should enable dhcp when updating new dhcp draft'() {
+ def 'should enable dhcp when updating new dhcp draft'() {
     given:
       def original = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
                       status: 'DRAFT', owner: 'test', data: [:]]
@@ -99,9 +68,7 @@ class DraftResource2Test extends Specification {
       with(res) {
         status == 200
       }
-      1 * networkRepository.enableDhcp(10, 11, 2)
-      1 * networkRepository.findDevice(11) >> [name: 'switch-11-br']
-      1 * networkService.enableSwitchPort('switch-11-br', 2)
+      1 * networkRepository.bindDhcp(10, 11, 2)
   }
 
   def 'should create new customer draft resource'() {

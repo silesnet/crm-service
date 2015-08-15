@@ -167,24 +167,14 @@ public class DraftResource2 {
       final ValueMap current = valueMapOf(currentDraft.data());
       final String originalAuth = original.get("auth_type").asStringOr("0");
       final String currentAuth = current.get("auth_type").asStringOr("0");
-      if (AUTH_DHCP.equals(originalAuth)) {
+      if (AUTH_DHCP.equals(originalAuth) && !AUTH_DHCP.equals(currentAuth)) {
         final int originalSwitchId = original.get("auth_a").asIntegerOr(-1);
         final int originalPort = original.get("auth_b").asIntegerOr(-1);
-        if (AUTH_DHCP.equals(currentAuth)) {
-          final int currentSwitchId = current.get("auth_a").asIntegerOr(-1);
-          final int currentPort = current.get("auth_b").asIntegerOr(-1);
-          if (originalSwitchId != currentSwitchId || originalPort != currentPort) {
-            disableDhcp(originalSwitchId, originalPort);
-          }
-        }
-        else {
-          disableDhcp(originalSwitchId, originalPort);
-        }
-      }
-      if (AUTH_DHCP.equals(currentAuth)) {
+        disableDhcp(originalSwitchId, originalPort);
+      } else {
         final int switchId = current.get("auth_a").asIntegerOr(-1);
         final int port = current.get("auth_b").asIntegerOr(-1);
-        enableDhcp(currentDraft.entityId(), switchId, port);
+        bindDhcp(currentDraft.entityId(), switchId, port);
       }
     }
   }
@@ -221,20 +211,12 @@ public class DraftResource2 {
   private void disableDhcp(int switchId, int port) {
     if (switchId != -1 && port != -1) {
       networkRepository.disableDhcp(switchId, port);
-      final Object switchName = networkRepository.findDevice(switchId).get("name");
-      if (switchName != null) {
-        networkService.disableSwitchPort(switchName.toString(), port);
-      }
     }
   }
 
-  private void enableDhcp(long serviceId, int switchId, int port) {
+  private void bindDhcp(long serviceId, int switchId, int port) {
     if (switchId != -1 && port != -1) {
-      networkRepository.enableDhcp(serviceId, switchId, port);
-      final Object switchName = networkRepository.findDevice(switchId).get("name");
-      if (switchName != null) {
-        networkService.enableSwitchPort(switchName.toString(), port);
-      }
+      networkRepository.bindDhcp(serviceId, switchId, port);
     }
   }
 

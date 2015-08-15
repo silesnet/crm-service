@@ -13,7 +13,5 @@ public interface NetworkRepository {
 
   void bindDhcp(long serviceId, int switchId, int port);
 
-  void enableDhcp(long serviceId, int switchId, int port);
-
   void disableDhcp(int switchId, int port);
 }

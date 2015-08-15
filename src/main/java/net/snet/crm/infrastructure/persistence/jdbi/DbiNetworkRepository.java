@@ -76,23 +76,12 @@ public class DbiNetworkRepository implements NetworkRepository {
             .createQuery("SELECT network_id, port FROM dhcp WHERE service_id=:serviceId")
             .bind("serviceId", serviceId)
             .first());
-        if (!currentDhcp.map().isEmpty()) {
+        if (currentDhcp.map() != null) {
           disableDhcpInternal(
               currentDhcp.get("network_id").asInteger(),
               currentDhcp.get("port").asInteger(),
               handle);
         }
-        enableDhcpInternal(serviceId, switchId, port, handle);
-        return null;
-      }
-    });
-  }
-
-  @Override
-  public void enableDhcp(final long serviceId, final int switchId, final int port) {
-    dbi.inTransaction(new TransactionCallback<Object>() {
-      @Override
-      public Object inTransaction(Handle handle, TransactionStatus status) throws Exception {
         enableDhcpInternal(serviceId, switchId, port, handle);
         return null;
       }
