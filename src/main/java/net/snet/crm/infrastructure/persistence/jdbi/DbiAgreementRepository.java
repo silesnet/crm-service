@@ -97,7 +97,7 @@ public class DbiAgreementRepository implements AgreementRepository {
         customerUpdate.put("symbol", symbol);
       }
       final Object variable = agreement.number();
-      customerUpdate.put("lastly_billed", service.periodStart().minusDays(1));
+      customerUpdate.put("lastly_billed", service.periodStart().dayOfMonth().withMaximumValue());
       customerUpdate.put("status", 20);
       customerUpdate.put("variable", variable);
     }
