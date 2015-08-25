@@ -5,7 +5,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.service.dao.CrmRepository;
-import net.snet.crm.service.utils.Entities;
 import net.snet.crm.service.utils.Entities.Value;
 import net.snet.crm.service.utils.Entities.ValueMap;
 import org.slf4j.Logger;
@@ -19,10 +18,8 @@ import javax.ws.rs.core.UriInfo;
 import java.util.List;
 import java.util.Map;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static net.snet.crm.service.utils.Entities.entityOf;
 import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 @Path("/services")
@@ -66,6 +63,13 @@ public class ServiceResource {
   @Path("/{serviceId}/dhcp")
   public Response serviceDhcp(@PathParam("serviceId") long serviceId) {
     return Response.ok(ImmutableMap.of("dhcp", crmRepository.serviceDhcp(serviceId))).build();
+  }
+
+  @DELETE
+  @Path("/{serviceId}/dhcp")
+  public Response deleteDhcp(@PathParam("serviceId") long serviceId) {
+    crmRepository.deleteDhcp(serviceId);
+    return Response.noContent().build();
   }
 
   @GET
