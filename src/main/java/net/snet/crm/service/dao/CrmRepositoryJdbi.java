@@ -284,19 +284,6 @@ public class CrmRepositoryJdbi implements CrmRepository {
   }
 
   @Override
-  public void deleteDhcp(final long serviceId) {
-    db.withHandle(new HandleCallback<Object>() {
-      @Override
-      public Object withHandle(Handle handle) throws Exception {
-        handle.createStatement("DELETE from dhcp WHERE service_id=:service_id")
-            .bind("service_id", serviceId)
-            .execute();
-        return null;
-      }
-    });
-  }
-
-  @Override
   public List<Map<String, Object>> findService(final String rawQuery, final String country) {
     final String query = Utils.replaceChars(rawQuery, TRANSLATE_FROM_CHARS, TRANSLATE_TO_CHARS);
     if (query.isEmpty()) return Lists.newArrayList();

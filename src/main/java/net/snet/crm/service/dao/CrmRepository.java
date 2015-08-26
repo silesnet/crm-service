@@ -43,8 +43,6 @@ public interface CrmRepository {
 
     Map<String, Object> servicePppoe(long serviceId);
 
-    void deleteDhcp(long serviceId);
-
     // connection
 
     Map<String, Object> insertConnection(long serviceId);
