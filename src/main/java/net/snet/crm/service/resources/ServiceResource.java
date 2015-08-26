@@ -50,11 +50,21 @@ public class ServiceResource {
     logger.debug("updating service '{}'", serviceId);
     Value dhcpUpdate = serviceUpdate.asValueMap().get("dhcp");
     if (!dhcpUpdate.isNull()) {
-      final int networkId = dhcpUpdate.asValueMap().get("network_id").asIntegerOr(-1);
-      final int port = dhcpUpdate.asValueMap().get("port").asIntegerOr(-1);
-      checkState(networkId > 0, "new switch network_id not provided");
-      checkState(port >= 0, "new switch port not provided");
-      networkRepository.bindDhcp(serviceId, networkId, port);
+      if (dhcpUpdate.asValueMap().map().isEmpty()) {
+        logger.debug("deleting dhcp for service '{}'", serviceId);
+        ValueMap currentDhcp = valueMapOf(crmRepository.serviceDhcp(serviceId));
+        final int networkId = currentDhcp.get("network_id").asIntegerOr(-1);
+        final int port = currentDhcp.get("port").asIntegerOr(-1);
+        checkState(networkId > 0, "switch network_id does not exist for service '%s'", serviceId);
+        checkState(port >= 0, "switch port not does not exit for service '%s'", serviceId);
+        networkRepository.disableDhcp(networkId, port);
+      } else {
+        final int networkId = dhcpUpdate.asValueMap().get("network_id").asIntegerOr(-1);
+        final int port = dhcpUpdate.asValueMap().get("port").asIntegerOr(-1);
+        checkState(networkId > 0, "new switch network_id not provided");
+        checkState(port >= 0, "new switch port not provided");
+        networkRepository.bindDhcp(serviceId, networkId, port);
+      }
     }
     return Response.ok(ImmutableMap.of()).build();
   }
@@ -63,13 +73,6 @@ public class ServiceResource {
   @Path("/{serviceId}/dhcp")
   public Response serviceDhcp(@PathParam("serviceId") long serviceId) {
     return Response.ok(ImmutableMap.of("dhcp", crmRepository.serviceDhcp(serviceId))).build();
-  }
-
-  @DELETE
-  @Path("/{serviceId}/dhcp")
-  public Response deleteDhcp(@PathParam("serviceId") long serviceId) {
-    crmRepository.deleteDhcp(serviceId);
-    return Response.noContent().build();
   }
 
   @GET
