@@ -1,7 +1,11 @@
 package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkRepository.Country;
 import net.snet.crm.domain.model.network.NetworkRepository.DeviceType;
@@ -14,15 +18,13 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Path("/networks")
 public class NetworkResource {
 
   private static final Logger logger = LoggerFactory.getLogger(NetworkResource.class);
+  private static final Set<String> SWITCH_MASTERS = Sets.newHashSet("o12", "pricni", "piast", "novodvorska");
 
   private NetworkDAO networkDAO;
   private final NetworkRepository networkRepository;
@@ -40,8 +42,17 @@ public class NetworkResource {
       @QueryParam("deviceType") String deviceTypeParam) {
     final Country country = Country.valueOf(countryParam.toUpperCase());
     final DeviceType deviceType = DeviceType.valueOf(deviceTypeParam.toUpperCase());
-    final List<Map<String, Object>> devices =
+    List<Map<String, Object>> devices =
         networkRepository.findDevicesByCountryAndType(country, deviceType);
+    if (DeviceType.SWITCH.equals(deviceType)) {
+      Iterable<Map<String, Object>> switches = Iterables.filter(devices, new Predicate<Map<String, Object>>() {
+        @Override
+        public boolean apply(Map<String, Object> device) {
+          return SWITCH_MASTERS.contains("" + device.get("master"));
+        }
+      });
+      devices = Lists.newArrayList(switches);
+    }
     return Response.ok(ImmutableMap.of("devices", devices)).build();
   }
 
