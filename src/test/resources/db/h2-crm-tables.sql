@@ -198,6 +198,18 @@ CREATE TABLE dhcp
   a_location2 TEXT NOT NULL DEFAULT ''
 );
 
+CREATE TABLE pppoe
+(
+  service_id    BIGINT,
+  login         TEXT NOT NULL DEFAULT '',
+  password      TEXT NOT NULL DEFAULT '',
+  mac           TEXT DEFAULT NULL,
+  mode          TEXT NOT NULL DEFAULT '',
+  master        TEXT NOT NULL DEFAULT '',
+  interface     TEXT NOT NULL DEFAULT '',
+  ip            TEXT DEFAULT NULL
+);
+
 CREATE SEQUENCE audit_item_id_seq
   INCREMENT 1
   MINVALUE 1
