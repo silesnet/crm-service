@@ -276,11 +276,17 @@ public class CrmRepositoryJdbi implements CrmRepository {
 
   @Override
   public Map<String, Object> servicePppoe(final long serviceId) {
-    return Databases.getRecord(
-        "SELECT * FROM radius WHERE id=:serviceId",
+    final Map<String, Object> pppoe = Databases.getRecord(
+        "SELECT * FROM pppoe WHERE service_id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
     ).or(new HashMap<String, Object>());
+    pppoe.put("radius", Databases.getRecord(
+        "SELECT * FROM radius WHERE id=:serviceId",
+        ImmutableMap.of("serviceId", (Object) serviceId),
+        dbi
+    ).or(new HashMap<String, Object>()));
+    return pppoe;
   }
 
   @Override
