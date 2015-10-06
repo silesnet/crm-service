@@ -193,7 +193,7 @@ public class Entities {
     }
 
     @Nonnull
-    public ValueMap asValueMap() {
+    public ValueMap asMap() {
       return valueMapOf((Map<String, ?>) original);
     }
 
