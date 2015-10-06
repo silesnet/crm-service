@@ -32,8 +32,8 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.*;
 
-public class CrmRepositoryJdbi implements CrmRepository {
-  private static final Logger logger = LoggerFactory.getLogger(CrmRepositoryJdbi.class);
+public class DbiCrmRepository implements CrmRepository {
+  private static final Logger logger = LoggerFactory.getLogger(DbiCrmRepository.class);
 
   private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
   public static final int SERVICE_COUNTRY_MULTIPLIER = 100000;
@@ -56,7 +56,7 @@ public class CrmRepositoryJdbi implements CrmRepository {
   private final CrmDatabase db;
   private final DBI dbi;
 
-  public CrmRepositoryJdbi(final DBI dbi) {
+  public DbiCrmRepository(final DBI dbi) {
     this.dbi = dbi;
     this.db = dbi.onDemand(CrmDatabase.class);
   }
