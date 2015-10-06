@@ -10,7 +10,7 @@ import com.google.common.collect.*;
 import com.sun.jersey.api.Responses;
 import net.snet.crm.service.bo.Draft;
 import net.snet.crm.service.dao.CrmRepository;
-import net.snet.crm.service.dao.CrmRepositoryJdbi;
+import net.snet.crm.service.dao.DbiCrmRepository;
 import net.snet.crm.service.dao.DraftDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -194,7 +194,7 @@ public class DraftResource {
 				if (!"ACTIVE".equals(agreement.get("status"))) {
 					crmRepository.updateAgreementStatus(agreementId, "ACTIVE");
 				}
-				long contractNumber = agreementId % CrmRepositoryJdbi.SERVICE_COUNTRY_MULTIPLIER;
+				long contractNumber = agreementId % DbiCrmRepository.SERVICE_COUNTRY_MULTIPLIER;
 				String agreements = "" + contractNumber;
 				Optional<String> currentAgreements = Optional.fromNullable((String) updatedCustomer.get("contract_no"));
 				if (currentAgreements.isPresent() && currentAgreements.get().trim().length() > 0) {

@@ -8,14 +8,14 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
 
-class CrmRepositoryJdbiTest extends Specification {
+class DbiCrmRepositoryTest extends Specification {
   @Shared DBI dbi = new DBI("jdbc:h2:mem:customerRepositoryTest")
   @Shared Handle handle
 
 	@Subject CrmRepository repository
 
   def setup() {
-	  repository = new CrmRepositoryJdbi(dbi)
+	  repository = new DbiCrmRepository(dbi)
     handle = dbi.open()
     handle.execute(Resources.getResource('db/h2-crm-tables.sql').text)
   }

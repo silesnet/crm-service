@@ -18,7 +18,7 @@ import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.infrastructure.network.SnmpNetworkService;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
-import net.snet.crm.service.dao.CrmRepositoryJdbi;
+import net.snet.crm.service.dao.DbiCrmRepository;
 import net.snet.crm.service.dao.DbiDraftRepository;
 import net.snet.crm.service.dao.DraftDAO;
 import net.snet.crm.service.resources.*;
@@ -86,7 +86,7 @@ public class CrmService extends Application<CrmConfiguration> {
             .using(environment)
             .build("crm-service-http-client");
 
-    CrmRepositoryJdbi crmRepository = new CrmRepositoryJdbi(dbi);
+    DbiCrmRepository crmRepository = new DbiCrmRepository(dbi);
     final DbiDraftRepository draftRepository = new DbiDraftRepository(dbi, mapper);
     final AgreementRepository agreementRepository = new DbiAgreementRepository(dbi, mapper);
     final DbiNetworkRepository networkRepository = new DbiNetworkRepository(dbi);
