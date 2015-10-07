@@ -266,30 +266,6 @@ public class DbiCrmRepository implements CrmRepository {
   }
 
   @Override
-  public Map<String, Object> serviceDhcp(final long serviceId) {
-    return Databases.getRecord(
-        "SELECT * FROM dhcp WHERE service_id=:serviceId",
-        ImmutableMap.of("serviceId", (Object) serviceId),
-        dbi
-    ).or(new HashMap<String, Object>());
-  }
-
-  @Override
-  public Map<String, Object> servicePppoe(final long serviceId) {
-    final Map<String, Object> pppoe = Databases.getRecord(
-        "SELECT * FROM pppoe WHERE service_id=:serviceId",
-        ImmutableMap.of("serviceId", (Object) serviceId),
-        dbi
-    ).or(new HashMap<String, Object>());
-    pppoe.put("radius", Databases.getRecord(
-        "SELECT * FROM radius WHERE id=:serviceId",
-        ImmutableMap.of("serviceId", (Object) serviceId),
-        dbi
-    ).or(new HashMap<String, Object>()));
-    return pppoe;
-  }
-
-  @Override
   public List<Map<String, Object>> findService(final String rawQuery, final String country) {
     final String query = Utils.replaceChars(rawQuery, TRANSLATE_FROM_CHARS, TRANSLATE_TO_CHARS);
     if (query.isEmpty()) return Lists.newArrayList();

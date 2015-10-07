@@ -39,10 +39,6 @@ public interface CrmRepository {
 
     Map<String, Object> updateService(long serviceId, Map<String, Object> updates);
 
-    Map<String, Object> serviceDhcp(long serviceId);
-
-    Map<String, Object> servicePppoe(long serviceId);
-
     // connection
 
     Map<String, Object> insertConnection(long serviceId);

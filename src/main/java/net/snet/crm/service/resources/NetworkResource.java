@@ -34,6 +34,22 @@ public class NetworkResource {
     this.networkRepository = new DbiNetworkRepository(dbi);
   }
 
+  @PUT
+  @Path("pppoe/{serviceId}")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response updateServicePppoe(
+      @PathParam("serviceId") long serviceId) {
+    return Response.ok().build();
+  }
+
+  @PUT
+  @Path("dhcp/{serviceId}")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response updateServiceDhcp(
+      @PathParam("serviceId") long serviceId) {
+    return Response.ok().build();
+  }
+
   @GET
   @Path("{country}/devices")
   @Produces({"application/json; charset=UTF-8"})

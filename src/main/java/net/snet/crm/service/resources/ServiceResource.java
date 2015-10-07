@@ -52,7 +52,7 @@ public class ServiceResource {
     if (!dhcpUpdate.isNull()) {
       if (dhcpUpdate.asMap().map().isEmpty()) {
         logger.debug("deleting DHCP for service '{}'", serviceId);
-        ValueMap currentDhcp = valueMapOf(crmRepository.serviceDhcp(serviceId));
+        ValueMap currentDhcp = valueMapOf(networkRepository.findServiceDhcp(serviceId));
         final int networkId = currentDhcp.get("network_id").asIntegerOr(-1);
         final int port = currentDhcp.get("port").asIntegerOr(-1);
         checkState(networkId > 0, "switch network_id does not exist for service '%s'", serviceId);
@@ -79,13 +79,13 @@ public class ServiceResource {
   @GET
   @Path("/{serviceId}/dhcp")
   public Response serviceDhcp(@PathParam("serviceId") long serviceId) {
-    return Response.ok(ImmutableMap.of("dhcp", crmRepository.serviceDhcp(serviceId))).build();
+    return Response.ok(ImmutableMap.of("dhcp", networkRepository.findServiceDhcp(serviceId))).build();
   }
 
   @GET
   @Path("/{serviceId}/pppoe")
   public Response servicePppoe(@PathParam("serviceId") long serviceId) {
-    return Response.ok(ImmutableMap.of("pppoe", crmRepository.servicePppoe(serviceId))).build();
+    return Response.ok(ImmutableMap.of("pppoe", networkRepository.findServicePppoe(serviceId))).build();
   }
 
   @GET
