@@ -11,6 +11,10 @@ public interface NetworkRepository {
 
   Map<String, Object> findDevice(int deviceId);
 
+  Map<String, Object> findServiceDhcp(long serviceId);
+
+  Map<String, Object> findServicePppoe(long serviceId);
+
   void bindDhcp(long serviceId, int switchId, int port);
 
   void disableDhcp(int switchId, int port);

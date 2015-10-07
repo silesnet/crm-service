@@ -2,6 +2,7 @@ package net.snet.crm.infrastructure.persistence.jdbi;
 
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.model.network.NetworkRepository;
+import net.snet.crm.service.utils.Databases;
 import net.snet.crm.service.utils.Entities;
 import net.snet.crm.service.utils.Entities.ValueMap;
 import org.skife.jdbi.v2.DBI;
@@ -13,6 +14,7 @@ import org.skife.jdbi.v2.util.LongMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +67,30 @@ public class DbiNetworkRepository implements NetworkRepository {
             .list();
       }
     });
+  }
+
+  @Override
+  public Map<String, Object> findServiceDhcp(final long serviceId) {
+    return Databases.getRecord(
+        "SELECT * FROM dhcp WHERE service_id=:serviceId",
+        ImmutableMap.of("serviceId", (Object) serviceId),
+        dbi
+    ).or(new HashMap<String, Object>());
+  }
+
+  @Override
+  public Map<String, Object> findServicePppoe(final long serviceId) {
+    final Map<String, Object> pppoe = Databases.getRecord(
+        "SELECT * FROM pppoe WHERE service_id=:serviceId",
+        ImmutableMap.of("serviceId", (Object) serviceId),
+        dbi
+    ).or(new HashMap<String, Object>());
+    pppoe.put("radius", Databases.getRecord(
+        "SELECT * FROM radius WHERE id=:serviceId",
+        ImmutableMap.of("serviceId", (Object) serviceId),
+        dbi
+    ).or(new HashMap<String, Object>()));
+    return pppoe;
   }
 
   @Override
