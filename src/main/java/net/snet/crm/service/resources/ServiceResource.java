@@ -94,7 +94,7 @@ public class ServiceResource {
       @QueryParam("country") Optional<String> country,
       @QueryParam("isActive") Optional<String> isActiveBool
   ) {
-    boolean isActive = isActiveBool.isPresent() && "1".equals(isActiveBool.get());
+    boolean isActive = !isActiveBool.isPresent() || "1".equals(isActiveBool.get());
     List<Map<String, Object>> services = crmRepository.findService(query.or(""), country.or(""), isActive);
     return Response.ok(ImmutableMap.of("services", services)).build();
   }
