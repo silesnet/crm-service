@@ -266,7 +266,11 @@ public class DbiCrmRepository implements CrmRepository {
   }
 
   @Override
-  public List<Map<String, Object>> findService(final String rawQuery, final String country) {
+  public List<Map<String, Object>> findService(
+      final String rawQuery,
+      final String country,
+      final boolean isActive
+  ) {
     final String query = Utils.replaceChars(rawQuery, TRANSLATE_FROM_CHARS, TRANSLATE_TO_CHARS);
     if (query.isEmpty()) return Lists.newArrayList();
     final Long countryId = COUNTRIES.get(country.toUpperCase());
@@ -298,12 +302,13 @@ public class DbiCrmRepository implements CrmRepository {
                 "  INNER JOIN customers AS c ON s.customer_id = c.id\n" +
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
                 "WHERE " + countryRestriction + "\n" +
-                "AND   c.is_active\n" +
+                "AND   c.is_active = :isActive\n" +
                 "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
                 "  OR s.id\\:\\:text ~ :query\n" +
                 "  OR (a.id % 100000)\\:\\:text ~ :query)\n" +
                 "ORDER BY c.name, s.id \n" +
                 "LIMIT 20")
+            .bind("isActive", isActive)
             .bind("query", query)
             .bind("fromChars", TRANSLATE_FROM_CHARS)
             .bind("toChars", TRANSLATE_TO_CHARS)
