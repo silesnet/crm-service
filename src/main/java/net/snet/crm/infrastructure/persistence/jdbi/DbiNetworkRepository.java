@@ -87,12 +87,6 @@ public class DbiNetworkRepository implements NetworkRepository {
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
     ).or(new HashMap<String, Object>());
-    if (pppoe.get("mac") != null) {
-      pppoe.put("mac", pppoe.get("mac").toString());
-    }
-    if (pppoe.get("ip") != null) {
-      pppoe.put("ip", pppoe.get("ip").toString());
-    }
     pppoe.put("radius", getRecord(
         "SELECT * FROM radius WHERE id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
@@ -150,20 +144,6 @@ public class DbiNetworkRepository implements NetworkRepository {
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        if (update.containsKey("mac") && update.get("mac") != null) {
-          final PGobject mac = new PGobject();
-          mac.setType("macaddr");
-          String macValue = update.get("mac").toString();
-          mac.setValue(macValue.length() > 0 ? macValue : null);
-          update.put("mac", mac);
-        }
-        if (update.containsKey("ip") && update.get("ip") != null) {
-          final PGobject ip = new PGobject();
-          ip.setType("inet");
-          final String ipValue = update.get("ip").toString();
-          ip.setValue(ipValue.length() > 0 ? ipValue : null);
-          update.put("ip", ip);
-        }
         updateRecordWithId(new RecordId("pppoe", "service_id", serviceId),
             update, handle);
         return null;
