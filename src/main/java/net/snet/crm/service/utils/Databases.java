@@ -5,6 +5,7 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
+import org.postgresql.util.PGobject;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.Update;
@@ -12,6 +13,7 @@ import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.util.LongMapper;
 
 import javax.annotation.Nullable;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
@@ -115,6 +117,22 @@ public class Databases {
   public static void updateRecordWithId(final RecordId recordId,
                                         final Map<String, Object> update,
                                         final Handle handle) {
+    for (String column : update.keySet()) {
+      if (update.get(column) instanceof Map) {
+        final Map<String, Object> pgValue = (Map<String, Object>) update.get(column);
+        if (pgValue.containsKey("type") && pgValue.containsKey("value")) {
+          final PGobject value = new PGobject();
+          value.setType(pgValue.get("type").toString());
+          if (pgValue.get("value") != null && pgValue.get("value").toString().length() > 0)
+          try {
+            value.setValue(pgValue.get("value").toString());
+          } catch (SQLException e) {
+            throw new RuntimeException(e);
+          }
+          update.put(column, value);
+        }
+      }
+    }
     final int updatedRows = handle
         .createStatement(updateSqlWithId(recordId.table(), recordId.idColumn(), update.keySet()))
         .bindFromMap(update)
