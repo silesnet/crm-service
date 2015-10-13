@@ -44,36 +44,8 @@ public class ServiceResource {
   public Response updateService(
       @PathParam("serviceId") long serviceId,
       Map<String, Object> updateBody) {
-    ValueMap update = valueMapOf(updateBody);
-    Value serviceUpdate = update.get("services");
-    checkState(!serviceUpdate.isNull(), "no service update body sent");
-    logger.debug("updating service '{}'", serviceId);
-    Value dhcpUpdate = serviceUpdate.asMap().get("dhcp");
-    if (!dhcpUpdate.isNull()) {
-      if (dhcpUpdate.asMap().map().isEmpty()) {
-        logger.debug("deleting DHCP for service '{}'", serviceId);
-        ValueMap currentDhcp = valueMapOf(networkRepository.findServiceDhcp(serviceId));
-        final int networkId = currentDhcp.get("network_id").asIntegerOr(-1);
-        final int port = currentDhcp.get("port").asIntegerOr(-1);
-        checkState(networkId > 0, "switch network_id does not exist for service '%s'", serviceId);
-        checkState(port >= 0, "switch port not does not exit for service '%s'", serviceId);
-        networkRepository.disableDhcp(networkId, port);
-      } else {
-        final int networkId = dhcpUpdate.asMap().get("network_id").asIntegerOr(-1);
-        final int port = dhcpUpdate.asMap().get("port").asIntegerOr(-1);
-        checkState(networkId > 0, "new switch network_id not provided");
-        checkState(port >= 0, "new switch port not provided");
-        networkRepository.bindDhcp(serviceId, networkId, port);
-      }
-    }
-    Value pppoeUpdate = serviceUpdate.asMap().get("pppoe");
-    if (!pppoeUpdate.isNull()) {
-      if (pppoeUpdate.asMap().map().isEmpty()) {
-        logger.debug("removing PPPoE for service '{}'", serviceId);
-//        ValueMap currentPppoe = valueMapOf(crmRepository.removeServicePppoe(serviceId));
-      }
-    }
-    return Response.ok(ImmutableMap.of()).build();
+    throw new UnsupportedOperationException("Not implemented yet.");
+//    return Response.ok(ImmutableMap.of()).build();
   }
 
   @GET

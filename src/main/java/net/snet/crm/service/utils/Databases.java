@@ -62,12 +62,12 @@ public class Databases {
                                   final Map<String, Object> record,
                                   final Handle handle) {
     return insertStatement(table, record, handle)
-            .executeAndReturnGeneratedKeys(LongMapper.FIRST).first();
+        .executeAndReturnGeneratedKeys(LongMapper.FIRST).first();
   }
 
   public static void insertRecordWithoutKey(final String table,
-                                  final Map<String, Object> record,
-                                  final Handle handle) {
+                                            final Map<String, Object> record,
+                                            final Handle handle) {
     final int insertedRows = insertStatement(table, record, handle).execute();
     checkState(insertedRows == 1, "failed to insert record into '%s'", table);
   }
@@ -93,8 +93,7 @@ public class Databases {
   public static Optional<Map<String, Object>> getRecord(
       final String query,
       final Map<String, Object> binding,
-      final DBI dbi)
-  {
+      final DBI dbi) {
     return Optional.fromNullable(
         dbi.withHandle(new HandleCallback<Map<String, Object>>() {
           @Override
@@ -110,12 +109,19 @@ public class Databases {
                                   final long id,
                                   final Map<String, Object> update,
                                   final Handle handle) {
+    updateRecordWithId(new RecordId(table, "id", id), update, handle);
+  }
+
+  public static void updateRecordWithId(final RecordId recordId,
+                                        final Map<String, Object> update,
+                                        final Handle handle) {
     final int updatedRows = handle
-        .createStatement(updateSql(table, update.keySet()))
+        .createStatement(updateSqlWithId(recordId.table(), recordId.idColumn(), update.keySet()))
         .bindFromMap(update)
-        .bind("id", id)
+        .bind(recordId.idColumn(), recordId.idValue())
         .execute();
-    checkState(updatedRows == 1, "failed to update record '%s' in '%s'", id, table);
+    checkState(updatedRows == 1, "failed to update record '%s' in '%s'",
+        recordId.idValue(), recordId.table());
   }
 
   public static long lastValueOf(final String table, final String column, final Handle handle) {
@@ -140,24 +146,31 @@ public class Databases {
     checkTableName(table);
     final Collection<String> references = Collections2.transform(columns, columnToReference);
     return "INSERT INTO " + table + " (" + Joiner.on(", ").join(columns) +
-              ") VALUES (" + Joiner.on(", ").join(references) + ");";
+        ") VALUES (" + Joiner.on(", ").join(references) + ");";
   }
 
   public static String updateSql(final String table,
                                  final Collection<String> columns) {
+    return updateSqlWithId(table, "id", columns);
+  }
+
+  public static String updateSqlWithId(final String table,
+                                       final String idColumn,
+                                       final Collection<String> columns) {
     checkTableName(table);
     final List<String> assignments = FluentIterable.from(columns)
         .filter(notId)
         .transform(columnToAssignment)
         .toList();
-    return "UPDATE " + table + " SET " + Joiner.on(", ").join(assignments) + " WHERE id=:id;";
+    return "UPDATE " + table + " SET " + Joiner.on(", ").join(assignments)
+        + " WHERE " + idColumn + "=:" + idColumn + ";";
   }
 
   private static Predicate<String> notId() {
     return new Predicate<String>() {
       @Override
       public boolean apply(@Nullable String input) {
-        return ! "id".equalsIgnoreCase(input);
+        return !"id".equalsIgnoreCase(input);
       }
     };
   }
@@ -246,5 +259,27 @@ public class Databases {
     };
   }
 
+  public static class RecordId {
+    final String table;
+    final String idColumn;
+    final Object idValue;
 
+    public RecordId(String table, String idColumn, Object idValue) {
+      this.table = table;
+      this.idColumn = idColumn;
+      this.idValue = idValue;
+    }
+
+    public String table() {
+      return table;
+    }
+
+    public String idColumn() {
+      return idColumn;
+    }
+
+    public Object idValue() {
+      return idValue;
+    }
+  }
 }

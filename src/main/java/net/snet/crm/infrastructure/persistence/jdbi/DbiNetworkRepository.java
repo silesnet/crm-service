@@ -5,6 +5,7 @@ import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.service.utils.Databases;
 import net.snet.crm.service.utils.Entities;
 import net.snet.crm.service.utils.Entities.ValueMap;
+import org.postgresql.util.PGobject;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.TransactionCallback;
@@ -21,7 +22,9 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkState;
 import static java.lang.Enum.valueOf;
 import static net.snet.crm.domain.model.network.NetworkRepository.Country.PL;
+import static net.snet.crm.service.utils.Databases.*;
 import static net.snet.crm.service.utils.Databases.insertRecordWithoutKey;
+import static net.snet.crm.service.utils.Databases.updateRecordWithId;
 import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 public class DbiNetworkRepository implements NetworkRepository {
@@ -40,7 +43,7 @@ public class DbiNetworkRepository implements NetworkRepository {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
-              "SELECT * FROM " + NETWORK_TABLE + " WHERE id=:id")
+            "SELECT * FROM " + NETWORK_TABLE + " WHERE id=:id")
             .bind("id", deviceId)
             .first();
       }
@@ -51,17 +54,16 @@ public class DbiNetworkRepository implements NetworkRepository {
   @Override
   public List<Map<String, Object>> findDevicesByCountryAndType(
       final Country country,
-      final DeviceType deviceType)
-  {
+      final DeviceType deviceType) {
     final int countryId = Country.CZ.equals(country) ? 10 : PL.equals(country) ? 20 : 0;
     final int deviceTypeId = DeviceType.SWITCH.equals(deviceType) ? 40 : 0;
     return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
       @Override
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
-                "SELECT id, name, master FROM "+ NETWORK_TABLE +
-                    " WHERE type = :type AND name ~ '^.+-br.?.?$' AND country = :country" +
-                    " ORDER BY name")
+            "SELECT id, name, master FROM " + NETWORK_TABLE +
+                " WHERE type = :type AND name ~ '^.+-br.?.?$' AND country = :country" +
+                " ORDER BY name")
             .bind("type", deviceTypeId)
             .bind("country", countryId)
             .list();
@@ -71,7 +73,7 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public Map<String, Object> findServiceDhcp(final long serviceId) {
-    return Databases.getRecord(
+    return getRecord(
         "SELECT * FROM dhcp WHERE service_id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
@@ -80,12 +82,18 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public Map<String, Object> findServicePppoe(final long serviceId) {
-    final Map<String, Object> pppoe = Databases.getRecord(
+    final Map<String, Object> pppoe = getRecord(
         "SELECT * FROM pppoe WHERE service_id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
     ).or(new HashMap<String, Object>());
-    pppoe.put("radius", Databases.getRecord(
+    if (pppoe.get("mac") != null) {
+      pppoe.put("mac", pppoe.get("mac").toString());
+    }
+    if (pppoe.get("ip") != null) {
+      pppoe.put("ip", pppoe.get("ip").toString());
+    }
+    pppoe.put("radius", getRecord(
         "SELECT * FROM radius WHERE id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
@@ -120,6 +128,44 @@ public class DbiNetworkRepository implements NetworkRepository {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
         disableDhcpInternal(switchId, port, handle);
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public void updateDhcp(final long serviceId, final Map<String, Object> update) {
+    dbi.inTransaction(new TransactionCallback<Void>() {
+      @Override
+      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
+        updateRecordWithId(new RecordId("dhcp", "service_id", serviceId),
+            update, handle);
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public void updatePppoe(final long serviceId, final Map<String, Object> update) {
+    dbi.inTransaction(new TransactionCallback<Void>() {
+      @Override
+      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
+        if (update.containsKey("mac") && update.get("mac") != null) {
+          final PGobject mac = new PGobject();
+          mac.setType("macaddr");
+          String macValue = update.get("mac").toString();
+          mac.setValue(macValue.length() > 0 ? macValue : null);
+          update.put("mac", mac);
+        }
+        if (update.containsKey("ip") && update.get("ip") != null) {
+          final PGobject ip = new PGobject();
+          ip.setType("inet");
+          final String ipValue = update.get("ip").toString();
+          ip.setValue(ipValue.length() > 0 ? ipValue : null);
+          update.put("ip", ip);
+        }
+        updateRecordWithId(new RecordId("pppoe", "service_id", serviceId),
+            update, handle);
         return null;
       }
     });

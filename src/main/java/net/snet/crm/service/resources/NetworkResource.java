@@ -12,6 +12,7 @@ import net.snet.crm.domain.model.network.NetworkRepository.DeviceType;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.service.bo.Network;
 import net.snet.crm.service.dao.NetworkDAO;
+import net.snet.crm.service.utils.Entities;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,10 @@ import org.slf4j.LoggerFactory;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.*;
+
+import static com.google.common.base.Preconditions.checkState;
+import static net.snet.crm.service.utils.Entities.*;
+import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 @Path("/networks")
 public class NetworkResource {
@@ -38,16 +43,60 @@ public class NetworkResource {
   @Path("pppoe/{serviceId}")
   @Produces({"application/json; charset=UTF-8"})
   public Response updateServicePppoe(
-      @PathParam("serviceId") long serviceId) {
-    return Response.ok().build();
+      @PathParam("serviceId") long serviceId,
+      Map<String, Object> updateBody) {
+    ValueMap update = valueMapOf(updateBody);
+    Value serviceUpdate = update.get("services");
+    checkState(!serviceUpdate.isNull(), "no service update body sent");
+    Value pppoeUpdate = serviceUpdate.asMap().get("pppoe");
+    if (!pppoeUpdate.isNull()) {
+      if (pppoeUpdate.asMap().map().isEmpty()) {
+        logger.debug("removing PPPoE for service '{}'", serviceId);
+//        ValueMap currentPppoe = valueMapOf(crmRepository.removeServicePppoe(serviceId));
+      } else {
+        logger.debug("updating PPPoE for service '{}'", serviceId);
+        networkRepository.updatePppoe(serviceId, pppoeUpdate.asMap().map());
+      }
+    }
+
+    return Response.ok(ImmutableMap.of()).build();
   }
 
   @PUT
   @Path("dhcp/{serviceId}")
   @Produces({"application/json; charset=UTF-8"})
   public Response updateServiceDhcp(
-      @PathParam("serviceId") long serviceId) {
-    return Response.ok().build();
+      @PathParam("serviceId") long serviceId,
+      Map<String, Object> updateBody) {
+    ValueMap update = valueMapOf(updateBody);
+    Value serviceUpdate = update.get("services");
+    checkState(!serviceUpdate.isNull(), "no service update body sent");
+    Value dhcpUpdate = serviceUpdate.asMap().get("dhcp");
+    if (!dhcpUpdate.isNull()) {
+      if (dhcpUpdate.asMap().map().isEmpty()) {
+        logger.debug("deleting DHCP for service '{}'", serviceId);
+        ValueMap currentDhcp = valueMapOf(networkRepository.findServiceDhcp(serviceId));
+        final int networkId = currentDhcp.get("network_id").asIntegerOr(-1);
+        final int port = currentDhcp.get("port").asIntegerOr(-1);
+        checkState(networkId > 0, "switch network_id does not exist for service '%s'", serviceId);
+        checkState(port >= 0, "switch port not does not exit for service '%s'", serviceId);
+        networkRepository.disableDhcp(networkId, port);
+      } else {
+        logger.debug("updating DHCP of service '{}'", serviceId);
+        final int networkId = dhcpUpdate.asMap().get("network_id").asIntegerOr(-1);
+        final int port = dhcpUpdate.asMap().get("port").asIntegerOr(-1);
+        checkState(networkId > 0, "new switch network_id not provided");
+        checkState(port >= 0, "new switch port not provided");
+        networkRepository.bindDhcp(serviceId, networkId, port);
+        final Map<String, Object> propsUpdate = dhcpUpdate.asMap().map();
+        propsUpdate.remove("network_id");
+        propsUpdate.remove("port");
+        if (!propsUpdate.isEmpty()) {
+          networkRepository.updateDhcp(serviceId, propsUpdate);
+        }
+      }
+    }
+    return Response.ok(ImmutableMap.of()).build();
   }
 
   @GET

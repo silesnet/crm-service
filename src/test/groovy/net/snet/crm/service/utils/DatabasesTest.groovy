@@ -40,7 +40,7 @@ class DatabasesTest extends Specification {
       lastValueOf("entities", "id", handle) == 2
   }
 
-  def 'should create updated sql statement'() {
+  def 'should create update sql statement'() {
     given:
       def table = 'table'
       def columns = values().keySet()
@@ -48,6 +48,16 @@ class DatabasesTest extends Specification {
       def sql = updateSql(table, columns)
     then:
       sql == 'UPDATE table SET col1=:col1, col2=:col2 WHERE id=:id;'
+  }
+
+  def 'should create update sql statement with id'() {
+    given:
+      def table = 'table'
+      def columns = values().keySet()
+    when:
+      def sql = updateSqlWithId(table, 'col_id', columns)
+    then:
+      sql == 'UPDATE table SET col1=:col1, col2=:col2 WHERE col_id=:col_id;'
   }
 
   def 'should create insert sql statement'() {
