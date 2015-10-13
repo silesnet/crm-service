@@ -234,8 +234,8 @@ public class Entities {
       return value == null ? fallBack : value;
     }
 
-    public Map<String, ?> map() {
-      return map;
+    public Map<String, Object> map() {
+      return (Map<String, Object>) map;
     }
   }
 

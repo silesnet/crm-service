@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface NetworkRepository {
+
   enum Country { CZ, PL }
   enum DeviceType { SWITCH, ROUTER }
 
@@ -18,4 +19,9 @@ public interface NetworkRepository {
   void bindDhcp(long serviceId, int switchId, int port);
 
   void disableDhcp(int switchId, int port);
+
+  void updateDhcp(long serviceId, Map<String, Object> update);
+
+  void updatePppoe(long serviceId, Map<String, Object> update);
+
 }
