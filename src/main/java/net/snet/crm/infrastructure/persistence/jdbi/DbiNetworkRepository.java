@@ -2,10 +2,7 @@ package net.snet.crm.infrastructure.persistence.jdbi;
 
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.model.network.NetworkRepository;
-import net.snet.crm.service.utils.Databases;
-import net.snet.crm.service.utils.Entities;
 import net.snet.crm.service.utils.Entities.ValueMap;
-import org.postgresql.util.PGobject;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.TransactionCallback;
@@ -20,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkState;
-import static java.lang.Enum.valueOf;
 import static net.snet.crm.domain.model.network.NetworkRepository.Country.PL;
 import static net.snet.crm.service.utils.Databases.*;
 import static net.snet.crm.service.utils.Databases.insertRecordWithoutKey;
@@ -30,6 +26,7 @@ import static net.snet.crm.service.utils.Entities.valueMapOf;
 public class DbiNetworkRepository implements NetworkRepository {
   private static final Logger logger = LoggerFactory.getLogger(DbiNetworkRepository.class);
   private static final String DHCP_TABLE = "dhcp";
+  private static final String PPPOE_TABLE = "pppoe";
   private static final String NETWORK_TABLE = "network";
   private final DBI dbi;
 
@@ -87,11 +84,19 @@ public class DbiNetworkRepository implements NetworkRepository {
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
     ).or(new HashMap<String, Object>());
-    pppoe.put("radius", getRecord(
-        "SELECT * FROM radius WHERE id=:serviceId",
-        ImmutableMap.of("serviceId", (Object) serviceId),
-        dbi
-    ).or(new HashMap<String, Object>()));
+    if (!pppoe.isEmpty()) {
+      if (pppoe.get("ip") == null) {
+        pppoe.put("ip", ImmutableMap.of("type", "inet", "value", ""));
+      }
+      if (pppoe.get("mac") == null) {
+        pppoe.put("mac", ImmutableMap.of("type", "macaddr", "value", ""));
+      }
+      pppoe.put("radius", getRecord(
+          "SELECT * FROM radius WHERE id=:serviceId",
+          ImmutableMap.of("serviceId", (Object) serviceId),
+          dbi
+      ).or(new HashMap<String, Object>()));
+    }
     return pppoe;
   }
 
@@ -128,12 +133,36 @@ public class DbiNetworkRepository implements NetworkRepository {
   }
 
   @Override
+  public void addPppoe(long serviceId, final Map<String, Object> pppoe) {
+    dbi.inTransaction(new TransactionCallback<Void>() {
+      @Override
+      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
+        insertRecordWithoutKey(PPPOE_TABLE, pppoe, handle);
+        return null;
+      }
+    });
+  }
+
+  @Override
   public void updateDhcp(final long serviceId, final Map<String, Object> update) {
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
         updateRecordWithId(new RecordId("dhcp", "service_id", serviceId),
             update, handle);
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public void removePppoe(final long serviceId) {
+    dbi.inTransaction(new TransactionCallback<Void>() {
+      @Override
+      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
+        handle.createStatement("DELETE FROM pppoe WHERE service_id=:service_id")
+            .bind("service_id", serviceId)
+            .execute();
         return null;
       }
     });

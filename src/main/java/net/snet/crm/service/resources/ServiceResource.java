@@ -45,7 +45,6 @@ public class ServiceResource {
       @PathParam("serviceId") long serviceId,
       Map<String, Object> updateBody) {
     throw new UnsupportedOperationException("Not implemented yet.");
-//    return Response.ok(ImmutableMap.of()).build();
   }
 
   @GET

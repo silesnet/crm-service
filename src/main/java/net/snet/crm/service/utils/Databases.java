@@ -63,6 +63,8 @@ public class Databases {
   public static long insertRecord(final String table,
                                   final Map<String, Object> record,
                                   final Handle handle) {
+    checkTableName(table);
+    toPgTypesInPlace(record);
     return insertStatement(table, record, handle)
         .executeAndReturnGeneratedKeys(LongMapper.FIRST).first();
   }
@@ -70,6 +72,8 @@ public class Databases {
   public static void insertRecordWithoutKey(final String table,
                                             final Map<String, Object> record,
                                             final Handle handle) {
+    checkTableName(table);
+    toPgTypesInPlace(record);
     final int insertedRows = insertStatement(table, record, handle).execute();
     checkState(insertedRows == 1, "failed to insert record into '%s'", table);
   }
@@ -117,22 +121,8 @@ public class Databases {
   public static void updateRecordWithId(final RecordId recordId,
                                         final Map<String, Object> update,
                                         final Handle handle) {
-    for (String column : update.keySet()) {
-      if (update.get(column) instanceof Map) {
-        final Map<String, Object> pgValue = (Map<String, Object>) update.get(column);
-        if (pgValue.containsKey("type") && pgValue.containsKey("value")) {
-          final PGobject value = new PGobject();
-          value.setType(pgValue.get("type").toString());
-          if (pgValue.get("value") != null && pgValue.get("value").toString().length() > 0)
-          try {
-            value.setValue(pgValue.get("value").toString());
-          } catch (SQLException e) {
-            throw new RuntimeException(e);
-          }
-          update.put(column, value);
-        }
-      }
-    }
+    checkTableName(recordId.table());
+    toPgTypesInPlace(update);
     final int updatedRows = handle
         .createStatement(updateSqlWithId(recordId.table(), recordId.idColumn(), update.keySet()))
         .bindFromMap(update)
@@ -182,6 +172,25 @@ public class Databases {
         .toList();
     return "UPDATE " + table + " SET " + Joiner.on(", ").join(assignments)
         + " WHERE " + idColumn + "=:" + idColumn + ";";
+  }
+
+  private static void toPgTypesInPlace(Map<String, Object> update) {
+    for (String column : update.keySet()) {
+      if (update.get(column) instanceof Map) {
+        final Map<String, Object> pgValue = (Map<String, Object>) update.get(column);
+        if (pgValue.containsKey("type") && pgValue.containsKey("value")) {
+          final PGobject value = new PGobject();
+          value.setType(pgValue.get("type").toString());
+          if (pgValue.get("value") != null && pgValue.get("value").toString().length() > 0)
+            try {
+              value.setValue(pgValue.get("value").toString());
+            } catch (SQLException e) {
+              throw new RuntimeException(e);
+            }
+          update.put(column, value);
+        }
+      }
+    }
   }
 
   private static Predicate<String> notId() {
