@@ -52,13 +52,20 @@ public class NetworkResource {
     if (!pppoeUpdate.isNull()) {
       if (pppoeUpdate.asMap().map().isEmpty()) {
         logger.debug("removing PPPoE for service '{}'", serviceId);
-//        ValueMap currentPppoe = valueMapOf(crmRepository.removeServicePppoe(serviceId));
+        networkRepository.removePppoe(serviceId);
       } else {
-        logger.debug("updating PPPoE for service '{}'", serviceId);
-        networkRepository.updatePppoe(serviceId, pppoeUpdate.asMap().map());
+        ValueMap currentPppoe = valueMapOf(networkRepository.findServicePppoe(serviceId));
+        if (currentPppoe.map().isEmpty()) {
+          logger.debug("adding PPPoE for service '{}'", serviceId);
+          final Map<String, Object> pppoe = pppoeUpdate.asMap().map();
+          pppoe.put("service_id", serviceId);
+          networkRepository.addPppoe(serviceId, pppoe);
+        } else {
+          logger.debug("updating PPPoE for service '{}'", serviceId);
+          networkRepository.updatePppoe(serviceId, pppoeUpdate.asMap().map());
+        }
       }
     }
-
     return Response.ok(ImmutableMap.of()).build();
   }
 

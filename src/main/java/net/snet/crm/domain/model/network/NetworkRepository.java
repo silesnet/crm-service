@@ -5,6 +5,7 @@ import java.util.Map;
 
 public interface NetworkRepository {
 
+
   enum Country { CZ, PL }
   enum DeviceType { SWITCH, ROUTER }
 
@@ -22,6 +23,9 @@ public interface NetworkRepository {
 
   void updateDhcp(long serviceId, Map<String, Object> update);
 
+  void addPppoe(long serviceId, Map<String, Object> pppoe);
+
   void updatePppoe(long serviceId, Map<String, Object> update);
 
+  void removePppoe(long serviceId);
 }
