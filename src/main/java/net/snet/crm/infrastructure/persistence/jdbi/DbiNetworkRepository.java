@@ -71,7 +71,7 @@ public class DbiNetworkRepository implements NetworkRepository {
   @Override
   public Map<String, Object> findServiceDhcp(final long serviceId) {
     return getRecord(
-        "SELECT * FROM dhcp WHERE service_id=:serviceId",
+        "SELECT * FROM " + DHCP_TABLE + " WHERE service_id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
     ).or(new HashMap<String, Object>());
@@ -80,7 +80,7 @@ public class DbiNetworkRepository implements NetworkRepository {
   @Override
   public Map<String, Object> findServicePppoe(final long serviceId) {
     final Map<String, Object> pppoe = getRecord(
-        "SELECT * FROM pppoe WHERE service_id=:serviceId",
+        "SELECT * FROM " + PPPOE_TABLE + " WHERE service_id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
         dbi
     ).or(new HashMap<String, Object>());
@@ -106,7 +106,7 @@ public class DbiNetworkRepository implements NetworkRepository {
       @Override
       public Object inTransaction(Handle handle, TransactionStatus status) throws Exception {
         ValueMap currentDhcp = valueMapOf(handle
-            .createQuery("SELECT network_id, port FROM dhcp WHERE service_id=:serviceId")
+            .createQuery("SELECT network_id, port FROM " + DHCP_TABLE + " WHERE service_id=:serviceId")
             .bind("serviceId", serviceId)
             .first());
         if (currentDhcp.map() != null) {
@@ -148,7 +148,7 @@ public class DbiNetworkRepository implements NetworkRepository {
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        updateRecordWithId(new RecordId("dhcp", "service_id", serviceId),
+        updateRecordWithId(new RecordId(DHCP_TABLE, "service_id", serviceId),
             update, handle);
         return null;
       }
@@ -160,7 +160,7 @@ public class DbiNetworkRepository implements NetworkRepository {
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        handle.createStatement("DELETE FROM pppoe WHERE service_id=:service_id")
+        handle.createStatement("DELETE FROM " + PPPOE_TABLE + " WHERE service_id=:service_id")
             .bind("service_id", serviceId)
             .execute();
         return null;
@@ -173,7 +173,7 @@ public class DbiNetworkRepository implements NetworkRepository {
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        updateRecordWithId(new RecordId("pppoe", "service_id", serviceId),
+        updateRecordWithId(new RecordId(PPPOE_TABLE, "service_id", serviceId),
             update, handle);
         return null;
       }
