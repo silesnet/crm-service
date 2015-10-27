@@ -5,8 +5,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.service.dao.CrmRepository;
-import net.snet.crm.service.utils.Entities.Value;
-import net.snet.crm.service.utils.Entities.ValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 @Path("/services")
 @Consumes(MediaType.APPLICATION_JSON)
