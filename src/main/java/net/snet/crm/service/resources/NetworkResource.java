@@ -29,7 +29,7 @@ import static net.snet.crm.service.utils.Entities.valueMapOf;
 public class NetworkResource {
 
   private static final Logger logger = LoggerFactory.getLogger(NetworkResource.class);
-  private static final Set<String> SWITCH_MASTERS = Sets.newHashSet("o12", "pricni", "piast", "novodvorska");
+  private static final Set<String> SWITCH_MASTERS = Sets.newHashSet("o12", "pricni", "piast", "novodvorska", "f40");
 
   private NetworkDAO networkDAO;
   private final NetworkRepository networkRepository;
