@@ -11,6 +11,8 @@ public interface NetworkRepository {
 
   List<Map<String, Object>> findDevicesByCountryAndType(Country country, DeviceType deviceType);
 
+  List<String> findAllMasters();
+
   Map<String, Object> findDevice(int deviceId);
 
   Map<String, Object> findServiceDhcp(long serviceId);
