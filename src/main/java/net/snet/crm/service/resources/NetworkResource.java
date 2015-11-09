@@ -138,6 +138,12 @@ public class NetworkResource {
         .build();
   }
 
+  @GET
+  @Path("/masters")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response allMasters() {
+    return Response.ok(ImmutableMap.of("masters", networkRepository.findAllMasters())).build();
+  }
 
   @GET
   @Path("/routers")

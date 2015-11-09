@@ -9,6 +9,7 @@ import org.skife.jdbi.v2.TransactionCallback;
 import org.skife.jdbi.v2.TransactionStatus;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.util.LongMapper;
+import org.skife.jdbi.v2.util.StringMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,18 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   public DbiNetworkRepository(DBI dbi) {
     this.dbi = dbi;
+  }
+
+  @Override
+  public List<String> findAllMasters() {
+    return dbi.withHandle(new HandleCallback<List<String>>() {
+      @Override
+      public List<String> withHandle(Handle handle) throws Exception {
+        return handle.createQuery("SELECT DISTINCT master FROM " + NETWORK_TABLE + " ORDER BY master;")
+            .map(StringMapper.FIRST)
+            .list();
+      }
+    });
   }
 
   @Override
