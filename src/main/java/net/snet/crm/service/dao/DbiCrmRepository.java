@@ -301,13 +301,16 @@ public class DbiCrmRepository implements CrmRepository {
                 "FROM services AS s\n" +
                 "  INNER JOIN customers AS c ON s.customer_id = c.id\n" +
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
+                "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   c.is_active = :isActive\n" +
                 "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
                 "  OR s.id\\:\\:text ~ :query\n" +
+                "  OR lower(translate(p.interface, '-', '')) ~* :query\n" +
+                "  OR lower(translate(p.mac\\:\\:text, '\\:', '')) ~* :query\n" +
                 "  OR (a.id % 100000)\\:\\:text ~ :query)\n" +
                 "ORDER BY c.name, s.id \n" +
-                "LIMIT 20")
+                "LIMIT 25")
             .bind("isActive", isActive)
             .bind("query", query)
             .bind("fromChars", TRANSLATE_FROM_CHARS)
