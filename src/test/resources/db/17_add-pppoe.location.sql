@@ -1,0 +1,2 @@
+ALTER TABLE pppoe
+  ADD COLUMN location TEXT NOT NULL DEFAULT '';
