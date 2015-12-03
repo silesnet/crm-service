@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.snet.crm.service.utils.Databases;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
@@ -307,6 +306,7 @@ public class DbiCrmRepository implements CrmRepository {
                 "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
                 "  OR s.id\\:\\:text ~ :query\n" +
                 "  OR lower(translate(p.interface, '-', '')) ~* :query\n" +
+                "  OR lower(translate(p.location, '-', '')) ~* :query\n" +
                 "  OR lower(translate(p.mac\\:\\:text, '\\:', '')) ~* :query\n" +
                 "  OR (a.id % 100000)\\:\\:text ~ :query)\n" +
                 "ORDER BY c.name, s.id \n" +
