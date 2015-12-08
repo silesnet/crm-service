@@ -1,5 +1,6 @@
 package net.snet.crm.service.dao;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
@@ -38,6 +39,7 @@ public class DbiCrmRepository implements CrmRepository {
   public static final int SERVICE_COUNTRY_MULTIPLIER = 100000;
   private final String TRANSLATE_FROM_CHARS = "ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź.-,;:&+? ";
   private final String TRANSLATE_TO_CHARS = "aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz";
+  private static final String DRAFT_TABLE = "drafts2";
 
   private static final Map<String, String> CONNECTION_FIELDS;
 
@@ -245,9 +247,40 @@ public class DbiCrmRepository implements CrmRepository {
     final Map<String, Object> service = db.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
-        return handle.createQuery("SELECT * FROM services WHERE id=:id")
+        final Map<String, Object> service = handle.createQuery("SELECT * FROM services WHERE id=:id")
             .bind("id", serviceId)
             .first();
+        if (service != null) {
+          final Map<String, Object> draft = handle.createQuery("SELECT data FROM " + DRAFT_TABLE + " WHERE entity_type='services' " +
+              "AND entity_id=:id")
+              .bind("id", serviceId)
+              .first();
+          if (!(draft == null || draft.isEmpty())) {
+            final Object data = draft.get("data");
+            if (data != null) {
+              final Map dataMap = new ObjectMapper().readValue(data.toString(), Map.class);
+              String country = "";
+              final Object countryId = dataMap.get("location_country");
+              if (countryId != null) {
+                for (Map.Entry<String, Long> countryEntry : COUNTRIES.entrySet()) {
+                  if (countryEntry.getValue().toString().equals(countryId)) {
+                    country = countryEntry.getKey();
+                  }
+                }
+              }
+              final Map<String, Object> address = new HashMap<>();
+              address.put("street", dataMap.get("location_street"));
+              address.put("descriptive_number", dataMap.get("location_descriptive_number"));
+              address.put("orientation_number", dataMap.get("location_orientation_number"));
+              address.put("apartment", dataMap.get("location_flat"));
+              address.put("town", dataMap.get("location_town"));
+              address.put("postal_code", dataMap.get("location_postal_code"));
+              address.put("country", country);
+              service.put("address", address);
+            }
+          }
+        }
+        return service;
       }
     });
     final Map<String, Object> serviceInfo = db.withHandle(new HandleCallback<Map<String, Object>>() {
