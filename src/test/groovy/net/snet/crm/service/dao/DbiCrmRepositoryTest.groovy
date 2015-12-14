@@ -157,7 +157,7 @@ class DbiCrmRepositoryTest extends Specification {
     then: 'service is inserted'
       service.id == (agreement.id * 100) + 1
       service.customer_id == customer.id
-      service.status == 'DRAFT'
+      service.status.value.string == 'ACTIVE'
   }
 
   def 'it should fail inserting 100th service for agreement'() {
@@ -289,9 +289,9 @@ class DbiCrmRepositoryTest extends Specification {
 		and: 'existing service'
 			def service = repository.insertService(agreement.id as Long)
 		and: 'service update map'
-			def update = [ name: 'Updated Name', price: 10, status: 'ACTIVE']
+			def update = [ name: 'Updated Name', price: 10, status: 'SUSPENDED']
 		expect:
-			service.status == 'DRAFT'
+			service.status.value.string == 'ACTIVE'
 		when: 'service update is called'
 			def updated = repository.updateService(service.id as Long, update)
 		then:
@@ -299,6 +299,6 @@ class DbiCrmRepositoryTest extends Specification {
 			updated.id == service.id
 			updated.name == 'Updated Name'
 			updated.price == 10
-			updated.status == 'ACTIVE'
+			updated.status.value.string == 'SUSPENDED'
 	}
 }

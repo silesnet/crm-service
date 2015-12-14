@@ -70,7 +70,8 @@ CREATE TABLE services (
     replace_id bigint,
     additionalname character varying(50),
     bps character(1),
-    old_id bigint
+    old_id bigint,
+    status TEXT NOT NULL DEFAULT 'ACTIVE'
 );
 
 CREATE TABLE services_info (
@@ -192,7 +193,7 @@ CREATE TABLE dhcp
   a_descriptive_number TEXT,
   a_orientation_number TEXT,
   a_flat      TEXT,
-  a_town      TEXT NOT NULL DEFAULT 'Èeský Tìšín',
+  a_town      TEXT NOT NULL DEFAULT 'ï¿½eskï¿½ Tï¿½ï¿½n',
   a_postal_code TEXT NOT NULL DEFAULT '73701',
   a_country   TEXT NOT NULL DEFAULT 'CZ',
   a_location2 TEXT NOT NULL DEFAULT ''

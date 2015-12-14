@@ -8,10 +8,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.snet.crm.service.utils.Databases;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.TransactionCallback;
+import org.skife.jdbi.v2.TransactionStatus;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
@@ -31,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.*;
+import static net.snet.crm.service.utils.Databases.updateRecordWithId;
 
 public class DbiCrmRepository implements CrmRepository {
   private static final Logger logger = LoggerFactory.getLogger(DbiCrmRepository.class);
@@ -233,7 +237,7 @@ public class DbiCrmRepository implements CrmRepository {
       checkState((lastServiceId % 100) < 99, "cannot add new service to the agreement '%s', max of 99 services already exists", agreementId);
       long serviceId = lastServiceId + 1;
       db.insertService(serviceId, Long.valueOf(agreement.get("customer_id").toString()), now());
-      db.insertServiceInfo(serviceId);
+//      db.insertServiceInfo(serviceId);
       db.commit();
       return findServiceById(serviceId);
     } catch (Exception e) {
@@ -244,7 +248,7 @@ public class DbiCrmRepository implements CrmRepository {
 
   @Override
   public Map<String, Object> findServiceById(final long serviceId) {
-    final Map<String, Object> service = db.withHandle(new HandleCallback<Map<String, Object>>() {
+    return db.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
         final Map<String, Object> service = handle.createQuery("SELECT * FROM services WHERE id=:id")
@@ -283,18 +287,6 @@ public class DbiCrmRepository implements CrmRepository {
         return service;
       }
     });
-    final Map<String, Object> serviceInfo = db.withHandle(new HandleCallback<Map<String, Object>>() {
-      @Override
-      public Map<String, Object> withHandle(Handle handle) throws Exception {
-        return handle.createQuery("SELECT * FROM services_info WHERE service_id=:service_id")
-            .bind("service_id", serviceId)
-            .first();
-      }
-    });
-    if (service != null && serviceInfo != null) {
-      service.put("status", serviceInfo.get("status"));
-    }
-    return service;
   }
 
   @Override
@@ -388,39 +380,16 @@ public class DbiCrmRepository implements CrmRepository {
   }
 
   @Override
-  public Map<String, Object> updateService(final long serviceId, final Map<String, Object> updates) {
-    if (updates.size() == 0) {
-      logger.debug("nothing to update returning original service '{}'", serviceId);
-      return findServiceById(serviceId);
-    }
-    final Optional<String> status = Optional.fromNullable((String) updates.get("status"));
-    if (status.isPresent()) {
-      updates.remove("status");
-    }
-    final String sql = sqlUpdate("services", updates, "id");
-    db.begin();
-    try {
-      Integer updated = db.withHandle(new HandleCallback<Integer>() {
-        @Override
-        public Integer withHandle(Handle handle) throws Exception {
-          return handle.createStatement(sql)
-              .bind("id", serviceId)
-              .bindFromMap(updates)
-              .execute();
-        }
-      });
-      if (updated != 1) {
-        throw new IllegalStateException("failed to update service '" + serviceId + "'");
+  public Map<String, Object> updateService(final long serviceId, final Map<String, Object> update) {
+    dbi.inTransaction(new TransactionCallback<Void>() {
+      @Override
+      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
+        updateRecordWithId(new Databases.RecordId("services", "id", serviceId), update, handle);
+        return null;
       }
-      if (status.isPresent()) {
-        db.updateServiceStatus(serviceId, status.get());
-      }
-      db.commit();
-      return findServiceById(serviceId);
-    } catch (Exception e) {
-      db.rollback();
-      throw new RuntimeException(e);
-    }
+    });
+    logger.info("service '{}' has been updated", serviceId);
+    return findServiceById(serviceId);
   }
 
   @Override
