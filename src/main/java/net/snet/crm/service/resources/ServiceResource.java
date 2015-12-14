@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.service.dao.CrmRepository;
+import net.snet.crm.service.utils.Entities.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 @Path("/services")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -37,10 +40,12 @@ public class ServiceResource {
 
   @PUT
   @Path("/{serviceId}")
-  public Response updateService(
-      @PathParam("serviceId") long serviceId,
-      Map<String, Object> updateBody) {
-    throw new UnsupportedOperationException("Not implemented yet.");
+  public Response updateService(@PathParam("serviceId") long serviceId,
+                                Map<String, Object> updateBody) {
+    final Value serviceUpdate = valueMapOf(updateBody).get("services");
+    checkState(!serviceUpdate.isNull(), "no service update body sent");
+    crmRepository.updateService(serviceId, serviceUpdate.asMap().map());
+    return Response.ok(ImmutableMap.of()).build();
   }
 
   @GET
