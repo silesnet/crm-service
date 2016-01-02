@@ -149,6 +149,7 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public void addPppoe(long serviceId, final Map<String, Object> pppoe) {
+    pppoe.put("service_id", serviceId);
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
