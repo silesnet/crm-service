@@ -6,6 +6,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.draft.Draft;
@@ -38,6 +39,7 @@ public class DraftResource2 {
   private static final Logger logger = LoggerFactory.getLogger(DraftResource2.class);
   private static final Function<Map<String, Object>, String> getLoginValue = getValueOf("login");
   private static final String AUTH_DHCP = "1";
+  private static final String AUTH_PPPOE = "2";
 
   private final CrmRepository crmRepository;
   @Context
@@ -52,8 +54,7 @@ public class DraftResource2 {
       CrmRepository crmRepository,
       AgreementRepository agreementRepository,
       NetworkRepository networkRepository,
-      NetworkService networkService)
-  {
+      NetworkService networkService) {
     this.draftRepository = draftRepository;
     this.crmRepository = crmRepository;
     this.agreementRepository = agreementRepository;
@@ -153,13 +154,13 @@ public class DraftResource2 {
     draftRepository.update(draftId, draftData.get());
     logger.debug("draft '{}' updated", draftId);
     final Map<String, Object> draft = draftRepository.get(draftId);
-    populateDhcp(originalDraft, draft);
+    handleConnectionChanges(originalDraft, draft);
     return Response
         .ok(ImmutableMap.of("drafts", draft))
         .build();
   }
 
-  private void populateDhcp(Map<String, Object> originalDraftMap, Map<String, Object> currentDraftMap) {
+  private void handleConnectionChanges(Map<String, Object> originalDraftMap, Map<String, Object> currentDraftMap) {
     final Draft originalDraft = new Draft(originalDraftMap);
     final Draft currentDraft = new Draft(currentDraftMap);
     if (SERVICES.equals(originalDraft.entity()) && SERVICES.equals(currentDraft.entity())) {
@@ -171,12 +172,48 @@ public class DraftResource2 {
         final int originalSwitchId = original.get("auth_a").asIntegerOr(-1);
         final int originalPort = original.get("auth_b").asIntegerOr(-1);
         disableDhcp(originalSwitchId, originalPort);
-      } else {
+      }
+      if (AUTH_PPPOE.equals(originalAuth) && !AUTH_PPPOE.equals(currentAuth)) {
+        networkRepository.removePppoe(originalDraft.entityId());
+        logger.info("removed PPPoE for {}", originalDraft.entityId());
+      }
+      if (AUTH_DHCP.equals(currentAuth)) {
         final int switchId = current.get("auth_a").asIntegerOr(-1);
         final int port = current.get("auth_b").asIntegerOr(-1);
         bindDhcp(currentDraft.entityId(), switchId, port);
+      } else if (AUTH_PPPOE.equals(currentAuth)) {
+        if (AUTH_PPPOE.equals(originalAuth)) {
+          networkRepository.updatePppoe(currentDraft.entityId(), mapDraftToPppoe(currentDraft));
+          logger.info("updated PPPoE for {}", currentDraft.entityId());
+        } else {
+          networkRepository.addPppoe(currentDraft.entityId(), mapDraftToPppoe(currentDraft));
+          logger.info("created PPPoE for {}", currentDraft.entityId());
+        }
       }
     }
+  }
+
+  private Map<String, Object> mapDraftToPppoe(final Draft draft) {
+    final ValueMap data = valueMapOf(draft.data());
+    final Map<String, Object> pppoe = Maps.newHashMap();
+    final String productChannel = data.get("product_channel").toString().toUpperCase();
+    if (productChannel.length() > 0) {
+      pppoe.put("login", data.get("auth_a").toString());
+      pppoe.put("password", data.get("auth_b").toString());
+      pppoe.put("mac", ImmutableMap.<String, Object>of("type", "macaddr", "value", data.get("mac_address").toString()));
+      pppoe.put("ip", ImmutableMap.<String, Object>of("type", "inet", "value", data.get("ip").toString()));
+      pppoe.put("mode", productChannel);
+      final int interfaceId = data.get("core_router").asIntegerOr(-1);
+      if (interfaceId > 0) {
+        final ValueMap interfaceData = valueMapOf(networkRepository.findDevice(interfaceId));
+        pppoe.put("interface", interfaceData.get("name").toString());
+        pppoe.put("master", interfaceData.get("master").toString());
+      } else {
+        pppoe.put("interface", "");
+        pppoe.put("master", "");
+      }
+    }
+    return pppoe;
   }
 
   @DELETE
@@ -190,6 +227,10 @@ public class DraftResource2 {
         final int switchId = service.get("auth_a").asIntegerOr(-1);
         final int port = service.get("auth_b").asIntegerOr(-1);
         disableDhcp(switchId, port);
+      }
+      if (AUTH_PPPOE.equals(authentication)) {
+        networkRepository.removePppoe(original.entityId());
+        logger.info("removed PPPoE for {}", original.entityId());
       }
     }
     draftRepository.delete(draftId);
