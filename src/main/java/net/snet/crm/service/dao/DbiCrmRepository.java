@@ -2,7 +2,6 @@ package net.snet.crm.service.dao;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -44,6 +43,7 @@ public class DbiCrmRepository implements CrmRepository {
   private final String TRANSLATE_FROM_CHARS = "ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź.-,;:&+? ";
   private final String TRANSLATE_TO_CHARS = "aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz";
   private static final String DRAFT_TABLE = "drafts2";
+  private static final String PRODUCT_TABLE = "products";
 
   private static final Map<String, String> CONNECTION_FIELDS;
 
@@ -282,6 +282,12 @@ public class DbiCrmRepository implements CrmRepository {
               address.put("country", country);
               service.put("address", address);
             }
+          }
+          final Map<String, Object> productChannel = handle.createQuery("SELECT channel FROM " + PRODUCT_TABLE + " WHERE name like :name")
+                .bind("name", service.get("name") + "%")
+                .first();
+          if (!(productChannel == null || productChannel.isEmpty())) {
+            service.put("channel", productChannel.get("channel"));
           }
         }
         return service;
