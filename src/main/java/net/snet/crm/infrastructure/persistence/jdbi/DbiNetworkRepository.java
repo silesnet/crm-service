@@ -111,6 +111,20 @@ public class DbiNetworkRepository implements NetworkRepository {
           ImmutableMap.of("serviceId", (Object) serviceId),
           dbi
       ).or(new HashMap<String, Object>()));
+      if (pppoe.get("interface") != null) {
+        pppoe.put("network_interface", getRecord(
+            "SELECT id, name, ssid, master  FROM " + NETWORK_TABLE + " WHERE name=:name",
+            ImmutableMap.of("name", pppoe.get("interface")),
+            dbi
+        ).or(new HashMap<String, Object>()));
+      }
+      if (pppoe.get("master") != null) {
+        pppoe.put("network_master", getRecord(
+            "SELECT id, name, ssid, master  FROM " + NETWORK_TABLE + " WHERE name=:name",
+            ImmutableMap.of("name", pppoe.get("master")),
+            dbi
+        ).or(new HashMap<String, Object>()));
+      }
     }
     return pppoe;
   }
