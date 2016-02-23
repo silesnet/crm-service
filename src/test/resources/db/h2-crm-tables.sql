@@ -211,6 +211,18 @@ CREATE TABLE pppoe
   ip            TEXT DEFAULT NULL
 );
 
+CREATE TABLE products (
+    id integer NOT NULL,
+    name character varying(100),
+    downlink integer,
+    uplink integer,
+    price integer,
+    channel character varying(100),
+    is_dedicated boolean,
+    priority integer,
+    country character(2) NOT NULL DEFAULT 'CZ'
+);
+
 CREATE SEQUENCE audit_item_id_seq
   INCREMENT 1
   MINVALUE 1
