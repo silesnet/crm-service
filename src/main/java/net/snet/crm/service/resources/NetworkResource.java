@@ -29,7 +29,6 @@ import static net.snet.crm.service.utils.Entities.valueMapOf;
 public class NetworkResource {
 
   private static final Logger logger = LoggerFactory.getLogger(NetworkResource.class);
-  private static final Set<String> SWITCH_MASTERS = Sets.newHashSet("o12", "pricni", "piast", "novodvorska", "ulesa");
 
   private NetworkDAO networkDAO;
   private final NetworkRepository networkRepository;
@@ -116,15 +115,6 @@ public class NetworkResource {
     final DeviceType deviceType = DeviceType.valueOf(deviceTypeParam.toUpperCase());
     List<Map<String, Object>> devices =
         networkRepository.findDevicesByCountryAndType(country, deviceType);
-    if (DeviceType.SWITCH.equals(deviceType)) {
-      Iterable<Map<String, Object>> switches = Iterables.filter(devices, new Predicate<Map<String, Object>>() {
-        @Override
-        public boolean apply(Map<String, Object> device) {
-          return SWITCH_MASTERS.contains("" + device.get("master"));
-        }
-      });
-      devices = Lists.newArrayList(switches);
-    }
     return Response.ok(ImmutableMap.of("devices", devices)).build();
   }
 
