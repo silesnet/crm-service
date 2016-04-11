@@ -251,7 +251,8 @@ public class DbiCrmRepository implements CrmRepository {
     return db.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
-        final Map<String, Object> service = handle.createQuery("SELECT * FROM services WHERE id=:id")
+        final Map<String, Object> service = handle.createQuery("SELECT s.*, c.status AS actual_status FROM services AS s " +
+            "LEFT JOIN service_connections AS c ON s.id=c.service_id  WHERE s.id=:id")
             .bind("id", serviceId)
             .first();
         if (service != null) {
