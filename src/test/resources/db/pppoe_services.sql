@@ -1,3 +1,18 @@
+CREATE OR REPLACE VIEW pppoe_services
+(
+  id,
+  username,
+  password,
+  mode,
+  master,
+  mac,
+  interface,
+  rate,
+  address,
+  status
+)
+AS 
+
 SELECT p.service_id,
        p.login,
        p.password,

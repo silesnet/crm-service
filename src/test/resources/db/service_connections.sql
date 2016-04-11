@@ -13,24 +13,12 @@ SELECT s.id AS service_id,
        s.download AS downlink,
        s.upload AS uplink,
        CASE
+           WHEN NOT c.is_active THEN 'SUSPENDED'
            WHEN s.status != 'INHERIT_FROM_CUSTOMER' THEN s.status
-           WHEN c.is_active
-                AND s.period_from < NOW()
-                AND (s.period_to IS NULL
-                     OR s.period_to > NOW())
-                AND (c.status = ANY (ARRAY[10,30,40,50])) THEN 'ACTIVE'
-           WHEN c.is_active
-                AND s.period_from < NOW()
-                AND (s.period_to IS NULL
-                     OR s.period_to > NOW())
-                AND c.status = 20
-                AND NOW() <= c.lastly_billed THEN 'ACTIVE'
-           WHEN c.is_active
-                AND s.period_from < NOW()
-                AND (s.period_to IS NULL
-                     OR s.period_to > NOW())
-                AND c.status = 20
-                AND c.lastly_billed < NOW() THEN 'SUSPENDED'
+           WHEN NOW() < s.period_from OR (s.period_to IS NOT NULL AND s.period_to < NOW()) THEN 'SUSPENDED'
+           WHEN c.status = ANY (ARRAY[10, 30, 40, 50]) THEN 'ACTIVE'
+           WHEN c.status = 20 AND NOW() <= c.lastly_billed THEN 'ACTIVE'
+           WHEN c.status = 20 THEN 'SUSPENDED'
            ELSE 'DEBTOR'
        END AS status
 FROM services AS s
