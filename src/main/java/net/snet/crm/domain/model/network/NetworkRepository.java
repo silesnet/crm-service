@@ -19,6 +19,8 @@ public interface NetworkRepository {
 
   Map<String, Object> findServicePppoe(long serviceId);
 
+  Map<String, Object> findPppoeUserLastIp(String login);
+
   void bindDhcp(long serviceId, int switchId, int port);
 
   void disableDhcp(int switchId, int port);
