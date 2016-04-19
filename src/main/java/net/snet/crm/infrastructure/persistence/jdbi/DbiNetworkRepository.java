@@ -29,6 +29,7 @@ public class DbiNetworkRepository implements NetworkRepository {
   private static final String DHCP_TABLE = "dhcp";
   private static final String PPPOE_TABLE = "pppoe";
   private static final String NETWORK_TABLE = "network";
+  private static final String LOGIP_TABLE = "radlogip";
   private final DBI dbi;
 
   public DbiNetworkRepository(DBI dbi) {
@@ -128,6 +129,13 @@ public class DbiNetworkRepository implements NetworkRepository {
     }
     return pppoe;
   }
+
+  @Override
+  public Map<String, Object> findPppoeUserLastIp(String login) {
+    return getRecord("SELECT * FROM " + LOGIP_TABLE + " WHERE username=:login ORDER BY date DESC LIMIT 1;",
+        ImmutableMap.of("login", login), dbi).or(ImmutableMap.of());
+  }
+
 
   @Override
   public void bindDhcp(final long serviceId, final int switchId, final int port) {

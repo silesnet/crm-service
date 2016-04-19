@@ -211,6 +211,14 @@ CREATE TABLE pppoe
   ip            TEXT DEFAULT NULL
 );
 
+CREATE TABLE radlogip
+(
+   username  varchar(40),
+   address   varchar(40),
+   date      timestamp
+);
+
+
 CREATE TABLE products (
     id integer NOT NULL,
     name character varying(100),

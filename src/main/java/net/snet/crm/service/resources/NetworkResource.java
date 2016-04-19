@@ -1,18 +1,13 @@
 package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkRepository.Country;
 import net.snet.crm.domain.model.network.NetworkRepository.DeviceType;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.service.bo.Network;
 import net.snet.crm.service.dao.NetworkDAO;
-import net.snet.crm.service.utils.Entities;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +18,6 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.checkState;
 import static net.snet.crm.service.utils.Entities.*;
-import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 @Path("/networks")
 public class NetworkResource {
@@ -36,6 +30,14 @@ public class NetworkResource {
   public NetworkResource(DBI dbi) {
     this.networkDAO = dbi.onDemand(NetworkDAO.class);
     this.networkRepository = new DbiNetworkRepository(dbi);
+  }
+
+  @GET
+  @Path("pppoe/{login}/lastIp")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response pppoeUserLastIp(@PathParam("login") String login) {
+    Map<String, Object> lastIp = new LinkedHashMap<>(networkRepository.findPppoeUserLastIp(login));
+    return Response.ok(ImmutableMap.of("lastIp", lastIp)).build();
   }
 
   @PUT
