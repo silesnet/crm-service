@@ -42,7 +42,7 @@ public class NetworkResource {
 //    Map<String, Object> lastIp = new LinkedHashMap<>(networkRepository.findPppoeUserLastIp(login));
 //    logger.debug("PPPoE last IP '{}'", lastIp);
 //    return Response.ok(ImmutableMap.of("lastIp", lastIp)).build();
-    return Response.ok(ImmutableMap.of("lastIp", ImmutableMap.of())).build();
+    return Response.ok().build();
   }
 
   @PUT
