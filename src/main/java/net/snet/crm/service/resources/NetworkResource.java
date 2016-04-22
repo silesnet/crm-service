@@ -163,7 +163,7 @@ public class NetworkResource {
   }
 
   @GET
-  @Path("/ip")
+  @Path("/safari")
   @Produces({"application/json; charset=UTF-8"})
   @Timed(name = "get-requests")
   public Map<String, Object> ip() {
