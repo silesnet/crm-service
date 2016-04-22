@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,18 +33,6 @@ public class NetworkResource {
   public NetworkResource(DBI dbi) {
     this.networkDAO = dbi.onDemand(NetworkDAO.class);
     this.networkRepository = new DbiNetworkRepository(dbi);
-  }
-
-  @GET
-  @Path("/ip}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
-  public Response pppoeUserLastIp() {
-//    logger.debug("PPPoE login '{}'", login);
-//    Map<String, Object> lastIp = new LinkedHashMap<>(networkRepository.findPppoeUserLastIp(login));
-//    logger.debug("PPPoE last IP '{}'", lastIp);
-//    return Response.ok(ImmutableMap.of("lastIp", lastIp)).build();
-    return Response.ok().build();
   }
 
   @PUT
@@ -165,6 +152,21 @@ public class NetworkResource {
   @Produces({"application/json; charset=UTF-8"})
   @Timed(name = "get-requests")
   public Map<String, Object> getAllSsids() {
+
+    final HashMap<String, Object> networksMap = new HashMap<>();
+
+    Iterator<Network> networks = networkDAO.allSsids();
+
+    networksMap.put("ssids", networks);
+
+    return networksMap;
+  }
+
+  @GET
+  @Path("/ip")
+  @Produces({"application/json; charset=UTF-8"})
+  @Timed(name = "get-requests")
+  public Map<String, Object> ip() {
 
     final HashMap<String, Object> networksMap = new HashMap<>();
 
