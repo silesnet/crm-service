@@ -35,8 +35,8 @@ public class NetworkResource {
 
   @GET
   @Path("/pppoe/{login}")
-  @Produces({"application/json; charset=UTF-8"})
-  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+//  @Consumes(MediaType.APPLICATION_JSON)
   public Response pppoeUserLastIp(@PathParam("login") String login) {
     logger.debug("PPPoE login '{}'", login);
     Map<String, Object> lastIp = new LinkedHashMap<>(networkRepository.findPppoeUserLastIp(login));
@@ -147,7 +147,7 @@ public class NetworkResource {
   @Timed(name = "get-requests")
   public Map<String, Object> getAllNetworks() {
 
-    final HashMap<String, Object> coreRoutersMap = new HashMap<String, Object>();
+    final HashMap<String, Object> coreRoutersMap = new HashMap<>();
 
     Iterator<Network> routers = networkDAO.allMasters();
 
@@ -162,7 +162,7 @@ public class NetworkResource {
   @Timed(name = "get-requests")
   public Map<String, Object> getAllSsids() {
 
-    final HashMap<String, Object> networksMap = new HashMap<String, Object>();
+    final HashMap<String, Object> networksMap = new HashMap<>();
 
     Iterator<Network> networks = networkDAO.allSsids();
 
