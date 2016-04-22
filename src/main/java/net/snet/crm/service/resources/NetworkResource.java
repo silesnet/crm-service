@@ -33,7 +33,7 @@ public class NetworkResource {
   }
 
   @GET
-  @Path("pppoe/lastIp/{login}")
+  @Path("/pppoe/lastIp/{login}")
   @Produces({"application/json; charset=UTF-8"})
   public Response pppoeUserLastIp(@PathParam("login") String login) {
     Map<String, Object> lastIp = new LinkedHashMap<>(networkRepository.findPppoeUserLastIp(login));
