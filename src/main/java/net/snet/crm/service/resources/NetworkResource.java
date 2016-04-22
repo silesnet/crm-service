@@ -37,8 +37,8 @@ public class NetworkResource {
   @Path("/pppoe/{username}")
   @Produces(MediaType.APPLICATION_JSON)
 //  @Consumes(MediaType.APPLICATION_JSON)
-  public Response pppoeUserLastIp(@PathParam("username") String login) {
-    logger.debug("PPPoE login '{}'", login);
+  public Response pppoeUserLastIp() {
+//    logger.debug("PPPoE login '{}'", login);
 //    Map<String, Object> lastIp = new LinkedHashMap<>(networkRepository.findPppoeUserLastIp(login));
 //    logger.debug("PPPoE last IP '{}'", lastIp);
 //    return Response.ok(ImmutableMap.of("lastIp", lastIp)).build();
