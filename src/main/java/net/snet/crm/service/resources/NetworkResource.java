@@ -34,7 +34,7 @@ public class NetworkResource {
   }
 
   @GET
-  @Path("/pppoe/{username}")
+  @Path("/ip}")
   @Produces(MediaType.APPLICATION_JSON)
 //  @Consumes(MediaType.APPLICATION_JSON)
   public Response pppoeUserLastIp() {
