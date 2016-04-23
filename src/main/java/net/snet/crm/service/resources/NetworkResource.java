@@ -35,6 +35,14 @@ public class NetworkResource {
     this.networkRepository = new DbiNetworkRepository(dbi);
   }
 
+  @GET
+  @Path("pppoe/{login}/last-ip")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response pppoeLastIpOf(@PathParam("login") String login) {
+    return Response.ok(ImmutableMap.of("lastIp",
+        networkRepository.findPppoeUserLastIp(login))).build();
+  }
+
   @PUT
   @Path("pppoe/{serviceId}")
   @Produces({"application/json; charset=UTF-8"})
@@ -161,20 +169,4 @@ public class NetworkResource {
 
     return networksMap;
   }
-
-  @GET
-  @Path("/ssids2")
-  @Produces({"application/json; charset=UTF-8"})
-  @Timed(name = "get-requests")
-  public Map<String, Object> ssids2() {
-
-    final HashMap<String, Object> networksMap = new HashMap<>();
-
-    Iterator<Network> networks = networkDAO.allSsids();
-
-    networksMap.put("ssids", networks);
-
-    return networksMap;
-  }
-
 }
