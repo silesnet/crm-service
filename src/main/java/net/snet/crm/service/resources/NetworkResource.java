@@ -163,10 +163,10 @@ public class NetworkResource {
   }
 
   @GET
-  @Path("/safari")
+  @Path("/ssids2")
   @Produces({"application/json; charset=UTF-8"})
   @Timed(name = "get-requests")
-  public Map<String, Object> ip() {
+  public Map<String, Object> ssids2() {
 
     final HashMap<String, Object> networksMap = new HashMap<>();
 
