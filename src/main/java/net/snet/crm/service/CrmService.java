@@ -30,6 +30,8 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.skife.jdbi.v2.DBI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
@@ -43,6 +45,7 @@ import java.security.cert.X509Certificate;
 import java.util.EnumSet;
 
 public class CrmService extends Application<CrmConfiguration> {
+  private static final Logger LOG = LoggerFactory.getLogger(CrmService.class);
 
   public static void main(String[] args) throws Exception {
     new CrmService().run(args);
@@ -68,6 +71,7 @@ public class CrmService extends Application<CrmConfiguration> {
 
   @Override
   public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, URISyntaxException {
+    LOG.info("Starting CRM service...");
     final DBIFactory dbiFactory = new DBIFactory();
     final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
     final ObjectMapper mapper = environment.getObjectMapper();
