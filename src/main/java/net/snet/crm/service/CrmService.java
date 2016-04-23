@@ -15,7 +15,7 @@ import io.dropwizard.migrations.MigrationsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
-import net.snet.crm.infrastructure.network.SnmpNetworkService;
+import net.snet.crm.infrastructure.network.DefaultNetworkService;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.service.dao.DbiCrmRepository;
@@ -112,7 +112,7 @@ public class CrmService extends Application<CrmConfiguration> {
         crmRepository,
         agreementRepository,
         networkRepository,
-        new SnmpNetworkService()));
+        new DefaultNetworkService()));
     jersey.register(new RuntimeExceptionMapper());
   }
 

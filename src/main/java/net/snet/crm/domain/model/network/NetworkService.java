@@ -6,4 +6,6 @@ public interface NetworkService {
   void disableSwitchPort(String switchName, int port);
 
   boolean isSwitchPortEnabled(String switchName, int port);
+
+  void kickPppoeUser(String master, String login);
 }
