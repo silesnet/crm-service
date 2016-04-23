@@ -133,7 +133,7 @@ public class DbiNetworkRepository implements NetworkRepository {
   @Override
   public Map<String, Object> findPppoeUserLastIp(String login) {
     return getRecord("SELECT * FROM " + LOGIP_TABLE + " WHERE username=:login ORDER BY date DESC LIMIT 1;",
-        ImmutableMap.of("login", login), dbi
+        ImmutableMap.of("login", (Object) login), dbi
     ).or(new HashMap<String, Object>());
   }
 
