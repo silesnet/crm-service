@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkRepository.Country;
 import net.snet.crm.domain.model.network.NetworkRepository.DeviceType;
+import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.service.bo.Network;
 import net.snet.crm.service.dao.NetworkDAO;
@@ -29,10 +30,21 @@ public class NetworkResource {
 
   private NetworkDAO networkDAO;
   private final NetworkRepository networkRepository;
+  private final NetworkService networkService;
 
-  public NetworkResource(DBI dbi) {
+  public NetworkResource(DBI dbi, NetworkService networkService) {
     this.networkDAO = dbi.onDemand(NetworkDAO.class);
     this.networkRepository = new DbiNetworkRepository(dbi);
+    this.networkService = networkService;
+  }
+
+  @PUT
+  @Path("pppoe/{login}/kick/{master}")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response kickPppoeUser(
+      @PathParam("login") String login, @PathParam("master") String master) {
+    networkService.kickPppoeUser(master, login);
+    return Response.ok().build();
   }
 
   @GET
