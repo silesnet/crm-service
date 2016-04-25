@@ -1,0 +1,1 @@
+@echo kick from '%1' user '%2'

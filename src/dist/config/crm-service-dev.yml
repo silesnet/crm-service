@@ -8,6 +8,8 @@ database:
   password: sisa
   url: jdbc:postgresql://localhost/crm-service
 
+pppoeKickUserCommand: src/main/resources/kick-pppoe-user.cmd
+
 logging:
   level: WARN
   loggers:

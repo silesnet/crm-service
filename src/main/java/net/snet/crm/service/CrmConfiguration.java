@@ -7,6 +7,7 @@ import io.dropwizard.db.DataSourceFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -30,6 +31,11 @@ public class CrmConfiguration extends Configuration {
 	@JsonProperty
 	private String userServiceUri;
 
+	@Valid
+	@NotNull
+	@JsonProperty
+	private String pppoeKickUserCommand;
+
 	public Boolean getJsonPrettyPrint() {
 		return jsonPrettyPrint;
 	}
@@ -45,4 +51,8 @@ public class CrmConfiguration extends Configuration {
 	public URI getUserServiceUri() throws URISyntaxException {
 		return new URI(userServiceUri);
 	}
+
+  public String getPppoeKickUserCommand() {
+    return pppoeKickUserCommand;
+  }
 }
