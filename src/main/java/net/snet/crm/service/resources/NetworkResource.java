@@ -44,7 +44,7 @@ public class NetworkResource {
   public Response kickPppoeUser(
       @PathParam("login") String login, @PathParam("master") String master) {
     networkService.kickPppoeUser(master, login);
-    return Response.ok().build();
+    return Response.ok(ImmutableMap.of()).build();
   }
 
   @GET
