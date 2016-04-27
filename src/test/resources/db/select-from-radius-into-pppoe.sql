@@ -7,14 +7,19 @@ INSERT INTO pppoe
   master,
   mac,
   interface,
-  ip
+  ip,
+  ip_class
 )
 SELECT id AS service_id,
        username AS login,
-       password,
+       CASE
+         WHEN password IS NULL THEN ''
+         ELSE password
+       END AS password,
        CASE
          WHEN mode = 0 THEN 'LAN'
          WHEN mode = 1 THEN 'WIRELESS'
+         WHEN mode = 50 THEN '50'
          ELSE ''
        END AS mode,
        CASE
@@ -22,7 +27,7 @@ SELECT id AS service_id,
          ELSE master
        END AS master,
        CASE
-         WHEN mac = '' THEN NULL
+         WHEN mac !~ '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$' THEN NULL
          ELSE mac::macaddr
        END AS mac,
        CASE
@@ -31,12 +36,17 @@ SELECT id AS service_id,
        END AS interface,
        CASE
          WHEN address = 'public-pl' THEN NULL
+         WHEN address = 'internal-cz' THEN NULL
          WHEN address = '' THEN NULL
          ELSE address::inet
-       END AS ip
+       END AS ip,
+       CASE
+         WHEN address = 'public-pl' THEN 'public-pl'
+         WHEN address = 'internal-cz' THEN 'internal-cz'
+         WHEN address = '' THEN ''
+         ELSE 'static'
+       END AS ip_class
 FROM radius
-WHERE status != 50
-AND   id NOT IN (20555501,20018401,20148502,20067701,20190501,20098401,20045401,20145001,20200601,20174501,10249701)
 ;
 
 UPDATE pppoe
@@ -45,4 +55,3 @@ FROM (SELECT id, location FROM radius_extrainfo) AS r
 WHERE pppoe.service_id = r.id
 AND   r.location IS NOT NULL
 ;
-
