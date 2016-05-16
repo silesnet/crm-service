@@ -180,6 +180,7 @@ class DbiDraftRepositoryTest extends Specification {
   }
 
   def cleanup() {
+    handle.execute('DROP VIEW service_connections')
     handle.execute('DROP TABLE customers')
     handle.execute('DROP TABLE agreements')
     handle.execute('DROP TABLE services_info')
