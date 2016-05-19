@@ -31,4 +31,3 @@ FROM drafts2 AS d
 WHERE d.entity_type = 'services'
 AND   d.status != 'IMPORTED'
 ORDER BY d.id
-

@@ -300,17 +300,13 @@ public class DbiCrmRepository implements CrmRepository {
   public List<Map<String, Object>> findService(
       final String rawQuery,
       final String country,
-      final boolean isActive
+      final Boolean isActive
   ) {
     final String query = Utils.replaceChars(rawQuery, TRANSLATE_FROM_CHARS, TRANSLATE_TO_CHARS);
     if (query.isEmpty()) return Lists.newArrayList();
     final Long countryId = COUNTRIES.get(country.toUpperCase());
-    final String countryRestriction;
-    if (countryId != null) {
-      countryRestriction = "c.country = " + countryId;
-    } else {
-      countryRestriction = "1 = 1";
-    }
+    final String countryRestriction = countryId != null ? "c.country = " + countryId : "1 = 1";
+    final String isActiveRestriction = isActive != null ? "c.is_active = " + isActive : "1 = 1";
     return db.withHandle(new HandleCallback<List<Map<String, Object>>>() {
       @Override
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
@@ -334,7 +330,7 @@ public class DbiCrmRepository implements CrmRepository {
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
                 "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
                 "WHERE " + countryRestriction + "\n" +
-                "AND   c.is_active = :isActive\n" +
+                "AND   " + isActiveRestriction + "\n" +
                 "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
                 "  OR s.id\\:\\:text ~ :query\n" +
                 "  OR lower(translate(p.interface, '-', '')) ~* :query\n" +
@@ -343,7 +339,6 @@ public class DbiCrmRepository implements CrmRepository {
                 "  OR (a.id % 100000)\\:\\:text ~ :query)\n" +
                 "ORDER BY c.name, s.id \n" +
                 "LIMIT 25")
-            .bind("isActive", isActive)
             .bind("query", query)
             .bind("fromChars", TRANSLATE_FROM_CHARS)
             .bind("toChars", TRANSLATE_TO_CHARS)

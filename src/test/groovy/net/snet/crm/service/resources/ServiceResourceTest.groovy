@@ -40,7 +40,7 @@ class ServiceResourceTest extends Specification {
             .get(ClientResponse.class)
       def services = response.getEntity(Map.class).services
     then:
-      1 * crmRepository.findService(query, country, true) >> [[id: 1, name: 'LAN1'], [id: 2, name: 'LAN2']]
+      1 * crmRepository.findService(query, country, null) >> [[id: 1, name: 'LAN1'], [id: 2, name: 'LAN2']]
     and:
       response.status == 200
       response.type.toString().startsWith('application/json')
