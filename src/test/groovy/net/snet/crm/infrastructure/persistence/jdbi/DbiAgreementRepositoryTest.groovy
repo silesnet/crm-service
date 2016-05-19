@@ -42,16 +42,7 @@ class DbiAgreementRepositoryTest extends Specification {
   }
 
   def cleanup() {
-    handle.execute('DROP VIEW service_connections')
-    handle.execute('DROP TABLE customers')
-    handle.execute('DROP TABLE agreements')
-    handle.execute('DROP TABLE services_info')
-    handle.execute('DROP TABLE services')
-    handle.execute('DROP TABLE connections')
-    handle.execute('DROP TABLE users')
-    handle.execute('DROP TABLE drafts')
-    handle.execute('DROP TABLE drafts2')
-    handle.execute('DROP TABLE draft_links')
+    handle.execute(Resources.getResource('db/h2-drop-crm-tables.sql').text)
     handle.close()
     repo = null
   }

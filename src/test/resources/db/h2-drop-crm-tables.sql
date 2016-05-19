@@ -1,3 +1,4 @@
+DROP VIEW service_drafts;
 DROP VIEW service_connections;
 DROP TABLE customers;
 DROP TABLE agreements;
@@ -8,4 +9,3 @@ DROP TABLE users;
 DROP TABLE drafts;
 DROP TABLE drafts2;
 DROP TABLE draft_links;
-DROP TABLE entities;
