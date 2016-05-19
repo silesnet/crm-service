@@ -33,7 +33,7 @@ public interface CrmRepository {
 
     Map<String, Object> findServiceById(long serviceId);
 
-    List<Map<String, Object>> findService(String query, String country, boolean isActive);
+    List<Map<String, Object>> findService(String query, String country, Boolean isActive);
 
     void deleteService(long serviceId);
 
