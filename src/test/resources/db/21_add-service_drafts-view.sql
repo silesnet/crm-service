@@ -1,19 +1,19 @@
 CREATE OR REPLACE VIEW service_drafts
 (
-    agreement_id
-    agreement
-    customer_id
-    customer_name
-    street
-    city
-    customer_info
-    service_id
-    service_name
-    service_download
-    service_upload
+    agreement_id,
+    agreement,
+    customer_id,
+    customer_name,
+    street,
+    city,
+    customer_info,
+    service_id,
+    service_name,
+    service_download,
+    service_upload,
     service_price
-    service_info
 )
+
 AS
 
 SELECT CASE WHEN a.id IS NOT NULL THEN a.id ELSE da.entity_id END AS agreement_id,
@@ -27,8 +27,7 @@ SELECT CASE WHEN a.id IS NOT NULL THEN a.id ELSE da.entity_id END AS agreement_i
        SUBSTRING(d.data FROM '"product_name" ?: ?"([^"]*)",?') AS service_name,
        SUBSTRING(d.data FROM '"downlink" ?: ?"([0-9]+)",?')::INT AS service_download,
        SUBSTRING(d.data FROM '"uplink" ?: ?"([0-9]+)",?')::INT AS service_upload,
-       SUBSTRING(d.data FROM '"price" ?: ?"([0-9]+)",?')::INT AS service_price,
-       '' AS service_info
+       SUBSTRING(d.data FROM '"price" ?: ?"([0-9]+)",?')::INT AS service_price
 FROM drafts2 AS d
   LEFT JOIN draft_links AS la
          ON la.draft_id = d.id
