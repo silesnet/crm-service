@@ -251,18 +251,37 @@ public class DbiCrmRepository implements CrmRepository {
     return db.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
-        final Map<String, Object> service = handle.createQuery("SELECT s.*, c.status AS actual_status FROM services AS s " +
-            "LEFT JOIN service_connections AS c ON s.id=c.service_id  WHERE s.id=:id")
+        Map<String, Object> service = handle.createQuery("SELECT s.*, c.status AS actual_status, false AS is_draft\n" +
+            "FROM services AS s LEFT JOIN service_connections AS c ON s.id=c.service_id  WHERE s.id=:id")
             .bind("id", serviceId)
             .first();
+        if (service == null) {
+          service = handle.createQuery("SELECT\n" +
+              "  s.service_id AS id\n" +
+              "  , s.customer_id\n" +
+              "  , s.service_name AS name\n" +
+              "  , s.service_price AS price\n" +
+              "  , s.service_download AS download\n" +
+              "  , s.service_upload AS upload\n" +
+              "  , '' AS info\n" +
+              "  , 'ACTIVE' AS status\n" +
+              "  , c.status AS actual_status\n" +
+              "  , true is_draft\n" +
+              "FROM service_drafts AS s\n" +
+              "LEFT JOIN service_connections AS c ON s.service_id=c.service_id  WHERE s.service_id=:id")
+              .bind("id", serviceId)
+              .first();
+        }
         if (service != null) {
           final Map<String, Object> draft = handle.createQuery("SELECT data FROM " + DRAFT_TABLE + " WHERE entity_type='services' " +
               "AND entity_id=:id")
               .bind("id", serviceId)
               .first();
           if (!(draft == null || draft.isEmpty())) {
+            System.out.println("DARFT!!!");
             final Object data = draft.get("data");
             if (data != null) {
+              System.out.println("DARFT!!!");
               final Map dataMap = new ObjectMapper().readValue(data.toString(), Map.class);
               String country = "";
               final Object countryId = dataMap.get("location_country");
@@ -273,6 +292,7 @@ public class DbiCrmRepository implements CrmRepository {
                   }
                 }
               }
+              System.out.println("DARFT!!!" + dataMap);
               final Map<String, Object> address = new HashMap<>();
               address.put("street", dataMap.get("location_street"));
               address.put("descriptive_number", dataMap.get("location_descriptive_number"));
@@ -325,6 +345,7 @@ public class DbiCrmRepository implements CrmRepository {
                 "       , s.upload\n" +
                 "       , s.price\n" +
                 "       , s.info AS service_info\n" +
+                "       , false AS is_draft\n" +
                 "FROM services AS s\n" +
                 "  INNER JOIN customers AS c ON s.customer_id = c.id\n" +
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
@@ -337,7 +358,32 @@ public class DbiCrmRepository implements CrmRepository {
                 "  OR lower(translate(p.location, '-', '')) ~* :query\n" +
                 "  OR lower(translate(p.mac\\:\\:text, '\\:', '')) ~* :query\n" +
                 "  OR (a.id % 100000)\\:\\:text ~ :query)\n" +
-                "ORDER BY c.name, s.id \n" +
+                "\n" +
+                "UNION\n" +
+                "\n" +
+                "SELECT\n" +
+                "     d.agreement_id\n" +
+                "     , d.agreement\n" +
+                "     , d.customer_id\n" +
+                "     , d.customer_name\n" +
+                "     , d.street\n" +
+                "     , d.city\n" +
+                "     , d.customer_info\n" +
+                "     , d.service_id\n" +
+                "     , d.service_name\n" +
+                "     , d.service_download\n" +
+                "     , d.service_upload\n" +
+                "     , d.service_price\n" +
+                "     , '' AS service_info\n" +
+                "     , true AS is_draft\n" +
+                "FROM service_drafts AS d\n" +
+                "WHERE (lower(translate(d.customer_name, :fromChars, :toChars)) ~* :query\n" +
+                "  OR d.service_id\\:\\:text ~ :query\n" +
+                "  OR lower(translate(d.street, '-', '')) ~* :query\n" +
+                "  OR lower(translate(d.city, '-', '')) ~* :query\n" +
+                "  OR (d.agreement)\\:\\:text ~ :query)\n" +
+                "\n" +
+                "ORDER BY customer_name, service_id \n" +
                 "LIMIT 25")
             .bind("query", query)
             .bind("fromChars", TRANSLATE_FROM_CHARS)
