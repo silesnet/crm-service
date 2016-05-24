@@ -208,7 +208,9 @@ CREATE TABLE pppoe
   mode          TEXT NOT NULL DEFAULT '',
   master        TEXT NOT NULL DEFAULT '',
   interface     TEXT NOT NULL DEFAULT '',
-  ip            TEXT DEFAULT NULL
+  ip            TEXT DEFAULT NULL,
+  ip_class      TEXT NOT NULL DEFAULT 'static',
+  area          TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE radlogip
@@ -313,8 +315,6 @@ WHERE d.entity_type = 'services'
 AND   d.status != 'IMPORTED'
 ORDER BY d.id
 ;
-
-
 
 CREATE TABLE products (
     id integer NOT NULL,

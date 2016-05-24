@@ -8,7 +8,8 @@ INSERT INTO pppoe
   mac,
   interface,
   ip,
-  ip_class
+  ip_class,
+  area
 )
 SELECT id AS service_id,
        username AS login,
@@ -45,7 +46,8 @@ SELECT id AS service_id,
          WHEN address = 'internal-cz' THEN 'internal-cz'
          WHEN address = '' THEN ''
          ELSE 'static'
-       END AS ip_class
+       END AS ip_class,
+       area
 FROM radius
 ;
 
