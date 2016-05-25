@@ -278,10 +278,8 @@ public class DbiCrmRepository implements CrmRepository {
               .bind("id", serviceId)
               .first();
           if (!(draft == null || draft.isEmpty())) {
-            System.out.println("DARFT!!!");
             final Object data = draft.get("data");
             if (data != null) {
-              System.out.println("DARFT!!!");
               final Map dataMap = new ObjectMapper().readValue(data.toString(), Map.class);
               String country = "";
               final Object countryId = dataMap.get("location_country");
@@ -292,7 +290,6 @@ public class DbiCrmRepository implements CrmRepository {
                   }
                 }
               }
-              System.out.println("DARFT!!!" + dataMap);
               final Map<String, Object> address = new HashMap<>();
               address.put("street", dataMap.get("location_street"));
               address.put("descriptive_number", dataMap.get("location_descriptive_number"));
