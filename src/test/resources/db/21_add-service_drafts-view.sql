@@ -1,7 +1,9 @@
 CREATE OR REPLACE VIEW service_drafts
 (
+    has_existing_agreement,
     agreement_id,
     agreement,
+    has_existing_customer,
     customer_id,
     customer_name,
     street,
@@ -16,8 +18,10 @@ CREATE OR REPLACE VIEW service_drafts
 
 AS
 
-SELECT CASE WHEN a.id IS NOT NULL THEN a.id ELSE da.entity_id END AS agreement_id,
+SELECT a.id IS NOT NULL AS has_existing_agreement,
+       CASE WHEN a.id IS NOT NULL THEN a.id ELSE da.entity_id END AS agreement_id,
        CASE WHEN a.id IS NOT NULL THEN a.id % 100000 ELSE da.entity_id % 100000 END AS agreement,
+       c.id IS NOT NULL AS has_existing_customer,
        CASE WHEN c.id IS NOT NULL THEN c.id ELSE dc.entity_id END AS customer_id,
        CASE WHEN c.id IS NOT NULL THEN c.name ELSE dc.entity_name END AS customer_name,
        SUBSTRING(d.data FROM '"location_street" ?: ?"([^"]*)",?') AS street,
