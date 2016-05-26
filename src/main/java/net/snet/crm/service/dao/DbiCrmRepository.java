@@ -251,7 +251,7 @@ public class DbiCrmRepository implements CrmRepository {
     return db.withHandle(new HandleCallback<Map<String, Object>>() {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
-        Map<String, Object> service = handle.createQuery("SELECT s.*, c.status AS actual_status, false AS is_draft\n" +
+        Map<String, Object> service = handle.createQuery("SELECT s.*, c.status AS actual_status, false AS is_draft, true AS has_customer\n" +
             "FROM services AS s LEFT JOIN service_connections AS c ON s.id=c.service_id  WHERE s.id=:id")
             .bind("id", serviceId)
             .first();
@@ -267,6 +267,7 @@ public class DbiCrmRepository implements CrmRepository {
               "  , 'ACTIVE' AS status\n" +
               "  , c.status AS actual_status\n" +
               "  , true is_draft\n" +
+              "  , s.has_existing_customer AS has_customer\n" +
               "FROM service_drafts AS s\n" +
               "LEFT JOIN service_connections AS c ON s.service_id=c.service_id  WHERE s.service_id=:id")
               .bind("id", serviceId)
