@@ -290,10 +290,10 @@ public class DbiDraftRepository implements DraftRepository {
 
   private void insertLinks(long draftId, Map<String, Object> links, Handle handle) {
     for (Map.Entry<?, ?> link : links.entrySet()) {
-      final Map<String, Object> linkRecord = ImmutableMap.of(
-          "draft_id", draftId,
-          "entity", link.getKey(),
-          "entity_id", link.getValue());
+      final Map<String, Object> linkRecord = ImmutableMap.<String, Object>builder()
+          .put("draft_id", draftId)
+          .put("entity", link.getKey())
+          .put("entity_id", link.getValue()).build();
       insertRecordWithoutKey(DRAFTS_LINKS_TABLE, linkRecord, handle);
     }
   }
