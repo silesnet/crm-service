@@ -8,6 +8,7 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.net.InetAddresses;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.domain.model.network.NetworkRepository;
@@ -151,7 +152,7 @@ public class DraftResource2 {
       throw new WebApplicationException(new IllegalStateException("trying to updated IMPORTED " +
           "draft '" + draftId + "'"));
     }
-    draftRepository.update(draftId, draftData.get());
+    draftRepository.update(draftId, draftData.get()); // should be in transaction with handleConnectionChanges()
     logger.debug("draft '{}' updated", draftId);
     final Map<String, Object> draft = draftRepository.get(draftId);
     handleConnectionChanges(originalDraft, draft);
@@ -201,7 +202,7 @@ public class DraftResource2 {
       pppoe.put("login", data.get("auth_a").toString());
       pppoe.put("password", data.get("auth_b").toString());
       pppoe.put("mac", ImmutableMap.<String, Object>of("type", "macaddr", "value", data.get("mac_address").toString()));
-      pppoe.put("ip", ImmutableMap.<String, Object>of("type", "inet", "value", data.get("ip").toString()));
+      populateIpAddressTo(pppoe, data.get("ip"), draft.entityId());
       pppoe.put("mode", productChannel);
       final int interfaceId = data.get("core_router").asIntegerOr(-1);
       if (interfaceId > 0) {
@@ -214,6 +215,28 @@ public class DraftResource2 {
       }
     }
     return pppoe;
+  }
+
+  private void populateIpAddressTo(Map<String, Object> map, Object ipValue, long serviceId) {
+    if (ipValue == null || ipValue.toString().isEmpty()) {
+      map.put("ip", null);
+      map.put("ip_class", ipClass(serviceId));
+    } else {
+      final String ip = ipValue.toString();
+      try {
+        InetAddresses.forString(ip); // throws if not valid IP
+        map.put("ip", ImmutableMap.<String, Object>of("type", "inet", "value", ip));
+        map.put("ip_class", "static");
+      } catch (IllegalArgumentException e) {
+        map.put("ip", null);
+        map.put("ip_class", ip);
+      }
+    }
+  }
+
+  private String ipClass(long serviceId) {
+    return Long.valueOf(serviceId).toString().startsWith("1") ?
+        "internal-cz" : "public-pl";
   }
 
   @DELETE
