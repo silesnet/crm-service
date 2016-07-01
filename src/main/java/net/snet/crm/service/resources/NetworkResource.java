@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -181,4 +182,14 @@ public class NetworkResource {
 
     return networksMap;
   }
+
+  @GET
+  @Path("/ip/{ipAddress}")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response isIpReachable(@PathParam("ipAddress") String ipAddress) {
+    final ImmutableMap<String, ? extends Serializable> data =
+        ImmutableMap.of("ip", ipAddress, "isReachable", networkService.isIpReachable(ipAddress));
+    return Response.ok(data).build();
+  }
+
 }

@@ -8,4 +8,6 @@ public interface NetworkService {
   boolean isSwitchPortEnabled(String switchName, int port);
 
   void kickPppoeUser(String master, String login);
+
+  boolean isIpReachable(String ip);
 }
