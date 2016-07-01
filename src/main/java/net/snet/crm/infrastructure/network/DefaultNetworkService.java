@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.InetAddress;
 
 public class DefaultNetworkService implements NetworkService {
 
@@ -67,5 +68,16 @@ public class DefaultNetworkService implements NetworkService {
       }
     };
     final Thread thread = new Thread(task);
-    thread.start();  }
+    thread.start();
+  }
+
+  @Override
+  public boolean isIpReachable(String ip) {
+    try {
+      return InetAddress.getByName(ip).isReachable(1000);
+    } catch (IOException e) {
+      return false;
+    }
+  }
+
 }
