@@ -1,0 +1,2 @@
+ALTER TABLE services
+  ADD COLUMN data TEXT NOT NULL DEFAULT '{}';

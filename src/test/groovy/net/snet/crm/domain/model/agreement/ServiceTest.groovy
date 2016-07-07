@@ -21,6 +21,7 @@ class ServiceTest extends Specification {
         chargingAmount == 436
         connectionDownload == 10
         connectionUpload == 5
+        data =~ /"devices"/
       }
   }
 
@@ -42,6 +43,7 @@ class ServiceTest extends Specification {
         info == ''
         additionalname == ''
         bps == 'M'
+        data =~ /"devices"/
       }
   }
 
@@ -88,8 +90,11 @@ class ServiceTest extends Specification {
             "ip" : "",
             "is_ip_public" : false,
             "devices" : [ {
-              "name" : "",
+              "name" : "antena",
               "owner" : "silesnet"
+            }, {
+              "name" : "router",
+              "owner" : "customer"
             } ]
           },
           "links" : {
