@@ -1,14 +1,19 @@
 package net.snet.crm.domain.model.agreement;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.domain.shared.Entity;
+import net.snet.crm.service.utils.Entities;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
@@ -25,16 +30,19 @@ public class Service implements Entity<Service, ServiceId> {
           .put("chargingAmount", "price")
           .put("connectionDownload", "download")
           .put("connectionUpload", "upload")
+          .put("data", "data")
           .build();
 
   private static final Map<String, Object> RECORD_DEFAULTS =
       ImmutableMap.<String, Object>builder()
-        .put("additionalname", "")
-        .put("frequency", 40)
-        .put("bps", "M")
-        .put("is_aggregated", false)
-        .put("info", "")
-        .build();
+          .put("additionalname", "")
+          .put("frequency", 40)
+          .put("bps", "M")
+          .put("is_aggregated", false)
+          .put("info", "")
+          .build();
+
+  private static final ObjectMapper mapper = new ObjectMapper();
 
   public static final DateTimeFormatter DRAFT_DATE_FORMATTER = DateTimeFormat.forPattern("dd.MM.YYYY");
 
@@ -90,7 +98,31 @@ public class Service implements Entity<Service, ServiceId> {
     props.put("chargingAmount", data.get("price").asIntegerOr(0));
     props.put("connectionDownload", data.get("downlink").asIntegerOr(null));
     props.put("connectionUpload", data.get("uplink").asIntegerOr(null));
+    props.put("data", mapToJson(ImmutableMap.<String, Object>builder()
+        .put("devices", devices(data))
+        .build()));
     return Collections.unmodifiableMap(props);
+  }
+
+  private List<Map<String, Object>> devices(ValueMap data) {
+    final List<Map<String, Object>> result = new ArrayList<>();
+    final Object devices = data.getRawOr("devices", null);
+    if (devices instanceof Iterable) {
+      final Iterable iterable = (Iterable) devices;
+      for (Object device : iterable) {
+        if (device instanceof Map) {
+          final Map map = (Map) device;
+          final Object name = map.get("name");
+          if (name != null && name.toString().length() > 0) {
+            result.add(ImmutableMap.<String, Object>builder()
+                .put("name", name.toString())
+                .put("owner", "" + map.get("owner"))
+                .build());
+          }
+        }
+      }
+    }
+    return result;
   }
 
   private Map<String, Object> recordFromProps() {
@@ -106,5 +138,13 @@ public class Service implements Entity<Service, ServiceId> {
 
   public DateTime periodStart() {
     return (DateTime) props.get("periodStart");
+  }
+
+  private String mapToJson(Map<String, Object> map) {
+    try {
+      return mapper.writeValueAsString(map);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
