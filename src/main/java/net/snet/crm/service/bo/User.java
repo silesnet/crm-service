@@ -5,12 +5,14 @@ public class User {
   private String login;
   private String name;
   private String fullName;
+  private String country;
 
-  public User(long id, String name, String login, String fullName) {
+  public User(long id, String name, String login, String fullName, String country) {
     this.id = id;
     this.login = login;
     this.name = name;
     this.fullName = fullName;
+    this.country = country;
   }
 
   public long getId() {
@@ -43,5 +45,13 @@ public class User {
 
   public void setFullName(String fullName) {
     this.fullName = fullName;
+  }
+
+  public String getCountry() {
+    return country;
+  }
+
+  public void setCountry(String operationCountry) {
+    this.country = operationCountry;
   }
 }

@@ -15,6 +15,7 @@ public class UserMapper implements ResultSetMapper<User> {
         r.getLong("id"),
         r.getString("name"),
         r.getString("login"),
-        r.getString("full_name"));
+        r.getString("full_name"),
+        r.getString("operation_country"));
   }
 }
