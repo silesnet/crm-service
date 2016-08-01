@@ -16,6 +16,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.network.NetworkService;
+import net.snet.crm.infrastructure.messaging.SmtpMessagingService;
 import net.snet.crm.infrastructure.network.DefaultNetworkService;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
@@ -96,6 +97,7 @@ public class CrmService extends Application<CrmConfiguration> {
     final AgreementRepository agreementRepository = new DbiAgreementRepository(dbi, mapper);
     final DbiNetworkRepository networkRepository = new DbiNetworkRepository(dbi);
     final NetworkService networkService = new DefaultNetworkService(configuration.getPppoeKickUserCommand());
+    final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessagingConfiguration());
     final JerseyEnvironment jersey = environment.jersey();
     jersey.register(new CustomerResource(dbi, crmRepository));
     jersey.register(new AgreementResource(crmRepository));
@@ -115,6 +117,7 @@ public class CrmService extends Application<CrmConfiguration> {
         agreementRepository,
         networkRepository,
         networkService));
+    jersey.register(new MessagingResource(messagingService));
     jersey.register(new RuntimeExceptionMapper());
   }
 
