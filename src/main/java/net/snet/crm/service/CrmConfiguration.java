@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.db.DataSourceFactory;
+import net.snet.crm.infrastructure.messaging.SmsMessagingConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -36,6 +37,11 @@ public class CrmConfiguration extends Configuration {
 	@JsonProperty
 	private String pppoeKickUserCommand;
 
+	@Valid
+	@NotNull
+	@JsonProperty
+	private SmsMessagingConfiguration smsMessagingConfiguration = new SmsMessagingConfiguration();
+
 	public Boolean getJsonPrettyPrint() {
 		return jsonPrettyPrint;
 	}
@@ -55,4 +61,8 @@ public class CrmConfiguration extends Configuration {
   public String getPppoeKickUserCommand() {
     return pppoeKickUserCommand;
   }
+
+	public SmsMessagingConfiguration getSmsMessagingConfiguration() {
+		return smsMessagingConfiguration;
+	}
 }
