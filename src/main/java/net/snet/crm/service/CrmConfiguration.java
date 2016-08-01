@@ -8,7 +8,6 @@ import net.snet.crm.infrastructure.messaging.SmsMessagingConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -40,7 +39,7 @@ public class CrmConfiguration extends Configuration {
 	@Valid
 	@NotNull
 	@JsonProperty
-	private SmsMessagingConfiguration smsMessagingConfiguration = new SmsMessagingConfiguration();
+	private SmsMessagingConfiguration smsMessaging = new SmsMessagingConfiguration();
 
 	public Boolean getJsonPrettyPrint() {
 		return jsonPrettyPrint;
@@ -62,7 +61,7 @@ public class CrmConfiguration extends Configuration {
     return pppoeKickUserCommand;
   }
 
-	public SmsMessagingConfiguration getSmsMessagingConfiguration() {
-		return smsMessagingConfiguration;
+	public SmsMessagingConfiguration getSmsMessaging() {
+		return smsMessaging;
 	}
 }
