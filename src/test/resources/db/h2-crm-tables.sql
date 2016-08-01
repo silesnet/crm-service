@@ -71,7 +71,8 @@ CREATE TABLE services (
     additionalname character varying(50),
     bps character(1),
     old_id bigint,
-    status TEXT NOT NULL DEFAULT 'ACTIVE'
+    status TEXT NOT NULL DEFAULT 'ACTIVE',
+    data TEXT NOT NULL DEFAULT '{}'
 );
 
 CREATE TABLE services_info (
