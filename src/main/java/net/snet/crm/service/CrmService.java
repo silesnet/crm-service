@@ -97,7 +97,7 @@ public class CrmService extends Application<CrmConfiguration> {
     final AgreementRepository agreementRepository = new DbiAgreementRepository(dbi, mapper);
     final DbiNetworkRepository networkRepository = new DbiNetworkRepository(dbi);
     final NetworkService networkService = new DefaultNetworkService(configuration.getPppoeKickUserCommand());
-    final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessagingConfiguration());
+    final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessaging());
     final JerseyEnvironment jersey = environment.jersey();
     jersey.register(new CustomerResource(dbi, crmRepository));
     jersey.register(new AgreementResource(crmRepository));
