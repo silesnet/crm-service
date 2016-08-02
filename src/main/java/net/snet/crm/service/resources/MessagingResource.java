@@ -1,5 +1,6 @@
 package net.snet.crm.service.resources;
 
+import com.google.common.collect.ImmutableMap;
 import net.snet.crm.infrastructure.messaging.MessagingService;
 import net.snet.crm.infrastructure.messaging.SmsMessage;
 
@@ -27,6 +28,6 @@ public class MessagingResource {
   public Response sendSms(Map<String, String> request) {
     final SmsMessage sms = new SmsMessage(request.get("number"), request.get("text"));
     messagingService.send(sms);
-    return Response.created(URI.create("/messages")).build();
+    return Response.created(URI.create("/messages")).entity(ImmutableMap.of()).build();
   }
 }
