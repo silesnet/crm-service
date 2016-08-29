@@ -177,6 +177,7 @@ public class DraftResource2 {
       if (AUTH_PPPOE.equals(originalAuth) && !AUTH_PPPOE.equals(currentAuth)) {
         networkRepository.removePppoe(originalDraft.entityId());
         logger.info("removed PPPoE for {}", originalDraft.entityId());
+        kickPppoeOf(originalDraft);
       }
       if (AUTH_DHCP.equals(currentAuth)) {
         final int switchId = current.get("auth_a").asIntegerOr(-1);
@@ -186,10 +187,25 @@ public class DraftResource2 {
         if (AUTH_PPPOE.equals(originalAuth)) {
           networkRepository.updatePppoe(currentDraft.entityId(), mapDraftToPppoe(currentDraft));
           logger.info("updated PPPoE for {}", currentDraft.entityId());
+          kickPppoeOf(currentDraft);
         } else {
           networkRepository.addPppoe(currentDraft.entityId(), mapDraftToPppoe(currentDraft));
           logger.info("created PPPoE for {}", currentDraft.entityId());
         }
+      }
+    }
+  }
+
+  private void kickPppoeOf(final Draft draft) {
+    final ValueMap data = valueMapOf(draft.data());
+    final String productChannel = data.get("product_channel").toString().toUpperCase();
+    if (productChannel.length() > 0) {
+      final int interfaceId = data.get("core_router").asIntegerOr(-1);
+      if (interfaceId > 0) {
+        final ValueMap interfaceData = valueMapOf(networkRepository.findDevice(interfaceId));
+        final String login = data.get("auth_a").toString();
+        final String master = interfaceData.get("name").toString();
+        networkService.kickPppoeUser(master, login);
       }
     }
   }
