@@ -355,6 +355,7 @@ public class DbiCrmRepository implements CrmRepository {
                 "  OR lower(translate(p.interface, '-', '')) ~* :query\n" +
                 "  OR lower(translate(p.location, '-', '')) ~* :query\n" +
                 "  OR lower(translate(p.mac\\:\\:text, '\\:', '')) ~* :query\n" +
+                "  OR translate(phone, ' ', '') ~* :query\n" +
                 "  OR (a.id % 100000)\\:\\:text ~ :query)\n" +
                 "\n" +
                 "UNION\n" +
