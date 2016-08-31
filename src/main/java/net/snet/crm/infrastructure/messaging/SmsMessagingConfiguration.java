@@ -25,7 +25,7 @@ public class SmsMessagingConfiguration {
   @Valid
   @NotNull
   @JsonProperty
-  private String subjectTemplate = "{{number}}";
+  private String subjectTemplate = "{{port}}-{{number}}";
 
   public String hostAndPort() {
     return hostAndPort;
