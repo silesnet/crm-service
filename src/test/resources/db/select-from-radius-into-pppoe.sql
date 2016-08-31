@@ -61,3 +61,7 @@ UPDATE pppoe
 FROM (SELECT id, area FROM radius_extrainfo) AS r
 WHERE pppoe.service_id = r.id
 ;
+
+UPDATE pppoe
+   SET master = lower(master)
+;
