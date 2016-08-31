@@ -43,7 +43,9 @@ public class SmtpMessagingService implements MessagingService {
       final MimeMessage email = new MimeMessage(session);
       email.setFrom(new InternetAddress(fromAddress));
       email.setRecipient(Message.RecipientType.TO, new InternetAddress(toAddress));
-      final String subject = subjectTemplate.replaceAll("\\{\\{number\\}\\}", message.number());
+      final String subject = subjectTemplate
+          .replaceAll("\\{\\{port\\}\\}", portOf(message.number()))
+          .replaceAll("\\{\\{number\\}\\}", message.number());
       email.setSubject(subject);
       email.setText(message.text());
       Transport.send(email);
@@ -51,5 +53,9 @@ public class SmtpMessagingService implements MessagingService {
     } catch (MessagingException e) {
       throw new RuntimeException(e);
     }
+  }
+
+  private String portOf(String number) {
+    return (number != null && number.startsWith("48")) ? "7" : "5";
   }
 }
