@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX pppoe_service_id_index ON pppoe (service_id);
