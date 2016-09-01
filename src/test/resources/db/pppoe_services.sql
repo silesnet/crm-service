@@ -19,6 +19,7 @@ SELECT p.service_id,
        CASE
           WHEN p.mode='LAN' THEN 0
           WHEN p.mode='WIRELESS' THEN 1
+          WHEN p.mode='FIBER' THEN 1
           WHEN p.mode='50' THEN 50
        END AS mode,
        p.master,
