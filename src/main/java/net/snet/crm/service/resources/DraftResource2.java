@@ -220,7 +220,7 @@ public class DraftResource2 {
       pppoe.put("mac", ImmutableMap.<String, Object>of("type", "macaddr", "value", data.get("mac_address").toString()));
       populateIpAddressTo(pppoe, data.get("ip"), draft.entityId());
       pppoe.put("mode", productChannel);
-      final int interfaceId = data.get("core_router").asIntegerOr(-1);
+      final int interfaceId = data.get("ssid").asIntegerOr(-1);
       if (interfaceId > 0) {
         final ValueMap interfaceData = valueMapOf(networkRepository.findDevice(interfaceId));
         pppoe.put("interface", interfaceData.get("name").toString());
