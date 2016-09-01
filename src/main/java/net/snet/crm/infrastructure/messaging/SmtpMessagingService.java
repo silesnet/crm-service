@@ -56,6 +56,7 @@ public class SmtpMessagingService implements MessagingService {
   }
 
   private String portOf(String number) {
-    return (number != null && number.startsWith("48")) ? "7" : "5";
+    return (number != null &&
+        (number.startsWith("+48") || number.startsWith("48"))) ? "7" : "5";
   }
 }
