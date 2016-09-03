@@ -220,17 +220,21 @@ public class DraftResource2 {
       pppoe.put("mac", ImmutableMap.<String, Object>of("type", "macaddr", "value", data.get("mac_address").toString()));
       populateIpAddressTo(pppoe, data.get("ip"), draft.entityId());
       pppoe.put("mode", productChannel);
-      final int interfaceId = data.get("ssid").asIntegerOr(-1);
-      if (interfaceId > 0) {
-        final ValueMap interfaceData = valueMapOf(networkRepository.findDevice(interfaceId));
-        pppoe.put("interface", interfaceData.get("name").toString());
-        pppoe.put("master", interfaceData.get("master").toString());
-      } else {
+      if ("LAN".equals(productChannel) || "FIBER".equals(productChannel)) {
         pppoe.put("interface", "");
-        pppoe.put("master", "");
+        final ValueMap router = deviceOf(data.get("core_router"));
+        pppoe.put("master", router.get("name").toString());
+      } else {
+        final ValueMap ssid = deviceOf(data.get("ssid"));
+        pppoe.put("interface", ssid.get("name").toString());
+        pppoe.put("master", ssid.get("master").toString());
       }
     }
     return pppoe;
+  }
+
+  private ValueMap deviceOf(Value id) {
+    return valueMapOf(networkRepository.findDevice(id.asInteger()));
   }
 
   private void populateIpAddressTo(Map<String, Object> map, Object ipValue, long serviceId) {
