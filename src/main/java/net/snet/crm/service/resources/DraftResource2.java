@@ -274,6 +274,7 @@ public class DraftResource2 {
       if (AUTH_PPPOE.equals(authentication)) {
         networkRepository.removePppoe(original.entityId());
         logger.info("removed PPPoE for {}", original.entityId());
+        kickPppoeOf(original);
       }
     }
     draftRepository.delete(draftId);
