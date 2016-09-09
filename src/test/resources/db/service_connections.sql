@@ -13,8 +13,8 @@ SELECT s.id AS service_id,
        s.download AS downlink,
        s.upload AS uplink,
        CASE
-           WHEN NOT c.is_active THEN 'SUSPENDED'
            WHEN s.status != 'INHERIT_FROM_CUSTOMER' THEN s.status
+           WHEN NOT c.is_active THEN 'SUSPENDED'
            WHEN NOW() < s.period_from OR (s.period_to IS NOT NULL AND s.period_to < NOW()) THEN 'SUSPENDED'
            WHEN c.status = ANY (ARRAY[10, 30, 40, 50]) THEN 'ACTIVE'
            WHEN c.status = 20 AND NOW() <= c.lastly_billed THEN 'ACTIVE'
