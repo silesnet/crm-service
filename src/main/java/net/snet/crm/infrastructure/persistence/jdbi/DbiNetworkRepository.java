@@ -13,7 +13,6 @@ import org.skife.jdbi.v2.util.StringMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +38,21 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public List<Map<String, Object>> findConflictingAuthentications() {
-    return new ArrayList<>();
+    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+      @Override
+      public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+        return handle.createQuery(
+            "SELECT s.*\n" +
+                "       , p.*\n" +
+                "       , d.*\n" +
+                "FROM services AS s\n" +
+                "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
+                "  LEFT JOIN dhcp AS d ON s.id = d.service_id\n" +
+                "WHERE p.service_id IS NOT NULL\n" +
+                "AND   d.service_id IS NOT NULL")
+            .list();
+      }
+    });
   }
 
   @Override
