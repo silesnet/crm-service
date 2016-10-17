@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.service.dao.CrmRepository;
+import net.snet.crm.service.dao.TodoRepository;
 import net.snet.crm.service.utils.Entities.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,26 @@ public class ServiceResource {
   UriInfo uriInfo;
   private final CrmRepository crmRepository;
   private final NetworkRepository networkRepository;
+  private final TodoRepository todoRepository;
 
-  public ServiceResource(CrmRepository crmRepository, NetworkRepository networkRepository) {
+  public ServiceResource(CrmRepository crmRepository, NetworkRepository networkRepository, TodoRepository todoRepository) {
     this.crmRepository = crmRepository;
     this.networkRepository = networkRepository;
+    this.todoRepository = todoRepository;
+  }
+
+  @GET
+  @Path("/conflicting-authentications")
+  public Response conflictingAuthentications() {
+    return Response.ok(ImmutableMap.of(
+        "services", networkRepository.findConflictingAuthentications())).build();
+  }
+
+  @GET
+  @Path("/{serviceId}/comments")
+  public Response serviceComments(@PathParam("serviceId") long serviceId) {
+    return Response.ok(ImmutableMap.of(
+          "comments", todoRepository.findServiceComments(serviceId))).build();
   }
 
   @PUT
