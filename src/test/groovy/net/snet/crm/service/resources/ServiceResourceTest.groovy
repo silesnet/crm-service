@@ -16,7 +16,7 @@ class ServiceResourceTest extends Specification {
   @ClassRule
   @Shared
   ResourceTestRule resources = ResourceTestRule.builder()
-      .addResource(new ServiceResource(CUSTOMER_REPO_DELEGATE, null))
+      .addResource(new ServiceResource(CUSTOMER_REPO_DELEGATE, null, null))
       .build()
 
   def setup() {
