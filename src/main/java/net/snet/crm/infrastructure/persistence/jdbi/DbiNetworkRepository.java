@@ -13,6 +13,7 @@ import org.skife.jdbi.v2.util.StringMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,11 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   public DbiNetworkRepository(DBI dbi) {
     this.dbi = dbi;
+  }
+
+  @Override
+  public List<Map<String, Object>> findConflictingAuthentications() {
+    return new ArrayList<>();
   }
 
   @Override
