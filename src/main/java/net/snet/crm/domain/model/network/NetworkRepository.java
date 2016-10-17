@@ -5,6 +5,7 @@ import java.util.Map;
 
 public interface NetworkRepository {
 
+  List<Map<String, Object>> findConflictingAuthentications();
 
   enum Country { CZ, PL }
   enum DeviceType { SWITCH, ROUTER }
