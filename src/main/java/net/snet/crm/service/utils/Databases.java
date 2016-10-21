@@ -96,6 +96,21 @@ public class Databases {
     return record;
   }
 
+  public static List<Map<String, Object>> findRecords(
+      final String query,
+      final Map<String, Object> bindings,
+      DBI dbi)
+  {
+    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+      @Override
+      public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+        return handle.createQuery(query)
+            .bindFromMap(bindings)
+            .list();
+      }
+    });
+  }
+
   public static Optional<Map<String, Object>> getRecord(
       final String query,
       final Map<String, Object> binding,

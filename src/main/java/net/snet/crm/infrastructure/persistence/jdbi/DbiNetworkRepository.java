@@ -20,8 +20,6 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.checkState;
 import static net.snet.crm.domain.model.network.NetworkRepository.Country.PL;
 import static net.snet.crm.service.utils.Databases.*;
-import static net.snet.crm.service.utils.Databases.insertRecordWithoutKey;
-import static net.snet.crm.service.utils.Databases.updateRecordWithId;
 import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 public class DbiNetworkRepository implements NetworkRepository {
@@ -150,12 +148,12 @@ public class DbiNetworkRepository implements NetworkRepository {
   }
 
   @Override
-  public Map<String, Object> findPppoeUserLastIp(String login) {
-    return getRecord("SELECT * FROM " + LOGIP_TABLE + " WHERE username=:login ORDER BY date DESC LIMIT 1;",
-        ImmutableMap.of("login", (Object) login), dbi
-    ).or(new HashMap<String, Object>());
+  public List<Map<String, Object>> findPppoeUserLastIp(String login) {
+    return findRecords(
+        "SELECT * FROM " + LOGIP_TABLE + " WHERE username=:login ORDER BY date DESC LIMIT 4;",
+        ImmutableMap.of("login", (Object) login),
+        dbi);
   }
-
 
   @Override
   public void bindDhcp(final long serviceId, final int switchId, final int port) {
