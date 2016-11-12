@@ -329,6 +329,30 @@ CREATE TABLE products (
     country character(2) NOT NULL DEFAULT 'CZ'
 );
 
+CREATE TABLE commands
+(
+   id           bigserial     NOT NULL,
+   command      varchar(50)   NOT NULL,
+   entity       varchar(30),
+   entity_id    bigint,
+   data         varchar,
+   status       varchar(20)   NOT NULL,
+   inserted_on  timestamp     NOT NULL,
+   started_on   timestamp,
+   finished_on  timestamp
+);
+
+CREATE TABLE events
+(
+   id           bigserial     NOT NULL,
+   event        varchar(50)   NOT NULL,
+   entity       varchar(30),
+   entity_id    bigint,
+   data         varchar,
+   command_id   bigint,
+   happened_on  timestamp     NOT NULL
+);
+
 CREATE SEQUENCE audit_item_id_seq
   INCREMENT 1
   MINVALUE 1

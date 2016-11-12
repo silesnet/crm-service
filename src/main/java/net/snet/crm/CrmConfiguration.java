@@ -1,4 +1,4 @@
-package net.snet.crm.service;
+package net.snet.crm;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;

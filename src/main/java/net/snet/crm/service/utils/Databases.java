@@ -140,7 +140,7 @@ public class Databases {
     toPgTypesInPlace(update);
     final int updatedRows = handle
         .createStatement(updateSqlWithId(recordId.table(), recordId.idColumn(), update.keySet()))
-        .bindFromMap(update)
+        .bindFromMap(Maps.transformValues(update, valueToSqlType))
         .bind(recordId.idColumn(), recordId.idValue())
         .execute();
     checkState(updatedRows == 1, "failed to update record '%s' in '%s'",
@@ -205,6 +205,7 @@ public class Databases {
           update.put(column, value);
         }
       }
+//      if ()
     }
   }
 

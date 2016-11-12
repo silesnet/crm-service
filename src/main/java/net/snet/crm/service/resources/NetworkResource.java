@@ -106,7 +106,7 @@ public class NetworkResource {
         checkState(port >= 0, "switch port not does not exit for service '%s'", serviceId);
         networkRepository.disableDhcp(networkId, port);
       } else {
-        logger.debug("updating DHCP of service '{}'", serviceId);
+        logger.debug("updating DHCP get service '{}'", serviceId);
         final int networkId = dhcpUpdate.asMap().get("network_id").asIntegerOr(-1);
         final int port = dhcpUpdate.asMap().get("port").asIntegerOr(-1);
         checkState(networkId > 0, "new switch network_id not provided");

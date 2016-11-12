@@ -1,4 +1,4 @@
-package net.snet.crm.service;
+package net.snet.crm;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -16,9 +16,11 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.network.NetworkService;
+import net.snet.crm.domain.shared.command.CommandQueue;
 import net.snet.crm.infrastructure.messaging.SmtpMessagingService;
 import net.snet.crm.infrastructure.network.DefaultNetworkService;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
+import net.snet.crm.infrastructure.persistence.jdbi.DbiCommandQueue;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.service.dao.DbiCrmRepository;
 import net.snet.crm.service.dao.DbiDraftRepository;
@@ -98,6 +100,8 @@ public class CrmService extends Application<CrmConfiguration> {
     final AgreementRepository agreementRepository = new DbiAgreementRepository(dbi, mapper);
     final DbiNetworkRepository networkRepository = new DbiNetworkRepository(dbi);
     final DbiTodoRepository todoRepository = new DbiTodoRepository(dbi);
+    final CommandQueue commandQueue = new DbiCommandQueue(dbi, mapper);
+
     final NetworkService networkService = new DefaultNetworkService(configuration.getPppoeKickUserCommand());
     final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessaging());
     final JerseyEnvironment jersey = environment.jersey();

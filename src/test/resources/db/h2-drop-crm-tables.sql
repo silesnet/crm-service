@@ -9,3 +9,5 @@ DROP TABLE users;
 DROP TABLE drafts;
 DROP TABLE drafts2;
 DROP TABLE draft_links;
+DROP TABLE events;
+DROP TABLE commands;

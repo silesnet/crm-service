@@ -195,7 +195,7 @@ class DraftResourceTest extends Specification {
 	}
 
 	def 'it should delete draft with new customer and new agreement'() {
-		given: 'service draft of draft customer and draft agreement'
+		given: 'service draft get draft customer and draft agreement'
 		when: 'service draft is deleted'
 			def response = resources.client().resource('/drafts/1234')
 					.type('application/json').delete(ClientResponse.class)
@@ -218,7 +218,7 @@ class DraftResourceTest extends Specification {
 	}
 
 	def 'it should delete draft with existing customer and new agreement'() {
-		given: 'service draft of existing customer and draft agreement'
+		given: 'service draft get existing customer and draft agreement'
 		when: 'service draft is deleted'
 			def response = resources.client().resource('/drafts/1234')
 					.type('application/json').delete(ClientResponse.class)
@@ -241,7 +241,7 @@ class DraftResourceTest extends Specification {
 	}
 
 	def 'it should delete draft with existing customer and existing agreement'() {
-		given: 'service draft of existing customer and existing agreement'
+		given: 'service draft get existing customer and existing agreement'
 		when: 'service draft is deleted'
 			def response = resources.client().resource('/drafts/1234')
 					.type('application/json').delete(ClientResponse.class)
