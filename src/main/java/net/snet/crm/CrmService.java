@@ -22,6 +22,7 @@ import net.snet.crm.infrastructure.network.DefaultNetworkService;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiCommandQueue;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
+import net.snet.crm.service.CommandBroker;
 import net.snet.crm.service.dao.DbiCrmRepository;
 import net.snet.crm.service.dao.DbiDraftRepository;
 import net.snet.crm.service.dao.DbiTodoRepository;
@@ -125,6 +126,9 @@ public class CrmService extends Application<CrmConfiguration> {
         networkService));
     jersey.register(new MessagingResource(messagingService));
     jersey.register(new RuntimeExceptionMapper());
+
+    final CommandBroker commandBroker = new CommandBroker(commandQueue);
+    environment.lifecycle().manage(commandBroker);
   }
 
   private SchemeRegistry schemeRegistry() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
