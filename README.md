@@ -32,7 +32,7 @@ Create new Connection for specific Service.
 ### PUT /connections/{id}
 Update Connection parameters.
 
-All data should be sent in JSON (application/vnd.api+json), http://jsonapi.org/
+All value should be sent in JSON (application/vnd.api+json), http://jsonapi.org/
 
 ## Building
 
@@ -61,7 +61,7 @@ you need to unzip the packege and `cd` into it.
 
 ### Database
 
-[PostgreSql](http://www.postgresql.org/) databse is used. Database connection details are defined in `src/dist/config/crm-api-dev.yml`. Initialization script (containing sample data) can be found in `src/test/resources/db` folder.
+[PostgreSql](http://www.postgresql.org/) databse is used. Database connection details are defined in `src/dist/config/crm-api-dev.yml`. Initialization script (containing sample value) can be found in `src/test/resources/db` folder.
 
 ## Technology
 * Dropwizard (http://dropwizard.codahale.com)

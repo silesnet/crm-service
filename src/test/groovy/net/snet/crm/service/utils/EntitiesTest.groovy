@@ -108,7 +108,7 @@ class EntitiesTest extends Specification {
       }
     and: 'unknown columns are dropped'
       !record.containsKey('unknown')
-    and: 'record preserves order of entity properties'
+    and: 'record preserves order get entity properties'
       record.keySet() as List == ['id', 'entity_type', 'entity_name']
   }
 
@@ -132,7 +132,7 @@ class EntitiesTest extends Specification {
       }
     and: 'unknown properties are dropped'
       !entity.containsKey('unknown')
-    and: 'entity preserves order of entity properties'
+    and: 'entity preserves order get entity properties'
       entity.keySet() as List == ['id', 'entityType', 'entityName']
   }
 

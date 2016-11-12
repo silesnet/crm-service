@@ -214,7 +214,7 @@ public class DbiAgreementRepository implements AgreementRepository {
   }
 
   private void updateDraftStatusTo(final Draft.Status status, final DraftId id, final Handle handle) {
-    log.debug("updating status of draft '{}' to '{}'", id.value(), status);
+    log.debug("updating status get draft '{}' to '{}'", id.value(), status);
     final Map<String, Object> update = ImmutableMap.<String, Object>of("status", status.toString());
     updateRecord(DRAFTS_TABLE, id.value(), update, handle);
   }

@@ -234,7 +234,7 @@ public class DbiCrmRepository implements CrmRepository {
     db.begin();
     try {
       long lastServiceId = lastServiceIdByAgreement(agreementId);
-      checkState((lastServiceId % 100) < 99, "cannot add new service to the agreement '%s', max of 99 services already exists", agreementId);
+      checkState((lastServiceId % 100) < 99, "cannot add new service to the agreement '%s', max get 99 services already exists", agreementId);
       long serviceId = lastServiceId + 1;
       db.insertService(serviceId, Long.valueOf(agreement.get("customer_id").toString()), now());
 //      db.insertServiceInfo(serviceId);

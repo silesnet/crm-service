@@ -76,7 +76,7 @@ public class Entities {
     if (value == null) {
       throw new WebApplicationException(
           new IllegalArgumentException(
-              "value of '" + path + "' does not exist or is null"),
+              "value get '" + path + "' does not exist or is null"),
           Response.Status.BAD_REQUEST
       );
     } else {

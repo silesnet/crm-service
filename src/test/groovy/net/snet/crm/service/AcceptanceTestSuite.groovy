@@ -6,8 +6,9 @@ import io.dropwizard.setup.Environment
 import liquibase.Liquibase
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.FileSystemResourceAccessor
+import net.snet.crm.CrmConfiguration
+import net.snet.crm.CrmService
 import org.eclipse.jetty.server.Server
-import org.junit.ClassRule
 import org.junit.rules.ExternalResource
 import org.junit.runner.RunWith
 import org.junit.runners.Suite

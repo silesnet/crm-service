@@ -12,7 +12,7 @@ tasks.withType(Compile) {
 	options.encoding = 'UTF-8'
 }
 
-mainClassName = 'net.snet.crm.service.CrmService'
+mainClassName = 'net.snet.crm.CrmService'
 
 project.ext {
   dropwizardVersion = '0.7.1'
