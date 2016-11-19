@@ -44,7 +44,7 @@ public class DisconnectCustomerTask implements Task {
 
   @Override
   public void perform() {
-    log.debug("disconnecting customer with id '{}'", command.entityId());
+    log.debug("disconnecting customer with id '{}'...", command.entityId());
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
@@ -63,8 +63,7 @@ public class DisconnectCustomerTask implements Task {
   }
 
   private void publishDisconnected(String entity, long entityId) {
-    eventLog.publish(
-        occurred(DISCONNECTED).on(entity, entityId).withCommandId(command.id()).build());
+    eventLog.publish(occurred(DISCONNECTED).on(entity, entityId).withCommandId(command.id()).build());
   }
 
   private Databases.RecordId customerServices(Long customerId) {
@@ -80,7 +79,7 @@ public class DisconnectCustomerTask implements Task {
   }
 
   private List<Long> findCustomerServices(Long customerId, Handle handle) {
-    return handle.createQuery("SELECT id FROM services WHERE customer_id=:customerId;")
+    return handle.createQuery("SELECT id FROM services WHERE customer_id=:customerId ORDER BY id")
               .bind("customerId", customerId).map(LongMapper.FIRST).list();
   }
 }
