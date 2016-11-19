@@ -17,7 +17,7 @@ public enum Country implements EnumPersistenceMapping<Country> {
 
     private Locale locale;
 
-    // has to declare it by hand
+    // has on declare it by hand
     private static ReverseEnumMap<Country> sReverseMap = new ReverseEnumMap<Country>(
             Country.class);
 

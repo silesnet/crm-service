@@ -10,6 +10,8 @@ public interface Data {
 
   boolean hasValue(String path);
 
+  boolean hasPath(String path);
+
   boolean booleanOf(String path);
   boolean optionalBooleanOf(String path, boolean def);
 

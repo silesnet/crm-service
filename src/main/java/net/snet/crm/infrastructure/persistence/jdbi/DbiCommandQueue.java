@@ -51,7 +51,7 @@ public class DbiCommandQueue implements CommandQueue {
       public Command withHandle(Handle handle) throws Exception {
         final long id = insertRecord(COMMANDS_TABLE, record, handle);
         final Record commandRecord = MapRecord.of(getRecord(COMMANDS_TABLE, id, handle));
-        return new Command(commandRecord);
+        return Command.of(commandRecord);
       }
     });
   }
@@ -65,7 +65,7 @@ public class DbiCommandQueue implements CommandQueue {
         dbi);
     final List<Command> result = new ArrayList<>(commands.size());
     for (Map<String, Object> row : commands) {
-      result.add(new Command(MapRecord.of(row)));
+      result.add(Command.of(MapRecord.of(row)));
     }
     return result;
   }
@@ -76,7 +76,7 @@ public class DbiCommandQueue implements CommandQueue {
       @Override
       public Command inTransaction(Handle handle, TransactionStatus status) throws Exception {
         final Record currentRecord = MapRecord.of(getRecord(COMMANDS_TABLE, id.value(), handle));
-        final Command current = new Command(currentRecord);
+        final Command current = Command.of(currentRecord);
         if ("started".equals(current.status()) || "completed".equals(current.status())) {
           throw new IllegalStateException("command '" + id.value() + "' is already in '" +
             current.status() + "' state");
@@ -87,7 +87,7 @@ public class DbiCommandQueue implements CommandQueue {
         update.put("finished_on", null);
         updateRecord(COMMANDS_TABLE, id.value(), update, handle);
         final Record updatedRecord = MapRecord.of(getRecord(COMMANDS_TABLE, id.value(), handle));
-        final Command updated = new Command(updatedRecord);
+        final Command updated = Command.of(updatedRecord);
         return updated;
       }
     });
@@ -99,14 +99,14 @@ public class DbiCommandQueue implements CommandQueue {
       @Override
       public Command inTransaction(Handle handle, TransactionStatus status) throws Exception {
         final Record currentRecord = MapRecord.of(getRecord(COMMANDS_TABLE, id.value(), handle));
-        final Command current = new Command(currentRecord);
+        final Command current = Command.of(currentRecord);
         if (!"started".equals(current.status())) {
           throw new IllegalStateException("command '" + id.value() + "' has not 'started'");
         }
         updateRecord(COMMANDS_TABLE, id.value(),
             ImmutableMap.<String, Object>of("status", "completed", "finished_on", DateTime.now()), handle);
         final Record updatedRecord = MapRecord.of(getRecord(COMMANDS_TABLE, id.value(), handle));
-        final Command updated = new Command(updatedRecord);
+        final Command updated = Command.of(updatedRecord);
         return updated;
       }
     });
@@ -118,14 +118,14 @@ public class DbiCommandQueue implements CommandQueue {
       @Override
       public Command inTransaction(Handle handle, TransactionStatus status) throws Exception {
         final Record currentRecord = MapRecord.of(getRecord(COMMANDS_TABLE, id.value(), handle));
-        final Command current = new Command(currentRecord);
+        final Command current = Command.of(currentRecord);
         if (!"started".equals(current.status())) {
           throw new IllegalStateException("command '" + id.value() + "' has not 'started'");
         }
         updateRecord(COMMANDS_TABLE, id.value(),
             ImmutableMap.<String, Object>of("status", "failed", "finished_on", DateTime.now()), handle);
         final Record updatedRecord = MapRecord.of(getRecord(COMMANDS_TABLE, id.value(), handle));
-        final Command updated = new Command(updatedRecord);
+        final Command updated = Command.of(updatedRecord);
         return updated;
       }
     });

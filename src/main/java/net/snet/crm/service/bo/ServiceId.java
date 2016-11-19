@@ -39,7 +39,7 @@ public final class ServiceId {
         this.country = country;
         this.contractNo = contractNo;
         if (orderNo < FIRST_ORDER_NO || orderNo > LAST_ORDER_NO)
-            throw new IllegalArgumentException("order has to be in range [1..99], was '" + orderNo + "'");
+            throw new IllegalArgumentException("order has on be in range [1..99], was '" + orderNo + "'");
         this.orderNo = orderNo;
         this.isOnetime = isOnetime;
         int value = isOnetime ? ONETIME_BASE : 0;

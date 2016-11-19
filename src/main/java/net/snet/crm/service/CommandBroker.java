@@ -4,6 +4,8 @@ import io.dropwizard.lifecycle.Managed;
 import net.snet.crm.domain.shared.command.Command;
 import net.snet.crm.domain.shared.command.CommandQueue;
 import net.snet.crm.domain.shared.command.Commands;
+import net.snet.crm.infrastructure.command.Task;
+import net.snet.crm.infrastructure.command.TaskFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,9 +15,11 @@ public class CommandBroker implements Managed {
   private static final Logger log = LoggerFactory.getLogger(CommandBroker.class);
   private final Thread thread;
   private final Broker broker;
+  private final TaskFactory taskFactory;
 
-  public CommandBroker(CommandQueue commandQueue) {
+  public CommandBroker(CommandQueue commandQueue, TaskFactory taskFactory) {
     broker = new Broker(commandQueue);
+    this.taskFactory = taskFactory;
     thread = new Thread(this.broker, "command-broker");
   }
 
@@ -47,24 +51,23 @@ public class CommandBroker implements Managed {
           final List<Command> commands = commandQueue.nextOf(Commands.DISCONNECT, 1);
           for (Command command : commands) {
             current = command;
-            log.info("processing command '{}' for '{}/{}'...",
+            log.debug("processing command '{}' for '{}/{}'...",
                 command.name(), command.entity(), command.entityId());
+            final Task task = taskFactory.of(command);
             commandQueue.process(command.id());
-
-            //TODO: do the work here
-
-            //TODO: find customer's services, change status to debtor
-            //PPPoE -> kick, DHCP -> port down, email otherwise
-            //change customer status to debtor
-
+            task.perform();
             commandQueue.complete(command.id());
             current = null;
+            log.debug("command '{}' for '{}/{}' completed",
+                command.name(), command.entity(), command.entityId());
           }
           Thread.sleep(100);
         } catch (InterruptedException e) {
           isRunning = false;
         } catch (Exception e) {
           if (current != null) {
+            log.error("failed processing command '{}', for '{}/{}'",
+                current.name(), current.entity(), current.entityId());
             commandQueue.fail(current.id());
           }
         }

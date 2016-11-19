@@ -1,7 +1,7 @@
 package net.snet.crm.service.bo.enums;
 
 /**
- * An interface Enum classes need to implement in order to persist correctly
+ * An interface Enum classes need on implement in order on persist correctly
  * (Enum <-> int) mapping.
  *
  * @author Richard Sikora

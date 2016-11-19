@@ -17,10 +17,14 @@ import io.dropwizard.setup.Environment;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.domain.shared.command.CommandQueue;
+import net.snet.crm.domain.shared.event.EventLog;
+import net.snet.crm.infrastructure.command.DefaultTaskFactory;
+import net.snet.crm.infrastructure.command.TaskFactory;
 import net.snet.crm.infrastructure.messaging.SmtpMessagingService;
 import net.snet.crm.infrastructure.network.DefaultNetworkService;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiCommandQueue;
+import net.snet.crm.infrastructure.persistence.jdbi.DbiEventLog;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.service.CommandBroker;
 import net.snet.crm.service.dao.DbiCrmRepository;
@@ -28,6 +32,7 @@ import net.snet.crm.service.dao.DbiDraftRepository;
 import net.snet.crm.service.dao.DbiTodoRepository;
 import net.snet.crm.service.dao.DraftDAO;
 import net.snet.crm.service.resources.*;
+import net.snet.crm.service.utils.JsonUtil;
 import net.snet.crm.service.utils.RuntimeExceptionMapper;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -84,6 +89,7 @@ public class CrmService extends Application<CrmConfiguration> {
     if (configuration.getJsonPrettyPrint()) {
       mapper.enable(SerializationFeature.INDENT_OUTPUT);
     }
+    JsonUtil.configure(mapper);
 
     FilterRegistration.Dynamic filters = environment.servlets().addFilter("CORS", new CrossOriginFilter());
     filters.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
@@ -105,6 +111,7 @@ public class CrmService extends Application<CrmConfiguration> {
 
     final NetworkService networkService = new DefaultNetworkService(configuration.getPppoeKickUserCommand());
     final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessaging());
+
     final JerseyEnvironment jersey = environment.jersey();
     jersey.register(new CustomerResource(dbi, crmRepository));
     jersey.register(new AgreementResource(crmRepository));
@@ -127,7 +134,9 @@ public class CrmService extends Application<CrmConfiguration> {
     jersey.register(new MessagingResource(messagingService));
     jersey.register(new RuntimeExceptionMapper());
 
-    final CommandBroker commandBroker = new CommandBroker(commandQueue);
+    final EventLog eventLog = new DbiEventLog(dbi);
+    final TaskFactory taskFactory = new DefaultTaskFactory(dbi, networkService, eventLog);
+    final CommandBroker commandBroker = new CommandBroker(commandQueue, taskFactory);
     environment.lifecycle().manage(commandBroker);
   }
 

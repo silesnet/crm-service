@@ -116,7 +116,7 @@ public class DbiCrmRepository implements CrmRepository {
   @Override
   public Map<String, Object> updateCustomer(final long customerId, final Map<String, Object> updates) {
     if (updates.size() == 0) {
-      logger.debug("nothing to update returning original customer '{}'", customerId);
+      logger.debug("nothing on update returning original customer '{}'", customerId);
       return findCustomerById(customerId);
     }
     final String sql = sqlUpdate("customers", updates, "id");
@@ -132,7 +132,7 @@ public class DbiCrmRepository implements CrmRepository {
         }
       });
       if (updated != 1) {
-        throw new IllegalStateException("failed to update customer '" + customerId + "'");
+        throw new IllegalStateException("failed on update customer '" + customerId + "'");
       }
       db.commit();
       return findCustomerById(customerId);
@@ -175,7 +175,7 @@ public class DbiCrmRepository implements CrmRepository {
         int changes = 0;
         changes += db.updateAgreementCustomer(agreementId, customerId);
         changes += db.updateAgreementStatus(agreementId, "DRAFT");
-        checkState(changes == 2, "failed to reuse agreement '%d' for customer '%d'", agreementId, customer);
+        checkState(changes == 2, "failed on reuse agreement '%d' for customer '%d'", agreementId, customer);
       }
       db.commit();
       return findAgreementById(agreementId);
@@ -234,7 +234,7 @@ public class DbiCrmRepository implements CrmRepository {
     db.begin();
     try {
       long lastServiceId = lastServiceIdByAgreement(agreementId);
-      checkState((lastServiceId % 100) < 99, "cannot add new service to the agreement '%s', max get 99 services already exists", agreementId);
+      checkState((lastServiceId % 100) < 99, "cannot add new service on the agreement '%s', max get 99 services already exists", agreementId);
       long serviceId = lastServiceId + 1;
       db.insertService(serviceId, Long.valueOf(agreement.get("customer_id").toString()), now());
 //      db.insertServiceInfo(serviceId);
@@ -486,7 +486,7 @@ public class DbiCrmRepository implements CrmRepository {
       fields.add(update.getKey() + "=:" + update.getKey());
     }
     if (updateMap.size() == 0) {
-      logger.debug("nothing to update returning original connection for service '{}'", serviceId);
+      logger.debug("nothing on update returning original connection for service '{}'", serviceId);
       return findConnectionByServiceId(serviceId);
     }
     final String sqlTemplate = "UPDATE connections SET " + Joiner.on(", ").join(fields) + " WHERE service_id=:service_id";
@@ -502,7 +502,7 @@ public class DbiCrmRepository implements CrmRepository {
         }
       });
       if (updated != 1) {
-        throw new IllegalStateException("failed to update connection for service '" + serviceId + "'");
+        throw new IllegalStateException("failed on update connection for service '" + serviceId + "'");
       }
       db.commit();
       return findConnectionByServiceId(serviceId);

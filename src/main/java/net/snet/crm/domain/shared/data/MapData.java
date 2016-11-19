@@ -21,8 +21,13 @@ public class MapData implements Data {
   }
 
   @Override
-  public boolean hasValue(String path) {
+  public boolean hasPath(String path) {
     return valueOf(path).exists;
+  }
+
+  @Override
+  public boolean hasValue(String path) {
+    return valueOf(path).hasValue;
   }
 
   @Override
@@ -33,7 +38,7 @@ public class MapData implements Data {
   @Override
   public boolean optionalBooleanOf(String path, boolean def) {
     final Value value = valueOf(path);
-    return value.exists ? asBoolean(value) : def;
+    return value.hasValue ? asBoolean(value) : def;
   }
 
   @Override
@@ -44,7 +49,7 @@ public class MapData implements Data {
   @Override
   public int optionalIntOf(String path, int def) {
     final Value value = valueOf(path);
-    return value.exists ? asInt(value) : def;
+    return value.hasValue ? asInt(value) : def;
   }
 
   @Override
@@ -55,7 +60,7 @@ public class MapData implements Data {
   @Override
   public long optionalLongOf(String path, long def) {
     final Value value = valueOf(path);
-    return value.exists ? asLong(value) : def;
+    return value.hasValue ? asLong(value) : def;
   }
 
   @Override
@@ -66,7 +71,7 @@ public class MapData implements Data {
   @Override
   public String optionalStringOf(String path, String def) {
     final Value value = valueOf(path);
-    return value.exists ? asString(value) : def;
+    return value.hasValue ? asString(value) : def;
   }
 
   @Override
@@ -77,7 +82,7 @@ public class MapData implements Data {
   @Override
   public DateTime optionalDateTimeOf(String path, DateTime def) {
     final Value value = valueOf(path);
-    return value.exists ? asDateTime(value) : def;
+    return value.hasValue ? asDateTime(value) : def;
   }
 
   @Override
@@ -118,7 +123,7 @@ public class MapData implements Data {
   private DateTime asDateTime(Value value) {
     return (value.value instanceof DateTime)
         ? (DateTime) value.value
-        : DateTime.parse(value.value.toString());
+        : DateTime.parse(value.value.toString().replace(' ', 'T'));
   }
 
   private Map<String, Object> asMap(Value value) {
@@ -142,6 +147,8 @@ public class MapData implements Data {
 
   private class Value {
     private final boolean exists;
+    private final boolean isNull;
+    private final boolean hasValue;
     private final boolean isLeaf;
     private final String path;
     private final Object value;
@@ -169,6 +176,8 @@ public class MapData implements Data {
       }
       this.exists = (depth == parts.length) && keyExists;
       this.value = tmp;
+      this.isNull = tmp == null;
+      this.hasValue = this.exists && !this.isNull;
       this.isLeaf = !(tmp instanceof Map);
     }
   }

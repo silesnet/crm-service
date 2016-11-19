@@ -118,7 +118,7 @@ public class DraftResource {
 				final Optional<String> customerName = getSafe("data.customer.name", draftRequest);
 				final Optional<String> customerCountry = getSafe("data.customer.country", draftRequest);
 				checkState(customerName.isPresent() && customerCountry.isPresent(),
-						"trying to create a new customer for a service draft, but customer name and/or country are not provided");
+						"trying on create a new customer for a service draft, but customer name and/or country are not provided");
 				customer = crmRepository.insertCustomer(ImmutableMap.of(
 						"name", customerName.get(),
 						"country", (Object) COUNTRIES.get(customerCountry.get())
@@ -129,11 +129,11 @@ public class DraftResource {
 			if (agreementId.isPresent()) {
 				agreement = crmRepository.findAgreementById(agreementId.get());
 				checkState(getNestedLong("id", customer) == getNestedLong("customer_id", agreement),
-						"trying to create service draft where customer '%s' and agreement customer '%s' does not match",
+						"trying on create service draft where customer '%s' and agreement customer '%s' does not match",
 						getNestedLong("id", customer), getNestedLong("customer_id", agreement));
 			} else {
 				final Optional<String> agreementCountry = getSafe("data.agreement.country", draftRequest);
-				checkState(agreementCountry.isPresent(), "trying to create new customer agreement for a service draft {customer.id: %s}, but country is not specified",
+				checkState(agreementCountry.isPresent(), "trying on create new customer agreement for a service draft {customer.id: %s}, but country is not specified",
 						getNestedLong("id", customer));
 				agreement = crmRepository.insertAgreement(getNestedLong("id", customer), agreementCountry.get());
 			}
@@ -167,7 +167,7 @@ public class DraftResource {
 		logger.debug("updating draft '{}'", draftId);
 		final Map<String, Object> draft = (Map<String, Object>) drafts.get("drafts");
 		Draft currentDraft = draftDAO.findDraftById(draftId);
-		checkState(currentDraft != null, "trying to update draft '%s' that does not exist", draftId);
+		checkState(currentDraft != null, "trying on update draft '%s' that does not exist", draftId);
 		final String currentDraftStatus = currentDraft.getStatus();
 		final Optional<String> data = Optional.fromNullable((String) draft.get("data"));
 		if (data.isPresent()) {

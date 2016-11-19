@@ -49,7 +49,7 @@ public class SmtpMessagingService implements MessagingService {
       email.setSubject(subject);
       email.setText(message.text());
       Transport.send(email);
-      LOG.info("sent SMS over email to '{}'", message.number());
+      LOG.info("sent SMS over email on '{}'", message.number());
     } catch (MessagingException e) {
       throw new RuntimeException(e);
     }

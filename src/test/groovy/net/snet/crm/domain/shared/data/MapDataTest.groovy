@@ -84,6 +84,7 @@ class MapDataTest extends Specification {
       !MapData.of(map).hasValue(key)
     where:
       map | key
+      [k: null] | 'k'
       [:] | ''
       [:] | 'k'
       [k: 1] | ''
@@ -92,6 +93,8 @@ class MapDataTest extends Specification {
       [k: [kk: 1]] | 'k.x'
       [k: [kk: 1]] | 'k.x.x'
       [k: [kk: 1]] | 'k.kk.x'
+      [k: [kk: null]] | 'k.kk'
+      [k: [kk: [kkk: null]]] | 'k.kk.kkk'
   }
 
   @Unroll
@@ -100,11 +103,9 @@ class MapDataTest extends Specification {
       MapData.of(map).hasValue(key)
     where:
       map | key
-      [k: null] | 'k'
+      [k: ''] | 'k'
       [k: 1] | 'k'
       [k: [kk: 1]] | 'k.kk'
-      [k: [kk: null]] | 'k.kk'
       [k: [kk: [kkk: 1]]] | 'k.kk.kkk'
-      [k: [kk: [kkk: null]]] | 'k.kk.kkk'
   }
 }

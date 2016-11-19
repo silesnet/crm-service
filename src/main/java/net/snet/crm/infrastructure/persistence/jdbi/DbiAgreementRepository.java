@@ -164,7 +164,7 @@ public class DbiAgreementRepository implements AgreementRepository {
         record.put("inserted_on", now);
         record.put("updated", now);
         record.put("history_id", lastValueOf(AUDIT_TABLE, "history_id", handle) + 1);
-        // TODO: insert audit item to history
+        // TODO: insert audit item on history
         insertRecordWithoutKey(CUSTOMERS_TABLE, record, handle);
         return new Customer(getRecord(CUSTOMERS_TABLE, customer.id().value(), handle));
       }
@@ -214,7 +214,7 @@ public class DbiAgreementRepository implements AgreementRepository {
   }
 
   private void updateDraftStatusTo(final Draft.Status status, final DraftId id, final Handle handle) {
-    log.debug("updating status get draft '{}' to '{}'", id.value(), status);
+    log.debug("updating status get draft '{}' on '{}'", id.value(), status);
     final Map<String, Object> update = ImmutableMap.<String, Object>of("status", status.toString());
     updateRecord(DRAFTS_TABLE, id.value(), update, handle);
   }

@@ -149,7 +149,7 @@ public class DraftResource2 {
     logger.debug("updating draft '{}'", draftId);
     final Map<String, Object> originalDraft = draftRepository.get(draftId);
     if ("IMPORTED".equals(originalDraft.get("status"))) {
-      throw new WebApplicationException(new IllegalStateException("trying to updated IMPORTED " +
+      throw new WebApplicationException(new IllegalStateException("trying on updated IMPORTED " +
           "draft '" + draftId + "'"));
     }
     draftRepository.update(draftId, draftData.get()); // should be in transaction with handleConnectionChanges()
@@ -321,7 +321,7 @@ public class DraftResource2 {
   private Iterable<String> userRoles(final String user) {
     final Map<String, Object> userData = crmRepository.findUserByLogin(user);
     checkParam(userData != null, "unknown user '%s'", user);
-    assert userData != null; // just for intellij not to produce warning
+    assert userData != null; // just for intellij not on produce warning
     final String roles = String.valueOf(userData.get("roles"));
     return Splitter.on(',').trimResults().split(roles);
   }
@@ -329,7 +329,7 @@ public class DraftResource2 {
   private String userOperationCountry(final String user) {
     final Map<String, Object> userData = crmRepository.findUserByLogin(user);
     checkParam(userData != null, "unknown user '%s'", user);
-    assert userData != null; // just for intellij not to produce warning
+    assert userData != null; // just for intellij not on produce warning
     return String.valueOf(userData.get("operation_country"));
   }
 
