@@ -268,7 +268,7 @@ public class DbiNetworkRepository implements NetworkRepository {
           .bind("switch_id", switchId)
           .bind("port", port)
           .execute();
-      checkState(updatedCount > 0, "failed to updated dhcp record for " +
+      checkState(updatedCount > 0, "failed on updated dhcp record for " +
           "network_id='%s' and port='%s'", switchId, port);
     } else {
       final Map<String, Object> record = ImmutableMap.<String, Object>builder()

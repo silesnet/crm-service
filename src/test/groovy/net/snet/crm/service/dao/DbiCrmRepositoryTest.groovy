@@ -167,7 +167,7 @@ class DbiCrmRepositoryTest extends Specification {
       repository.insertService(agreement.id as Long)
     then: 'service last service sequence is 99'
       lastService.id == (agreement.id * 100) + 99
-    and: 'failed to insert 100th service'
+    and: 'failed on insert 100th service'
       thrown RuntimeException
   }
 
@@ -214,7 +214,7 @@ class DbiCrmRepositoryTest extends Specification {
       def agreement = repository.insertAgreement(customer.id as Long, 'CZ')
       def service = repository.insertService(agreement.id as Long)
       def connection = repository.insertConnection(service.id as Long)
-    and: 'connection fields to update'
+    and: 'connection fields on update'
       def update = [ auth_type : 'PPPoE', auth_name: 'joe', auth_value: 'password',
                      downlink: 100, uplink: 50, is_public_ip: true, ip: '10.0.0.1' ]
     when: 'updated service connection'

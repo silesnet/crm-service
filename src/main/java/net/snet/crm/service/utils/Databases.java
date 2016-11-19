@@ -75,7 +75,7 @@ public class Databases {
     checkTableName(table);
     toPgTypesInPlace(record);
     final int insertedRows = insertStatement(table, record, handle).execute();
-    checkState(insertedRows == 1, "failed to insert record into '%s'", table);
+    checkState(insertedRows == 1, "failed on insert record into '%s'", table);
   }
 
   private static Update insertStatement(String table, Map<String, Object> record, Handle handle) {
@@ -143,8 +143,20 @@ public class Databases {
         .bindFromMap(Maps.transformValues(update, valueToSqlType))
         .bind(recordId.idColumn(), recordId.idValue())
         .execute();
-    checkState(updatedRows == 1, "failed to update record '%s' in '%s'",
+    checkState(updatedRows == 1, "failed on update record '%s' in '%s'",
         recordId.idValue(), recordId.table());
+  }
+
+  public static void updateRecords(final RecordId recordId,
+                                   final Map<String, Object> update,
+                                   final Handle handle) {
+    checkTableName(recordId.table());
+    toPgTypesInPlace(update);
+    handle
+        .createStatement(updateSqlWithId(recordId.table(), recordId.idColumn(), update.keySet()))
+        .bindFromMap(Maps.transformValues(update, valueToSqlType))
+        .bind(recordId.idColumn(), recordId.idValue())
+        .execute();
   }
 
   public static long lastValueOf(final String table, final String column, final Handle handle) {

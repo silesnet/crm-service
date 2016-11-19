@@ -17,6 +17,17 @@ public class DefaultNetworkService implements NetworkService {
     this.kickPppoeUserCommand = kickPppoeUserCommand;
   }
 
+  @Override
+  public void enableService(long serviceId) {
+    logger.debug("enabling service with id '{}'...", serviceId);
+    logger.info("enabled service with id '{}'", serviceId);
+  }
+
+  @Override
+  public void disableService(long serviceId) {
+    logger.debug("disabling service with id '{}'...", serviceId);
+    logger.info("disabled service with id '{}'", serviceId);
+  }
 
   @Override
   public void enableSwitchPort(final String switchName, final int port) {

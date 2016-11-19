@@ -31,7 +31,7 @@ class DbiCommandQueueTest extends Specification {
       command.id().value() == 1
       command.name() == Commands.DISCONNECT
       command.entity() == 'customers'
-      command.entityId() == '23'
+      command.entityId() == 23
       command.data().asMap().isEmpty()
       command.status() == 'issued'
   }
@@ -70,7 +70,7 @@ class DbiCommandQueueTest extends Specification {
     then:
       queue.nextOf(Commands.DISCONNECT, 1).isEmpty()
       completed.status() == 'completed'
-    }
+  }
 
   def "should update status and time stamp on failed"() {
     given:

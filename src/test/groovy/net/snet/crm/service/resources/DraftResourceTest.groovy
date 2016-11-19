@@ -307,7 +307,7 @@ class DraftResourceTest extends Specification {
   @Ignore
 	def 'it should import draft data into system'() {
 		given: 'accepted draft'
-		and: 'draft status update to IMPORTED'
+		and: 'draft status update on IMPORTED'
 			def updateDraft = '''
 {
 	"drafts": {

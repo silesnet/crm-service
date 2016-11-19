@@ -10,4 +10,8 @@ public interface NetworkService {
   void kickPppoeUser(String master, String login);
 
   boolean isIpReachable(String ip);
+
+  void enableService(long serviceId);
+
+  void disableService(long serviceId);
 }
