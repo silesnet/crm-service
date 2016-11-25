@@ -1,6 +1,7 @@
 package net.snet.crm;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
 import io.dropwizard.Configuration;
 import io.dropwizard.client.JerseyClientConfiguration;
 import io.dropwizard.db.DataSourceFactory;
@@ -8,6 +9,7 @@ import net.snet.crm.infrastructure.messaging.SmsMessagingConfiguration;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -31,20 +33,8 @@ public class CrmConfiguration extends Configuration {
 	@JsonProperty
 	private String userServiceUri;
 
-	@Valid
-	@NotNull
-	@JsonProperty
-	private String kickPppoeUserCommand;
-
-	@Valid
-	@NotNull
-	@JsonProperty
-	private String configureDhcpPortCommand;
-
-	@Valid
-	@NotNull
-	@JsonProperty
-	private String sendEmailCommand;
+  @JsonProperty
+  private String systemCommandHome;
 
 	@Valid
 	@NotNull
@@ -67,16 +57,15 @@ public class CrmConfiguration extends Configuration {
 		return new URI(userServiceUri);
 	}
 
-  public String getKickPppoeUserCommand() {
-    return kickPppoeUserCommand;
-  }
-
-  public String getConfigureDhcpPortCommand() {
-    return configureDhcpPortCommand;
-  }
-
-  public String getSendEmailCommand() {
-    return sendEmailCommand;
+  public File getSystemCommandHome() {
+	  String value = systemCommandHome;
+    if (value == null) {
+      value = System.getProperty("sis.command.home");
+    }
+    if (value == null) {
+      value = System.getenv("SIS_COMMAND_HOME");
+    }
+    return new File(value).getAbsoluteFile();
   }
 
   public SmsMessagingConfiguration getSmsMessaging() {
