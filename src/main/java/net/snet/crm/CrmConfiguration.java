@@ -34,7 +34,17 @@ public class CrmConfiguration extends Configuration {
 	@Valid
 	@NotNull
 	@JsonProperty
-	private String pppoeKickUserCommand;
+	private String kickPppoeUserCommand;
+
+	@Valid
+	@NotNull
+	@JsonProperty
+	private String configureDhcpPortCommand;
+
+	@Valid
+	@NotNull
+	@JsonProperty
+	private String sendEmailCommand;
 
 	@Valid
 	@NotNull
@@ -57,11 +67,19 @@ public class CrmConfiguration extends Configuration {
 		return new URI(userServiceUri);
 	}
 
-  public String getPppoeKickUserCommand() {
-    return pppoeKickUserCommand;
+  public String getKickPppoeUserCommand() {
+    return kickPppoeUserCommand;
   }
 
-	public SmsMessagingConfiguration getSmsMessaging() {
+  public String getConfigureDhcpPortCommand() {
+    return configureDhcpPortCommand;
+  }
+
+  public String getSendEmailCommand() {
+    return sendEmailCommand;
+  }
+
+  public SmsMessagingConfiguration getSmsMessaging() {
 		return smsMessaging;
 	}
 }

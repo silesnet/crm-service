@@ -1,0 +1,1 @@
+@echo configure DHCP $1:'%1' port $2:'%2' to $3:'%3'

@@ -1,0 +1,1 @@
+@echo send email to $1:'%1' with subject $2:'%2' and body $3:'%3'
