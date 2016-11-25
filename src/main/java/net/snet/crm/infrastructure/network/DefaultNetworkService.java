@@ -1,6 +1,8 @@
 package net.snet.crm.infrastructure.network;
 
 import net.snet.crm.domain.model.network.NetworkService;
+import net.snet.crm.infrastructure.system.SystemCommand;
+import net.snet.crm.infrastructure.system.SystemCommandFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,10 +13,10 @@ public class DefaultNetworkService implements NetworkService {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultNetworkService.class);
 
-  private final String kickPppoeUserCommand;
+  private final SystemCommandFactory commandFactory;
 
-  public DefaultNetworkService(String kickPppoeUserCommand) {
-    this.kickPppoeUserCommand = kickPppoeUserCommand;
+  public DefaultNetworkService(SystemCommandFactory commandFactory) {
+    this.commandFactory = commandFactory;
   }
 
   @Override
@@ -60,26 +62,25 @@ public class DefaultNetworkService implements NetworkService {
 
   @Override
   public void kickPppoeUser(final String master, final String login) {
+    final SystemCommand command = commandFactory.systemCommand("kickPppoeUser", master, login);
     final Runnable task = new Runnable() {
       @Override
       public void run() {
         try {
-          Process process = new ProcessBuilder(kickPppoeUserCommand, master, login)
-              .redirectErrorStream(true)
-              .redirectOutput(ProcessBuilder.Redirect.INHERIT)
-              .start();
-          int error = process.waitFor();
-          if (error != 0) {
-            throw new RuntimeException("error code: " + error);
-          }
-          logger.info("PPPoE '{}' kicked '{}'", master, login);
+          command.run();
+          logger.info("command '{}' completed", command.name());
         } catch (Exception e) {
-          logger.error("failed executing '{}'", kickPppoeUserCommand, e);
+          logger.error("failed executing '{}'", command.name(), e);
         }
       }
     };
     final Thread thread = new Thread(task);
     thread.start();
+    try {
+      thread.join();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   @Override

@@ -26,6 +26,8 @@ import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiCommandQueue;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiEventLog;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
+import net.snet.crm.infrastructure.system.FileSystemCommandFactory;
+import net.snet.crm.infrastructure.system.SystemCommandFactory;
 import net.snet.crm.service.CommandBroker;
 import net.snet.crm.service.dao.DbiCrmRepository;
 import net.snet.crm.service.dao.DbiDraftRepository;
@@ -109,7 +111,9 @@ public class CrmService extends Application<CrmConfiguration> {
     final DbiTodoRepository todoRepository = new DbiTodoRepository(dbi);
     final CommandQueue commandQueue = new DbiCommandQueue(dbi, mapper);
 
-    final NetworkService networkService = new DefaultNetworkService(configuration.getKickPppoeUserCommand());
+    final SystemCommandFactory systemCommandFactory = new FileSystemCommandFactory(configuration.getSystemCommandHome());
+
+    final NetworkService networkService = new DefaultNetworkService(systemCommandFactory);
     final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessaging());
 
     final JerseyEnvironment jersey = environment.jersey();
