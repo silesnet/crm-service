@@ -109,7 +109,7 @@ public class CrmService extends Application<CrmConfiguration> {
     final DbiTodoRepository todoRepository = new DbiTodoRepository(dbi);
     final CommandQueue commandQueue = new DbiCommandQueue(dbi, mapper);
 
-    final NetworkService networkService = new DefaultNetworkService(configuration.getPppoeKickUserCommand());
+    final NetworkService networkService = new DefaultNetworkService(configuration.getKickPppoeUserCommand());
     final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessaging());
 
     final JerseyEnvironment jersey = environment.jersey();

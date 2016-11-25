@@ -6,7 +6,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -45,10 +44,9 @@ public class Entities {
     return entity;
   }
 
-  @Nonnull
   public static Optional<Object> optionalOf(
-      @Nonnull String path,
-      @Nonnull Map<String, Object> map) {
+      String path,
+      Map<String, Object> map) {
     return optionalOf(path, map, Object.class);
   }
 
@@ -59,19 +57,17 @@ public class Entities {
 //    return valueOf(path, map, Object.class);
 //  }
 
-  @Nonnull
   @SuppressWarnings("unchecked unused")
-  public static <T> Optional<T> optionalOf(@Nonnull String path,
-                                           @Nonnull Map<String, ?> map,
-                                           @Nonnull Class<T> klazz) {
+  public static <T> Optional<T> optionalOf(String path,
+                                           Map<String, ?> map,
+                                           Class<T> klazz) {
     return Optional.fromNullable((T) fetchNestedInternal(path, map));
   }
 
-  @Nonnull
   @SuppressWarnings("unused")
-  public static <T> T valueOf(@Nonnull String path,
-                              @Nonnull Map<String, ?> map,
-                              @Nonnull Class<T> klazz) {
+  public static <T> T valueOf(String path,
+                              Map<String, ?> map,
+                              Class<T> klazz) {
     Object value = fetchNestedInternal(path, map);
     if (value == null) {
       throw new WebApplicationException(
@@ -87,7 +83,7 @@ public class Entities {
     return (T) value;
   }
 
-  public static <T> T cast(@Nonnull Object obj, @Nonnull Class<T> klazz) {
+  public static <T> T cast(Object obj, Class<T> klazz) {
     T value = null;
     if (obj != null) {
       if (Integer.class.equals(klazz)) {
@@ -99,17 +95,17 @@ public class Entities {
     return value;
   }
 
-  @Nonnull
+
   public static Optional<Map<String, Object>> optionalMapOf(
-      @Nonnull String path,
-      @Nonnull Map<String, Object> map) {
+      String path,
+      Map<String, Object> map) {
     final Object nested = fetchNestedInternal(path, map);
     return Optional.fromNullable((Map<String, Object>) nested);
   }
 
-  @Nonnull
-  public static Map<String, Object> mapOf(@Nonnull String path,
-                                          @Nonnull Map<String, Object> map) {
+
+  public static Map<String, Object> mapOf(String path,
+                                          Map<String, Object> map) {
     final Object nested = fetchNestedInternal(path, map);
     if (nested == null) {
       throw new WebApplicationException(
@@ -121,9 +117,9 @@ public class Entities {
     return (Map<String, Object>) nested;
   }
 
-  @Nonnull
+
   public static Function<Map<String, Object>, String> getValueOf(final String key) {
-    return new Function<Map<String,Object>, String>() {
+    return new Function<Map<String, Object>, String>() {
       @Nullable
       @Override
       public String apply(Map<String, Object> userData) {
@@ -132,12 +128,12 @@ public class Entities {
     };
   }
 
-  public static Value valueOf(final @Nonnull String path,
-                              final @Nonnull Map<String, ?> map) {
+  public static Value valueOf(final String path,
+                              final Map<String, ?> map) {
     return new Value(fetchNestedInternal(path, map));
   }
 
-  public static ValueMap valueMapOf(final @Nonnull Map<String, ?> map) {
+  public static ValueMap valueMapOf(final Map<String, ?> map) {
     return new ValueMap(map);
   }
 
@@ -148,7 +144,7 @@ public class Entities {
       this.original = value;
     }
 
-    @Nonnull
+
     public String asString() {
       return original.toString();
     }
@@ -159,40 +155,36 @@ public class Entities {
     }
 
     public String asStringValueOr(@Nullable final String fallback) {
-      return isNullOrEmpty() ? fallback: asString();
+      return isNullOrEmpty() ? fallback : asString();
     }
 
-    @Nonnull
+
     public long asLong() {
       return Long.valueOf(original.toString());
     }
 
-    @Nonnull
-    public Long asLongOr(@Nonnull final Long fallBack) {
-     return isNullOrEmpty() ? fallBack : asLong();
+
+    public Long asLongOr(final Long fallBack) {
+      return isNullOrEmpty() ? fallBack : asLong();
     }
 
-    @Nonnull
+
     public Integer asInteger() {
       return Integer.valueOf(original.toString());
     }
 
-    @Nonnull
-    public Integer asIntegerOr(@Nonnull final Integer fallBack) {
+    public Integer asIntegerOr(final Integer fallBack) {
       return isNullOrEmpty() ? fallBack : asInteger();
     }
 
-    @Nonnull
     public DateTime asDateTime() {
       return DateTime.parse(original.toString());
     }
 
-    @Nullable
     public DateTime asDateTimeOr(@Nullable final DateTime fallBack) {
       return isNullOrEmpty() ? fallBack : asDateTime();
     }
 
-    @Nonnull
     public ValueMap asMap() {
       return valueMapOf((Map<String, ?>) original);
     }
@@ -214,22 +206,19 @@ public class Entities {
   public static class ValueMap {
     private final Map<String, ?> map;
 
-    private ValueMap(@Nonnull final Map<String, ?> map) {
+    private ValueMap(final Map<String, ?> map) {
       this.map = map;
     }
 
-    @Nonnull
-    public Value get(@Nonnull final String path) {
+    public Value get(final String path) {
       return valueOf(path, map);
     }
 
-    @Nullable
-    public Object getRaw(@Nonnull final String path) {
+    public Object getRaw(final String path) {
       return fetchNestedInternal(path, map);
     }
 
-    @Nullable
-    public Object getRawOr(@Nonnull final String path, @Nullable final Object fallBack) {
+    public Object getRawOr(final String path, @Nullable final Object fallBack) {
       final Object value = fetchNestedInternal(path, map);
       return value == null ? fallBack : value;
     }
@@ -239,8 +228,8 @@ public class Entities {
     }
   }
 
-  private static Object fetchNestedInternal(@Nonnull String path,
-                                            @Nonnull Map<String, ?> map) {
+  private static Object fetchNestedInternal(String path,
+                                            Map<String, ?> map) {
     Object value = map;
     for (String key : Splitter.on('.').split(path)) {
       value = ((Map<String, Object>) value).get(key);
