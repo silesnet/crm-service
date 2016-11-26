@@ -1,22 +1,29 @@
 package net.snet.crm.infrastructure.network;
 
+import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
-import net.snet.crm.infrastructure.system.SystemCommand;
+import net.snet.crm.domain.shared.data.Data;
+import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.infrastructure.system.SystemCommandFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.Map;
+
+import static net.snet.crm.infrastructure.system.SystemCommandRunner.executeSystemCommand;
 
 public class DefaultNetworkService implements NetworkService {
 
   private static final Logger logger = LoggerFactory.getLogger(DefaultNetworkService.class);
 
   private final SystemCommandFactory commandFactory;
+  private final NetworkRepository networkRepository;
 
-  public DefaultNetworkService(SystemCommandFactory commandFactory) {
+  public DefaultNetworkService(SystemCommandFactory commandFactory, NetworkRepository networkRepository) {
     this.commandFactory = commandFactory;
+    this.networkRepository = networkRepository;
   }
 
   @Override
@@ -28,6 +35,22 @@ public class DefaultNetworkService implements NetworkService {
   @Override
   public void disableService(long serviceId) {
     logger.debug("disabling service with id '{}'...", serviceId);
+    final Data pppoe = MapData.of(networkRepository.findServicePppoe(serviceId));
+    final boolean hasPppoe = !pppoe.asMap().isEmpty();
+    if (hasPppoe) {
+      executeSystemCommand(commandFactory.systemCommand(
+          "kickPppoeUser", pppoe.stringOf("master"), pppoe.stringOf("login")));
+    }
+    final Data dhcp = MapData.of(networkRepository.findServiceDhcp(serviceId));
+    final boolean hasDhcp = !dhcp.asMap().isEmpty();
+    if (hasDhcp) {
+      executeSystemCommand(commandFactory.systemCommand(
+          "configureDhcpPort", dhcp.stringOf("switch"), dhcp.stringOf("port"), "2"));
+    }
+    if (!hasPppoe && !hasDhcp) {
+      executeSystemCommand(commandFactory.systemCommand(
+          "sendEmail", "admin@sis.silesnet.net", "disable service " + serviceId, "/SIS"));
+    }
     logger.info("disabled service with id '{}'", serviceId);
   }
 
@@ -62,25 +85,7 @@ public class DefaultNetworkService implements NetworkService {
 
   @Override
   public void kickPppoeUser(final String master, final String login) {
-    final SystemCommand command = commandFactory.systemCommand("kickPppoeUser", master, login);
-    final Runnable task = new Runnable() {
-      @Override
-      public void run() {
-        try {
-          command.run();
-          logger.info("command '{}' completed", command.name());
-        } catch (Exception e) {
-          logger.error("failed executing '{}'", command.name(), e);
-        }
-      }
-    };
-    final Thread thread = new Thread(task);
-    thread.start();
-    try {
-      thread.join();
-    } catch (InterruptedException e) {
-      throw new RuntimeException(e);
-    }
+    executeSystemCommand(commandFactory.systemCommand("kickPppoeUser", master, login));
   }
 
   @Override

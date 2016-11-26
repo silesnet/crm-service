@@ -61,15 +61,17 @@ public class CommandBroker implements Managed {
             log.debug("command '{}' for '{}/{}' completed",
                 command.name(), command.entity(), command.entityId());
           }
+        } catch (Exception e) {
+          if (current != null) {
+            log.error(String.format("failed processing command '%s', for '%s/%s'",
+                current.name(), current.entity(), current.entityId()), e);
+            commandQueue.fail(current.id());
+          }
+        }
+        try {
           Thread.sleep(100);
         } catch (InterruptedException e) {
           isRunning = false;
-        } catch (Exception e) {
-          if (current != null) {
-            log.error("failed processing command '{}', for '{}/{}'",
-                current.name(), current.entity(), current.entityId());
-            commandQueue.fail(current.id());
-          }
         }
       }
       log.info("command broker shut down.");
