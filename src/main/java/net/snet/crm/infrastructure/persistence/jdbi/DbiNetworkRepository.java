@@ -102,7 +102,7 @@ public class DbiNetworkRepository implements NetworkRepository {
   @Override
   public Map<String, Object> findServiceDhcp(final long serviceId) {
     return getRecord(
-        "SELECT d.*, n.master FROM " + DHCP_TABLE + " d " +
+        "SELECT d.*, n.name as switch, n.master FROM " + DHCP_TABLE + " d " +
             "LEFT JOIN " + NETWORK_TABLE + " n ON n.id=d.network_id " +
             "WHERE d.service_id=:serviceId",
         ImmutableMap.of("serviceId", (Object) serviceId),
