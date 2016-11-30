@@ -13,5 +13,5 @@ public interface EventLog {
 
   List<Event> eventsPast(EventId id, String entity, long entityId, int batch);
 
-
+  List<Event> events(EventConstrain constrain);
 }
