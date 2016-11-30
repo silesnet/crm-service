@@ -3,15 +3,13 @@ package net.snet.crm.infrastructure.persistence.jdbi;
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.domain.shared.data.MapRecord;
 import net.snet.crm.domain.shared.data.Record;
-import net.snet.crm.domain.shared.event.Event;
-import net.snet.crm.domain.shared.event.EventId;
-import net.snet.crm.domain.shared.event.EventLog;
-import net.snet.crm.domain.shared.event.Events;
+import net.snet.crm.domain.shared.event.*;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.TransactionCallback;
@@ -81,6 +79,11 @@ public class DbiEventLog implements EventLog {
         .from(findRecords("SELECT * FROM events WHERE id>:id AND entity=:entity AND entity_id=:entityId ORDER BY id LIMIT " + batch,
             ImmutableMap.<String, Object>of("id", id.value(), "entity", entity, "entityId", entityId), dbi))
         .transform(mapToEvent).toList();
+  }
+
+  @Override
+  public List<Event> events(EventConstrain constrain) {
+    return Lists.newArrayList();
   }
 
   private Data values(Event event) {
