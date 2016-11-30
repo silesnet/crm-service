@@ -57,7 +57,6 @@ public class DbiEventLog implements EventLog {
     });
   }
 
-  @Override
   public List<Event> eventsPast(final EventId id, int batch) {
     return FluentIterable
         .from(findRecords("SELECT * FROM events WHERE id>:id ORDER BY id LIMIT " + batch,
@@ -65,7 +64,6 @@ public class DbiEventLog implements EventLog {
         .transform(mapToEvent).toList();
   }
 
-  @Override
   public List<Event> eventsPast(EventId id, Events event, int batch) {
     return FluentIterable
         .from(findRecords("SELECT * FROM events WHERE id>:id AND event=:event ORDER BY id LIMIT " + batch,
@@ -73,7 +71,6 @@ public class DbiEventLog implements EventLog {
         .transform(mapToEvent).toList();
   }
 
-  @Override
   public List<Event> eventsPast(EventId id, String entity, long entityId, int batch) {
     return FluentIterable
         .from(findRecords("SELECT * FROM events WHERE id>:id AND entity=:entity AND entity_id=:entityId ORDER BY id LIMIT " + batch,

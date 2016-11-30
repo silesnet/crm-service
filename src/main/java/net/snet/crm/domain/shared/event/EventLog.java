@@ -7,11 +7,5 @@ public interface EventLog {
 
   Event find(EventId id);
 
-  List<Event> eventsPast(EventId id, int batch);
-
-  List<Event> eventsPast(EventId id, Events event, int batch);
-
-  List<Event> eventsPast(EventId id, String entity, long entityId, int batch);
-
   List<Event> events(EventConstrain constrain);
 }
