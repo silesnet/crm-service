@@ -2,14 +2,15 @@ package net.snet.crm.infrastructure.persistence.jdbi;
 
 import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.domain.shared.data.MapRecord;
 import net.snet.crm.domain.shared.data.Record;
-import net.snet.crm.domain.shared.event.*;
+import net.snet.crm.domain.shared.event.Event;
+import net.snet.crm.domain.shared.event.EventConstrain;
+import net.snet.crm.domain.shared.event.EventId;
+import net.snet.crm.domain.shared.event.EventLog;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.TransactionCallback;
@@ -21,9 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static net.snet.crm.service.utils.Databases.findRecords;
-import static net.snet.crm.service.utils.Databases.getRecord;
-import static net.snet.crm.service.utils.Databases.insertRecord;
+import static net.snet.crm.service.utils.Databases.*;
 
 public class DbiEventLog implements EventLog {
   private static final String EVENTS = "events";
@@ -57,30 +56,16 @@ public class DbiEventLog implements EventLog {
     });
   }
 
-  public List<Event> eventsPast(final EventId id, int batch) {
-    return FluentIterable
-        .from(findRecords("SELECT * FROM events WHERE id>:id ORDER BY id LIMIT " + batch,
-            ImmutableMap.<String, Object>of("id", id.value()), dbi))
-        .transform(mapToEvent).toList();
-  }
-
-  public List<Event> eventsPast(EventId id, Events event, int batch) {
-    return FluentIterable
-        .from(findRecords("SELECT * FROM events WHERE id>:id AND event=:event ORDER BY id LIMIT " + batch,
-            ImmutableMap.<String, Object>of("id", id.value(), "event", event.event()), dbi))
-        .transform(mapToEvent).toList();
-  }
-
-  public List<Event> eventsPast(EventId id, String entity, long entityId, int batch) {
-    return FluentIterable
-        .from(findRecords("SELECT * FROM events WHERE id>:id AND entity=:entity AND entity_id=:entityId ORDER BY id LIMIT " + batch,
-            ImmutableMap.<String, Object>of("id", id.value(), "entity", entity, "entityId", entityId), dbi))
-        .transform(mapToEvent).toList();
-  }
-
   @Override
   public List<Event> events(EventConstrain constrain) {
-    return Lists.newArrayList();
+    if (constrain.sql().isEmpty()) {
+      throw new IllegalArgumentException("events constrain can't be empty");
+    }
+    return FluentIterable
+        .from(findRecords("SELECT * FROM events WHERE " + constrain.sql() + ";",
+            constrain.binding(),
+            dbi))
+        .transform(mapToEvent).toList();
   }
 
   private Data values(Event event) {
