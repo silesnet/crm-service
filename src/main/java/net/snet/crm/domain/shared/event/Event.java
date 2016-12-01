@@ -3,10 +3,7 @@ package net.snet.crm.domain.shared.event;
 import com.google.common.collect.ImmutableMap;
 import net.snet.crm.domain.shared.Entity;
 import net.snet.crm.domain.shared.command.CommandId;
-import net.snet.crm.domain.shared.data.Data;
-import net.snet.crm.domain.shared.data.MapData;
-import net.snet.crm.domain.shared.data.MapRecord;
-import net.snet.crm.domain.shared.data.Record;
+import net.snet.crm.domain.shared.data.*;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -14,7 +11,7 @@ import java.util.Map;
 import static net.snet.crm.service.utils.JsonUtil.dataOf;
 import static net.snet.crm.service.utils.JsonUtil.jsonOf;
 
-public class Event implements Entity<Event, EventId>, Record {
+public class Event implements Entity<Event, EventId>, Record, Attributes {
 
   private final EventId id;
   private final Events name;
@@ -24,6 +21,7 @@ public class Event implements Entity<Event, EventId>, Record {
   private final CommandId commandId;
   private final DateTime happenedOn;
   private final Record record;
+  private final Attributes attributes;
 
   public static Event of(Record record) {
     return new Event(record);
@@ -43,7 +41,8 @@ public class Event implements Entity<Event, EventId>, Record {
     this.commandId = data.hasValue("command_id") ?
         new CommandId(data.longOf("command_id")) : CommandId.NONE;
     this.happenedOn = data.dateTimeOf("happened_on");
-    this.record = record;
+    this.record = record(this);
+    this.attributes = attributes(this);
   }
 
   private Event(Events name, String entity, long entityId, Data data, CommandId commandId) {
@@ -54,14 +53,30 @@ public class Event implements Entity<Event, EventId>, Record {
     this.data = data;
     this.commandId = commandId;
     this.happenedOn = DateTime.now();
-    this.record = MapRecord.of(ImmutableMap.<String, Object>builder()
-        .put("id", this.id.value())
-        .put("event", this.name.event())
-        .put("entity", this.entity)
-        .put("entity_id", this.entityId)
-        .put("data", jsonOf(this.data))
-        .put("command_id", this.commandId.value())
-        .put("happened_on", this.happenedOn)
+    this.record = record(this);
+    this.attributes = attributes(this);
+  }
+
+  private Record record(Event event) {
+    return MapRecord.of(ImmutableMap.<String, Object>builder()
+        .put("id", event.id.value())
+        .put("event", event.name.event())
+        .put("entity", event.entity)
+        .put("entity_id", event.entityId)
+        .put("data", jsonOf(event.data))
+        .put("command_id", event.commandId.value())
+        .put("happened_on", event.happenedOn)
+        .build());
+  }
+
+  private Attributes attributes(Event event) {
+    return MapAttributes.of(ImmutableMap.<String, Object>builder()
+        .put("event", event.name.event())
+        .put("entity", event.entity)
+        .put("entityId", event.entityId)
+        .put("data", event.data.asMap())
+        .put("commandId", event.commandId.value())
+        .put("happenedOn", event.happenedOn)
         .build());
   }
 
@@ -97,6 +112,11 @@ public class Event implements Entity<Event, EventId>, Record {
   @Override
   public Data recordData() {
     return record.recordData();
+  }
+
+  @Override
+  public Data attributesData() {
+    return attributes.attributesData();
   }
 
   public static class EventWithName {
