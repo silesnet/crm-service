@@ -1,7 +1,10 @@
 package net.snet.crm.service.resources;
 
 import com.google.common.collect.ImmutableMap;
+import net.snet.crm.domain.shared.event.Event;
+import net.snet.crm.domain.shared.event.EventConstrain;
 import net.snet.crm.domain.shared.event.EventLog;
+import net.snet.crm.domain.shared.event.Events;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +15,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.List;
 
 @Path("/events")
 public class EventResource {
@@ -28,8 +32,25 @@ public class EventResource {
   @Produces({"application/json; charset=UTF-8"})
   public Response findEvents(@Context UriInfo uriInfo) {
     final MultivaluedMap<String, String> params = uriInfo.getQueryParameters(true);
-    log.debug(params.toString());
+    final List<Event> events = eventLog.events(constrain(params));
+    return Response.ok(ImmutableMap.of("data", events)).build();
+  }
 
-    return Response.ok(ImmutableMap.of()).build();
+  private EventConstrain constrain(MultivaluedMap<String, String> params) {
+    final EventConstrain.Builder constrain = EventConstrain.builder();
+    if (params.containsKey("pastEventId")) {
+      constrain.eventsPastEventId(Long.valueOf(params.getFirst("pastEventId")));
+    }
+    if (params.containsKey("event")) {
+      constrain.forEvent(Events.of(params.getFirst("event")));
+    }
+    if (params.containsKey("entity")) {
+      if (params.containsKey("entityId")) {
+        constrain.forEntityInstance(params.getFirst("entity"), Long.valueOf(params.getFirst("entityId")));
+      } else {
+        constrain.forEntity(params.getFirst("entity"));
+      }
+    }
+    return constrain.build();
   }
 }

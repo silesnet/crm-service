@@ -3,6 +3,7 @@ package net.snet.crm.service.resources
 import ch.qos.logback.classic.Level
 import io.dropwizard.logging.LoggingFactory
 import io.dropwizard.testing.junit.ResourceTestRule
+import net.snet.crm.domain.shared.event.EventConstrain
 import net.snet.crm.domain.shared.event.EventId
 import net.snet.crm.domain.shared.event.EventLog
 import org.junit.ClassRule
@@ -21,7 +22,7 @@ class EventResourceTest extends Specification {
   ResourceTestRule testRule = ResourceTestRule.builder().addResource(eventResource).build()
 
   def setupSpec() {
-    LoggingFactory.bootstrap(Level.DEBUG)
+    LoggingFactory.bootstrap(Level.INFO)
   }
 
   def "should parse query params for entity request"() {
@@ -29,12 +30,22 @@ class EventResourceTest extends Specification {
       def eventLog = Mock(EventLog)
       eventResource.eventLog = eventLog
     when:
-      def result = testRule.client().resource('/events')
-          .queryParam('entity', 'services.123')
+      testRule.client().resource('/events')
+          .queryParam('pastEventId', '10')
+          .queryParam('event', 'disconnected')
+          .queryParam('entity', 'services')
+          .queryParam('entityId', '103')
           .accept(MediaType.APPLICATION_JSON_TYPE)
           .get(Map.class)
     then:
-      true
-//      1 * eventLog.eventsPast(new EventId(-1), 'services', 123L, _) >> []
+      1 * eventLog.events(_) >> { EventConstrain constrain ->
+        def sql = constrain.sql().replaceAll(' ', '')
+        assert sql.contains('id>:id')
+        assert sql.contains("event=:event")
+        assert sql.contains("entity=:entity")
+        assert sql.contains("entity_id=:entity_id")
+        assert sql.split(/AND/).size() == 4
+        return []
+      }
   }
 }

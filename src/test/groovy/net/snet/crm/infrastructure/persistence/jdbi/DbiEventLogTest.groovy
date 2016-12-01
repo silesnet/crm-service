@@ -1,11 +1,13 @@
 package net.snet.crm.infrastructure.persistence.jdbi
 
 import net.snet.crm.domain.shared.event.Event
+import net.snet.crm.domain.shared.event.EventConstrain
 import net.snet.crm.domain.shared.event.EventId
 import net.snet.crm.domain.shared.event.EventLog
 import net.snet.crm.service.utils.JsonUtil
 import spock.lang.Shared
 
+import static net.snet.crm.domain.shared.event.EventConstrain.builder
 import static net.snet.crm.domain.shared.event.Events.DISCONNECTED
 import static net.snet.crm.domain.shared.event.Events.RECONNECTED
 
@@ -21,12 +23,19 @@ class DbiEventLogTest extends BaseDbiSpecification {
       found.id() == published.id()
   }
 
+  def "should throw on finding events with empty constrain"() {
+    when:
+      eventLog.events(builder().build())
+    then:
+      thrown IllegalArgumentException
+  }
+
   def "should find past events"() {
     given:
       eventLog.publish(event())
       eventLog.publish(event())
     when:
-      def events = eventLog.eventsPast(new EventId(0), 10)
+      def events = eventLog.events(builder().eventsPastEventId(0).build())
     then:
       events.size() == 2
       events[0].id().value() == 1
@@ -38,7 +47,7 @@ class DbiEventLogTest extends BaseDbiSpecification {
       eventLog.publish(Event.occurred(DISCONNECTED).on('customers').build())
       eventLog.publish(Event.occurred(RECONNECTED).on('customers').build())
     when:
-      def events = eventLog.eventsPast(new EventId(0), RECONNECTED, 10)
+      def events = eventLog.events(builder().forEvent(RECONNECTED).build())
     then:
       events.size() == 1
       events[0].id().value() == 2
@@ -46,13 +55,13 @@ class DbiEventLogTest extends BaseDbiSpecification {
 
   def "should find past events of certain entity"() {
     given:
-    eventLog.publish(Event.occurred(DISCONNECTED).on('customers', 1).build())
-    eventLog.publish(Event.occurred(RECONNECTED).on('customers', 2).build())
+      eventLog.publish(Event.occurred(DISCONNECTED).on('customers', 1).build())
+      eventLog.publish(Event.occurred(RECONNECTED).on('customers', 2).build())
     when:
-    def events = eventLog.eventsPast(new EventId(0), 'customers', 2, 10)
+      def events = eventLog.events(builder().forEntityInstance('customers', 2).build())
     then:
-    events.size() == 1
-    events[0].id().value() == 2
+      events.size() == 1
+      events[0].id().value() == 2
   }
 
   def "should publish event"() {
