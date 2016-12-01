@@ -110,6 +110,7 @@ public class CrmService extends Application<CrmConfiguration> {
     final DbiNetworkRepository networkRepository = new DbiNetworkRepository(dbi);
     final DbiTodoRepository todoRepository = new DbiTodoRepository(dbi);
     final CommandQueue commandQueue = new DbiCommandQueue(dbi, mapper);
+    final EventLog eventLog = new DbiEventLog(dbi);
 
     final SystemCommandFactory systemCommandFactory = new FileSystemCommandFactory(configuration.getSystemCommandHome());
 
@@ -136,9 +137,9 @@ public class CrmService extends Application<CrmConfiguration> {
         networkRepository,
         networkService));
     jersey.register(new MessagingResource(messagingService));
+    jersey.register(new EventResource(eventLog));
     jersey.register(new RuntimeExceptionMapper());
 
-    final EventLog eventLog = new DbiEventLog(dbi);
     final TaskFactory taskFactory = new DefaultTaskFactory(dbi, networkService, eventLog);
     final CommandBroker commandBroker = new CommandBroker(commandQueue, taskFactory);
     environment.lifecycle().manage(commandBroker);
