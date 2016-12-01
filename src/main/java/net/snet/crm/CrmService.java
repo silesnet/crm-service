@@ -34,6 +34,7 @@ import net.snet.crm.service.dao.DbiDraftRepository;
 import net.snet.crm.service.dao.DbiTodoRepository;
 import net.snet.crm.service.dao.DraftDAO;
 import net.snet.crm.service.resources.*;
+import net.snet.crm.service.resources.modules.EventModule;
 import net.snet.crm.service.utils.JsonUtil;
 import net.snet.crm.service.utils.RuntimeExceptionMapper;
 import org.apache.http.conn.scheme.PlainSocketFactory;
@@ -72,6 +73,7 @@ public class CrmService extends Application<CrmConfiguration> {
   @Override
   public void initialize(Bootstrap<CrmConfiguration> bootstrap) {
     bootstrap.getObjectMapper().registerModule(new JodaModule());
+    bootstrap.getObjectMapper().registerModule(new EventModule());
     bootstrap.getObjectMapper().setDateFormat(new ISO8601DateFormat());
     bootstrap.addBundle(new MigrationsBundle<CrmConfiguration>() {
       @Override

@@ -31,7 +31,6 @@ public class EventResource {
   public Response findEvents(@Context UriInfo uriInfo) {
     final MultivaluedMap<String, String> params = uriInfo.getQueryParameters(true);
     final List<Event> events = eventLog.events(constrain(params));
-    log.debug(events.toString());
     return Response.ok(ImmutableMap.of("data", events)).build();
   }
 
