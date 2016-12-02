@@ -71,7 +71,7 @@ public class DisconnectCustomerTask implements Task {
   }
 
   private Map<String, Object> debtorStatus() {
-    return ImmutableMap.<String, Object>of("status", 20);
+    return ImmutableMap.<String, Object>of("status", 25);
   }
 
   private Map<String, Object> inheritStatus() {
