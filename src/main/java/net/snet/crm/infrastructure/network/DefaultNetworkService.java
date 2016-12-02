@@ -49,7 +49,7 @@ public class DefaultNetworkService implements NetworkService {
     }
     if (!hasPppoe && !hasDhcp) {
       executeSystemCommand(commandFactory.systemCommand(
-          "sendEmail", "admin@sis.silesnet.net", "disable service " + serviceId, "/SIS"));
+          "sendEmail", "podpora@silesnet.cz", "disable debtor's service: " + serviceId, "/SIS"));
     }
     logger.info("disabled service with id '{}'", serviceId);
   }
