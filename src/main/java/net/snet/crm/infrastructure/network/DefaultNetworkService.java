@@ -39,17 +39,25 @@ public class DefaultNetworkService implements NetworkService {
     final boolean hasPppoe = !pppoe.asMap().isEmpty();
     if (hasPppoe) {
       executeSystemCommand(commandFactory.systemCommand(
-          "kickPppoeUser", pppoe.stringOf("master"), pppoe.stringOf("login")));
+          "kickPppoeUser",
+          "-d", pppoe.stringOf("master"),
+          "-u", pppoe.stringOf("login")));
     }
     final Data dhcp = MapData.of(networkRepository.findServiceDhcp(serviceId));
     final boolean hasDhcp = !dhcp.asMap().isEmpty();
     if (hasDhcp) {
       executeSystemCommand(commandFactory.systemCommand(
-          "configureDhcpPort", dhcp.stringOf("switch"), dhcp.stringOf("port"), "2"));
+          "configureDhcpPort",
+          "-s", dhcp.stringOf("switch"),
+          "-p", dhcp.stringOf("port"),
+          "-v", "2"));
     }
     if (!hasPppoe && !hasDhcp) {
       executeSystemCommand(commandFactory.systemCommand(
-          "sendEmail", "podpora@silesnet.cz", "disable debtor's service: " + serviceId, "/SIS"));
+          "sendEmail",
+          "-a", "podpora@silesnet.cz",
+          "-s", "disable debtor's service: " + serviceId,
+          "-m", "/SIS"));
     }
     logger.info("disabled service with id '{}'", serviceId);
   }
