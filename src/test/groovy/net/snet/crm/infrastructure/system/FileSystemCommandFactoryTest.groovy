@@ -10,7 +10,9 @@ class FileSystemCommandFactoryTest extends Specification {
 
   def "should instantiate system command from file name"() {
     expect:
-      factory().systemCommand('kickPppoeUser', 'master-1', 'user-1').run()
+      factory().systemCommand('kickPppoeUser', '-u', 'user', '-d', 'device').run()
+      factory().systemCommand('configureDhcpPort', '-s', 'switch', '-p', 'port', '-v', 'value').run()
+      factory().systemCommand('sendEmail', '-a', 'address', '-s', 'subject', '-m', 'message').run()
   }
 
   FileSystemCommandFactory factory() {

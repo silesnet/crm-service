@@ -6,6 +6,7 @@ import net.snet.crm.domain.shared.command.CommandId
 import net.snet.crm.domain.shared.data.MapData
 import net.snet.crm.domain.shared.event.Event
 import net.snet.crm.domain.shared.event.Events
+import org.joda.time.DateTime
 import spock.lang.Specification
 
 class EventModuleTest extends Specification {
@@ -25,7 +26,7 @@ class EventModuleTest extends Specification {
       json.attributes.entity == 'customers'
       json.attributes.entityId == 10
       json.attributes.commandId == 0
-      json.attributes.happenedOn.beforeNow
+      json.attributes.happenedOn.equalNow || json.attributes.happenedOn.beforeNow
       json.attributes.data == [key: 'value']
   }
 }

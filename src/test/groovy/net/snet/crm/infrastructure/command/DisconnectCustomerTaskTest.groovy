@@ -62,7 +62,7 @@ class DisconnectCustomerTaskTest extends BaseDbiSpecification {
     when:
       task.perform()
     then:
-      handle.select("SELECT status FROM customers WHERE id=1")[0].status == 20
+      handle.select("SELECT status FROM customers WHERE id=1")[0].status == 25
       handle.select("SELECT status FROM services WHERE id=1")[0].status.toString().contains('INHERIT_FROM_CUSTOMER')
       handle.select("SELECT status FROM services WHERE id=2")[0].status.toString().contains('ACTIVE')
       handle.select("SELECT status FROM services WHERE id=3")[0].status.toString().contains('INHERIT_FROM_CUSTOMER')
