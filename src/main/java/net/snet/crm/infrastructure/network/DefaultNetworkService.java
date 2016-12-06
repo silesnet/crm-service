@@ -38,10 +38,7 @@ public class DefaultNetworkService implements NetworkService {
     final Data pppoe = MapData.of(networkRepository.findServicePppoe(serviceId));
     final boolean hasPppoe = !pppoe.asMap().isEmpty();
     if (hasPppoe) {
-      executeSystemCommand(commandFactory.systemCommand(
-          "kickPppoeUser",
-          "-d", pppoe.stringOf("master"),
-          "-u", pppoe.stringOf("login")));
+      kickPppoeUser(pppoe.stringOf("master"), pppoe.stringOf("login"));
     }
     final Data dhcp = MapData.of(networkRepository.findServiceDhcp(serviceId));
     final boolean hasDhcp = !dhcp.asMap().isEmpty();
@@ -93,7 +90,10 @@ public class DefaultNetworkService implements NetworkService {
 
   @Override
   public void kickPppoeUser(final String master, final String login) {
-    executeSystemCommand(commandFactory.systemCommand("kickPppoeUser", master, login));
+    executeSystemCommand(commandFactory.systemCommand(
+        "kickPppoeUser",
+        "-d", master,
+        "-u", login));
   }
 
   @Override
