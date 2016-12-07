@@ -2,7 +2,8 @@ package net.snet.crm.domain.shared.event;
 
 public enum Events {
   DISCONNECTED("disconnected"),
-  RECONNECTED("reconnected")
+  RECONNECTED("reconnected"),
+  CONNECTED("connected")
   ;
   private final String name;
 
