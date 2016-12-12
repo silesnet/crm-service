@@ -29,6 +29,27 @@ public class DefaultNetworkService implements NetworkService {
   @Override
   public void enableService(long serviceId) {
     logger.debug("enabling service with id '{}'...", serviceId);
+    final Data pppoe = MapData.of(networkRepository.findServicePppoe(serviceId));
+    final boolean hasPppoe = !pppoe.asMap().isEmpty();
+    if (hasPppoe) {
+      kickPppoeUser(pppoe.stringOf("master"), pppoe.stringOf("login"));
+    }
+    final Data dhcp = MapData.of(networkRepository.findServiceDhcp(serviceId));
+    final boolean hasDhcp = !dhcp.asMap().isEmpty();
+    if (hasDhcp) {
+      executeSystemCommand(commandFactory.systemCommand(
+          "configureDhcpPort",
+          "-s", dhcp.stringOf("switch"),
+          "-p", dhcp.stringOf("port"),
+          "-v", "1"));
+    }
+    if (!hasPppoe && !hasDhcp) {
+      executeSystemCommand(commandFactory.systemCommand(
+          "sendEmail",
+          "-a", "podpora@silesnet.cz",
+          "-s", "enable debtor's service: " + serviceId,
+          "-m", "/SIS"));
+    }
     logger.info("enabled service with id '{}'", serviceId);
   }
 
