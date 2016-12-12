@@ -57,6 +57,20 @@ public class DbiCommandQueue implements CommandQueue {
   }
 
   @Override
+  public List<Command> next(int batch) {
+    final List<Map<String, Object>> commands = findRecords(
+        "SELECT * FROM " + COMMANDS_TABLE + " WHERE " +
+            "status='issued' ORDER BY id LIMIT " + batch,
+        ImmutableMap.<String, Object>of(),
+        dbi);
+    final List<Command> result = new ArrayList<>(commands.size());
+    for (Map<String, Object> row : commands) {
+      result.add(Command.of(MapRecord.of(row)));
+    }
+    return result;
+  }
+
+  @Override
   public List<Command> nextOf(final Commands command, final int batch) {
     final List<Map<String, Object>> commands = findRecords(
         "SELECT * FROM " + COMMANDS_TABLE + " WHERE " +
