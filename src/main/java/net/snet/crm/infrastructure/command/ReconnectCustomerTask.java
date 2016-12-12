@@ -17,14 +17,15 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static net.snet.crm.domain.shared.command.Commands.DISCONNECT;
+import static net.snet.crm.domain.shared.command.Commands.RECONNECT;
 import static net.snet.crm.domain.shared.event.Event.occurred;
 import static net.snet.crm.domain.shared.event.Events.DISCONNECTED;
+import static net.snet.crm.domain.shared.event.Events.RECONNECTED;
 import static net.snet.crm.service.utils.Databases.updateRecord;
 import static net.snet.crm.service.utils.Databases.updateRecords;
 
-public class DisconnectCustomerTask implements Task {
-  private final static Logger log = LoggerFactory.getLogger(DisconnectCustomerTask.class);
+public class ReconnectCustomerTask implements Task {
+  private final static Logger log = LoggerFactory.getLogger(ReconnectCustomerTask.class);
   private static final String CUSTOMERS = "customers";
   private static final String SERVICES = "services";
 
@@ -33,45 +34,45 @@ public class DisconnectCustomerTask implements Task {
   private final Command command;
   private final EventLog eventLog;
 
-  public DisconnectCustomerTask(DBI dbi, NetworkService networkService, Command command, EventLog eventLog) {
+  public ReconnectCustomerTask(DBI dbi, NetworkService networkService, Command command, EventLog eventLog) {
     this.dbi = dbi;
     this.networkService = networkService;
-    checkArgument(DISCONNECT.equals(command.name()), "trying disconnect customer with wrong command '%s'", command.name());
-    checkArgument(CUSTOMERS.equals(command.entity()), "tyring to disconnect non 'customers' entity '%s'", command.entity());
+    checkArgument(RECONNECT.equals(command.name()), "trying reconnect customer with wrong command '%s'", command.name());
+    checkArgument(CUSTOMERS.equals(command.entity()), "tyring to reconnect non 'customers' entity '%s'", command.entity());
     this.command = command;
     this.eventLog = eventLog;
   }
 
   @Override
   public void perform() {
-    log.debug("disconnecting customer with id '{}'...", command.entityId());
+    log.debug("reconnecting customer with id '{}'...", command.entityId());
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
         final Long customerId = Long.valueOf(command.entityId());
-        updateRecord(CUSTOMERS, customerId, debtorStatus(), handle);
+        updateRecord(CUSTOMERS, customerId, invoiceStatus(), handle);
         updateRecords(customerServices(customerId), inheritStatus(), handle);
         for (Long serviceId : findCustomerServices(customerId, handle)) {
-          networkService.disableService(serviceId);
-          publishDisconnected(SERVICES, serviceId);
+          networkService.enableService(serviceId);
+          publishReconnected(SERVICES, serviceId);
         }
-        publishDisconnected(CUSTOMERS, customerId);
+        publishReconnected(CUSTOMERS, customerId);
         return null;
       }
     });
-    log.info("disconnected customer with id '{}'", command.entityId());
+    log.info("reconnected customer with id '{}'", command.entityId());
   }
 
-  private void publishDisconnected(String entity, long entityId) {
-    eventLog.publish(occurred(DISCONNECTED).on(entity, entityId).withCommandId(command.id()).build());
+  private void publishReconnected(String entity, long entityId) {
+    eventLog.publish(occurred(RECONNECTED).on(entity, entityId).withCommandId(command.id()).build());
   }
 
   private Databases.RecordId customerServices(Long customerId) {
     return new Databases.RecordId(SERVICES, "customer_id", customerId);
   }
 
-  private Map<String, Object> debtorStatus() {
-    return ImmutableMap.<String, Object>of("status", 25);
+  private Map<String, Object> invoiceStatus() {
+    return ImmutableMap.<String, Object>of("status", 10);
   }
 
   private Map<String, Object> inheritStatus() {

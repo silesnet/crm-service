@@ -48,7 +48,7 @@ public class CommandBroker implements Managed {
       Command current = null;
       while (isRunning) {
         try {
-          final List<Command> commands = commandQueue.nextOf(Commands.DISCONNECT, 1);
+          final List<Command> commands = commandQueue.next(1);
           for (Command command : commands) {
             current = command;
             log.debug("processing command '{}' for '{}/{}'...",

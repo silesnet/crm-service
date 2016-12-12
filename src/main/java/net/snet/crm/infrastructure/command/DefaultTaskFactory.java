@@ -21,6 +21,8 @@ public class DefaultTaskFactory implements TaskFactory {
     switch (command.name()) {
       case DISCONNECT:
         return new DisconnectCustomerTask(dbi, networkService, command, eventLog);
+      case RECONNECT:
+        return new ReconnectCustomerTask(dbi, networkService, command, eventLog);
       default:
         throw new UnsupportedOperationException();
     }

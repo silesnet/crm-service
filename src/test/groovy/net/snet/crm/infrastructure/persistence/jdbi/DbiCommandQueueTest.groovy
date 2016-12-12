@@ -37,6 +37,19 @@ class DbiCommandQueueTest extends Specification {
   }
 
   def "should return next command to execute"() {
+    given:
+      def commandA = queue.submit(Commands.DISCONNECT, 'customers', '23', Data.EMPTY)
+      def commandB = queue.submit(Commands.RECONNECT, 'customers', '23', Data.EMPTY)
+      def commandC = queue.submit(Commands.DISCONNECT, 'customers', '23', Data.EMPTY)
+    when:
+      def commands = queue.next(2)
+    then:
+      commands.size() == 2
+      commands[0].id().value() == commandA.id().value()
+      commands[1].id().value() == commandB.id().value()
+  }
+
+  def "should return next command of type to execute"() {
   given:
     def commandA = queue.submit(Commands.DISCONNECT, 'customers', '23', Data.EMPTY)
     def commandB = queue.submit(Commands.RECONNECT, 'customers', '23', Data.EMPTY)
