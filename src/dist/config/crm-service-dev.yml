@@ -8,7 +8,7 @@ database:
   password: sisa
   url: jdbc:postgresql://localhost/crm-service
 
-#systemCommandHome: src/test/resources/commands
+systemCommandHome: src/test/resources/commands
 
 logging:
   level: WARN
