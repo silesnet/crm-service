@@ -92,8 +92,30 @@ public class MapData implements Data {
   }
 
   @Override
+  public Map<String, Object> optionalMapOf(String path, Map<String, Object> def) {
+    final Value value = valueOf(path);
+    return value.hasValue ? asMap(value) : def;
+  }
+
+  @Override
+  public Data dataOf(String path) {
+    final Value value = assertValueExistsOn(path);
+    return asData(value);
+  }
+
+  @Override
+  public Data optionalDataOf(String path, Data def) {
+    final Value value = valueOf(path);
+    return value.hasValue ? asData(value) : def;
+  }
+
+  @Override
   public Map<String, Object> asMap() {
     return Maps.newHashMap(map);
+  }
+
+  private Data asData(Value value) {
+    return MapData.of(asMap(value));
   }
 
   private boolean asBoolean(Value value) {

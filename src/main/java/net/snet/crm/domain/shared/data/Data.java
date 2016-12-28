@@ -27,7 +27,12 @@ public interface Data {
   DateTime dateTimeOf(String path);
   DateTime optionalDateTimeOf(String path, DateTime def);
 
+  Data dataOf(String path);
+  Data optionalDataOf(String path, Data def);
+
   Map<String, Object> mapOf(String path);
+  Map<String, Object> optionalMapOf(String path, Map<String, Object> def);
+
   Map<String, Object> asMap();
 
 }
