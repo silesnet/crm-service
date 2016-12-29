@@ -4,6 +4,8 @@ import com.google.common.base.*;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Maps;
+import net.snet.crm.domain.shared.data.Data;
+import net.snet.crm.domain.shared.data.MapData;
 import org.joda.time.DateTime;
 import org.postgresql.util.PGobject;
 import org.skife.jdbi.v2.DBI;
@@ -30,6 +32,89 @@ public class Databases {
   private static Function<String, String> columnToAssignment = columnToAssignment();
   private static Function<Object, Object> valueToSqlType = valueToSqlType();
   private static Predicate<String> notId = notId();
+
+  public static void insertRecordWithoutKey(String table, Data record, Handle handle)
+  {
+    insertRecordWithoutKey(table, record.asMap(), handle);
+  }
+
+  public static void insertRecordWithoutKey(final String table, final Data record, DBI dbi)
+  {
+    dbi.withHandle(new HandleCallback<Void>()
+    {
+      @Override
+      public Void withHandle(Handle handle) throws Exception {
+        insertRecordWithoutKey(table, record, handle);
+        return null;
+      }
+    });
+  }
+
+  public static boolean updateRecord(RecordId recordId, Data update, Handle handle)
+  {
+    final Map<String, Object> map = update.asMap();
+    toPgTypesInPlace(map);
+    final int updated = handle
+        .createStatement(updateSqlWithId(recordId.table(), recordId.column(), map.keySet()))
+        .bindFromMap(Maps.transformValues(map, valueToSqlType))
+        .bind(recordId.column(), recordId.value())
+        .execute();
+    checkState(0 <= updated, "couldn't update record '%s'", recordId);
+    checkState(updated <= 1, "updated more than one (%s) records for '%s'", updated, recordId);
+    return updated == 1;
+  }
+
+  public static boolean updateRecord(final RecordId recordId, final Data update, DBI dbi)
+  {
+    return dbi.withHandle(new HandleCallback<Boolean>()
+    {
+      @Override
+      public Boolean withHandle(Handle handle) throws Exception {
+        return updateRecord(recordId, update, handle);
+      }
+    });
+  }
+
+  public static boolean deleteRecord(RecordId recordId, Handle handle)
+  {
+    final int deleted = handle.createStatement(
+        "DELETE FROM " + recordId.table() + " WHERE " + recordId.column() + "=:id;")
+           .bind("id", recordId.value())
+           .execute();
+    checkState(0 <= deleted, "couldn't delete record '%s'", recordId);
+    checkState(deleted <= 1, "deleted more than one (%s) records for '%s'", deleted, recordId);
+    return deleted == 1;
+  }
+
+  public static boolean deleteRecord(final RecordId recordId, DBI dbi)
+  {
+    return dbi.withHandle(new HandleCallback<Boolean>()
+    {
+      @Override
+      public Boolean withHandle(Handle handle) throws Exception {
+        return deleteRecord(recordId, handle);
+      }
+    });
+  }
+
+  public static Data findRecord(RecordId recordId, Handle handle)
+  {
+    final Map<String, Object> record = handle.createQuery(
+        "SELECT * FROM " + recordId.table() + " WHERE " + recordId.column() + "=:id;")
+        .bind("id", recordId.value())
+        .first();
+    return record != null ? MapData.of(record) : Data.EMPTY;
+  }
+
+  public static Data findRecord(final RecordId recordId, DBI dbi) {
+    return dbi.withHandle(new HandleCallback<Data>()
+    {
+      @Override
+      public Data withHandle(Handle handle) throws Exception {
+        return findRecord(recordId, handle);
+      }
+    });
+  }
 
   public static long lastEntityIdFor(final String entityType,
                                      final String entitySpate,
@@ -139,12 +224,12 @@ public class Databases {
     checkTableName(recordId.table());
     toPgTypesInPlace(update);
     final int updatedRows = handle
-        .createStatement(updateSqlWithId(recordId.table(), recordId.idColumn(), update.keySet()))
+        .createStatement(updateSqlWithId(recordId.table(), recordId.column(), update.keySet()))
         .bindFromMap(Maps.transformValues(update, valueToSqlType))
-        .bind(recordId.idColumn(), recordId.idValue())
+        .bind(recordId.column(), recordId.value())
         .execute();
     checkState(updatedRows == 1, "failed on update record '%s' in '%s'",
-        recordId.idValue(), recordId.table());
+               recordId.value(), recordId.table());
   }
 
   public static void updateRecords(final RecordId recordId,
@@ -153,9 +238,9 @@ public class Databases {
     checkTableName(recordId.table());
     toPgTypesInPlace(update);
     handle
-        .createStatement(updateSqlWithId(recordId.table(), recordId.idColumn(), update.keySet()))
+        .createStatement(updateSqlWithId(recordId.table(), recordId.column(), update.keySet()))
         .bindFromMap(Maps.transformValues(update, valueToSqlType))
-        .bind(recordId.idColumn(), recordId.idValue())
+        .bind(recordId.column(), recordId.value())
         .execute();
   }
 
@@ -316,25 +401,60 @@ public class Databases {
 
   public static class RecordId {
     final String table;
-    final String idColumn;
-    final Object idValue;
+    final String column;
+    final Object value;
 
-    public RecordId(String table, String idColumn, Object idValue) {
+    public static RecordId of(String table, String idColumn, Object idValue) {
+      return new RecordId(table, idColumn, idValue);
+    }
+
+    public RecordId(String table, String column, Object value) {
+      checkTableName(table);
+      checkColumnName(column);
       this.table = table;
-      this.idColumn = idColumn;
-      this.idValue = idValue;
+      this.column = column;
+      this.value = value;
     }
 
     public String table() {
       return table;
     }
 
-    public String idColumn() {
-      return idColumn;
+    public String column() {
+      return column;
     }
 
-    public Object idValue() {
-      return idValue;
+    public Object value() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return "RecordId{" +
+          "table='" + table + '\'' +
+          ", column='" + column + '\'' +
+          ", value=" + value +
+          '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      RecordId recordId = (RecordId) o;
+
+      if (table != null ? !table.equals(recordId.table) : recordId.table != null) return false;
+      if (column != null ? !column.equals(recordId.column) : recordId.column != null) return false;
+      return value != null ? value.equals(recordId.value) : recordId.value == null;
+    }
+
+    @Override
+    public int hashCode() {
+      int result = table != null ? table.hashCode() : 0;
+      result = 31 * result + (column != null ? column.hashCode() : 0);
+      result = 31 * result + (value != null ? value.hashCode() : 0);
+      return result;
     }
   }
 }

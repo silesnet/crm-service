@@ -6,6 +6,8 @@ import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkRepository.Country;
 import net.snet.crm.domain.model.network.NetworkRepository.DeviceType;
 import net.snet.crm.domain.model.network.NetworkService;
+import net.snet.crm.domain.shared.data.Data;
+import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.service.bo.Network;
 import net.snet.crm.service.dao.NetworkDAO;
@@ -25,7 +27,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static net.snet.crm.service.utils.Entities.*;
 
 @Path("/networks")
-public class NetworkResource {
+public class NetworkResource
+{
 
   private static final Logger logger = LoggerFactory.getLogger(NetworkResource.class);
 
@@ -43,7 +46,8 @@ public class NetworkResource {
   @Path("pppoe/{login}/kick/{master}")
   @Produces({"application/json; charset=UTF-8"})
   public Response kickPppoeUser(
-      @PathParam("login") String login, @PathParam("master") String master) {
+      @PathParam("login") String login, @PathParam("master") String master)
+  {
     networkService.kickPppoeUser(master, login);
     return Response.ok(ImmutableMap.of()).build();
   }
@@ -53,7 +57,30 @@ public class NetworkResource {
   @Produces({"application/json; charset=UTF-8"})
   public Response pppoeLastIpOf(@PathParam("login") String login) {
     return Response.ok(ImmutableMap.of("lastIp",
-        networkRepository.findPppoeUserLastIp(login))).build();
+                                       networkRepository.findPppoeUserLastIp(login))).build();
+  }
+
+  @PUT
+  @Path("dhcp-wireless/{serviceId}")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response updateServiceWirelessDhcp(
+      @PathParam("serviceId") long serviceId,
+      Data body)
+  {
+    checkState(body.hasValue("services.dhcp_wireless"),
+               "no wireless DHCP update provided");
+    final Data update = body.dataOf("services.dhcp_wireless");
+    if (update.isEmpty()) {
+      networkRepository.removeDhcpWireless(serviceId);
+    } else {
+      final Data current = networkRepository.findServiceDhcpWireless(serviceId);
+      if (current.isEmpty()) {
+        networkRepository.addDhcpWireless(serviceId, update);
+      } else {
+        networkRepository.updateDhcpWireless(serviceId, update);
+      }
+    }
+    return Response.ok(MapData.EMPTY).build();
   }
 
   @PUT
@@ -61,7 +88,8 @@ public class NetworkResource {
   @Produces({"application/json; charset=UTF-8"})
   public Response updateServicePppoe(
       @PathParam("serviceId") long serviceId,
-      Map<String, Object> updateBody) {
+      Map<String, Object> updateBody)
+  {
     ValueMap update = valueMapOf(updateBody);
     Value serviceUpdate = update.get("services");
     checkState(!serviceUpdate.isNull(), "no service update body sent");
@@ -91,7 +119,8 @@ public class NetworkResource {
   @Produces({"application/json; charset=UTF-8"})
   public Response updateServiceDhcp(
       @PathParam("serviceId") long serviceId,
-      Map<String, Object> updateBody) {
+      Map<String, Object> updateBody)
+  {
     ValueMap update = valueMapOf(updateBody);
     Value serviceUpdate = update.get("services");
     checkState(!serviceUpdate.isNull(), "no service update body sent");
@@ -128,7 +157,8 @@ public class NetworkResource {
   @Produces({"application/json; charset=UTF-8"})
   public Response findDevicesByCountry(
       @PathParam("country") String countryParam,
-      @QueryParam("deviceType") String deviceTypeParam) {
+      @QueryParam("deviceType") String deviceTypeParam)
+  {
     final Country country = Country.valueOf(countryParam.toUpperCase());
     final DeviceType deviceType = DeviceType.valueOf(deviceTypeParam.toUpperCase());
     List<Map<String, Object>> devices =
@@ -143,7 +173,7 @@ public class NetworkResource {
   public Response findDeviceById(@PathParam("deviceId") int deviceId) {
     return Response.ok(
         ImmutableMap.of("devices", networkRepository.findDevice(deviceId)))
-        .build();
+                   .build();
   }
 
   @GET
