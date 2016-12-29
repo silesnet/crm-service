@@ -1,5 +1,7 @@
 package net.snet.crm.domain.model.network;
 
+import net.snet.crm.domain.shared.data.Data;
+
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +23,14 @@ public interface NetworkRepository {
   Map<String, Object> findServicePppoe(long serviceId);
 
   List<Map<String, Object>> findPppoeUserLastIp(String login);
+
+  Data findServiceDhcpWireless(long serviceId);
+
+  void addDhcpWireless(long serviceId, Data dhcp);
+
+  void updateDhcpWireless(long serviceId, Data update);
+
+  void removeDhcpWireless(long serviceId);
 
   void bindDhcp(long serviceId, int switchId, int port);
 

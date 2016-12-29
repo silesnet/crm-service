@@ -31,6 +31,11 @@ public class MapData implements Data {
   }
 
   @Override
+  public boolean isEmpty() {
+    return map.isEmpty();
+  }
+
+  @Override
   public boolean booleanOf(String path) {
     return asBoolean(assertValueExistsOn(path));
   }

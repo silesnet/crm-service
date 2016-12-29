@@ -12,6 +12,8 @@ public interface Data {
 
   boolean hasPath(String path);
 
+  boolean isEmpty();
+
   boolean booleanOf(String path);
   boolean optionalBooleanOf(String path, boolean def);
 

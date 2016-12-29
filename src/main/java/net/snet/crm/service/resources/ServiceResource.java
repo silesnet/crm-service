@@ -72,6 +72,12 @@ public class ServiceResource {
   }
 
   @GET
+  @Path("/{serviceId}/dhcp-wireless")
+  public Response serviceDhcpWireless(@PathParam("serviceId") long serviceId) {
+    return Response.ok(ImmutableMap.of("dhcp_wireless", networkRepository.findServiceDhcpWireless(serviceId))).build();
+  }
+
+  @GET
   @Path("/{serviceId}/pppoe")
   public Response servicePppoe(@PathParam("serviceId") long serviceId) {
     return Response.ok(ImmutableMap.of("pppoe", networkRepository.findServicePppoe(serviceId))).build();
