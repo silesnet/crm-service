@@ -1,9 +1,13 @@
 package net.snet.crm.domain.shared.data;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MapData implements Data {
@@ -97,9 +101,21 @@ public class MapData implements Data {
   }
 
   @Override
-  public Map<String, Object> optionalMapOf(String path, Map<String, Object> def) {
+  public Map<String, Object> optionalMapOf(String path) {
     final Value value = valueOf(path);
-    return value.hasValue ? asMap(value) : def;
+    return value.hasValue ? asMap(value) : ImmutableMap.<String, Object>of();
+  }
+
+  @Override
+  public List<Object> listOf(String path) {
+    final Value value = assertValueExistsOn(path);
+    return asList(value);
+  }
+
+  @Override
+  public List<Object> optionalListOf(String path) {
+    final Value value = valueOf(path);
+    return value.hasValue ? asList(value) : ImmutableList.of();
   }
 
   @Override
@@ -109,18 +125,14 @@ public class MapData implements Data {
   }
 
   @Override
-  public Data optionalDataOf(String path, Data def) {
+  public Data optionalDataOf(String path) {
     final Value value = valueOf(path);
-    return value.hasValue ? asData(value) : def;
+    return value.hasValue ? asData(value) : Data.EMPTY;
   }
 
   @Override
   public Map<String, Object> asMap() {
     return Maps.newHashMap(map);
-  }
-
-  private Data asData(Value value) {
-    return MapData.of(asMap(value));
   }
 
   private boolean asBoolean(Value value) {
@@ -158,6 +170,17 @@ public class MapData implements Data {
       throw new IllegalStateException("value is not map");
     }
     return (Map<String, Object>) value.value;
+  }
+
+  private List<Object> asList(Value value) {
+    if (!(value.value instanceof List)) {
+      throw new IllegalStateException("value is not list");
+    }
+    return (List<Object>) value.value;
+  }
+
+  private Data asData(Value value) {
+    return MapData.of(asMap(value));
   }
 
   private Value assertValueExistsOn(final String path) {

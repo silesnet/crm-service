@@ -3,6 +3,7 @@ package net.snet.crm.domain.shared.data;
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
 
+import java.util.List;
 import java.util.Map;
 
 public interface Data {
@@ -30,10 +31,13 @@ public interface Data {
   DateTime optionalDateTimeOf(String path, DateTime def);
 
   Data dataOf(String path);
-  Data optionalDataOf(String path, Data def);
+  Data optionalDataOf(String path);
 
   Map<String, Object> mapOf(String path);
-  Map<String, Object> optionalMapOf(String path, Map<String, Object> def);
+  Map<String, Object> optionalMapOf(String path);
+
+  List<Object> listOf(String path);
+  List<Object> optionalListOf(String path);
 
   Map<String, Object> asMap();
 

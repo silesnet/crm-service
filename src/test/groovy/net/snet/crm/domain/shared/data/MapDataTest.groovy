@@ -6,6 +6,19 @@ import spock.lang.Unroll
 
 class MapDataTest extends Specification {
 
+  def "should return empty list on non existing path"() {
+    def data = MapData.of([:])
+    def list = data.optionalListOf('k')
+    expect:
+      list.size() == 0
+  }
+
+  def "should return list on path"() {
+    def data = MapData.of([k: [1, 2]])
+    def list = data.listOf('k')
+    expect:
+      list.size() == 2
+  }
 
   def "should return data on path"() {
       def data = MapData.of([k: [k: 1]]).dataOf('k')
@@ -13,16 +26,16 @@ class MapDataTest extends Specification {
       data.asMap() == [k: 1]
   }
 
-  def "should return default data on non existing path"() {
-      def data = MapData.of([:]).optionalDataOf('k', MapData.of([k: 1]))
+  def "should return empty data on non existing path"() {
+      def data = MapData.of([:]).optionalDataOf('k')
     expect:
-      data.asMap() == [k: 1]
+      data.isEmpty()
   }
 
-  def "should return default map on non existing path"() {
-      def map = MapData.of([:]).optionalMapOf('k', [k: 1])
+  def "should return empty map on non existing path"() {
+      def map = MapData.of([:]).optionalMapOf('k')
     expect:
-      map == [k: 1]
+      map.isEmpty()
   }
 
   def "should return copy of map data"() {
