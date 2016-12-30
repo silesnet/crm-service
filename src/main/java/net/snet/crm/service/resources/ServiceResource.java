@@ -98,7 +98,7 @@ public class ServiceResource {
     if (!isActiveValue.isPresent() || "null".equals(isActiveValue.get().toLowerCase())) {
       return null;
     }
-    return new Boolean(isActiveValue.get());
+    return Boolean.valueOf(isActiveValue.get());
   }
 
   @GET
