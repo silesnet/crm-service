@@ -6,7 +6,7 @@ CREATE TABLE ap_wireless
    interface   text      NOT NULL
 );
 
-ALTER TABLE events
+ALTER TABLE ap_wireless
    ADD CONSTRAINT ap_wireless_pkey
    PRIMARY KEY (id);
 
