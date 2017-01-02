@@ -3,6 +3,7 @@ CREATE TABLE dhcp_wireless
    service_id  bigint    NOT NULL,
    mac         macaddr,
    interface   text      DEFAULT ''::text NOT NULL,
+   master      text      DEFAULT ''::text NOT NULL,
    ip          inet,
    ip_class    text      DEFAULT 'static'::text NOT NULL
 );
