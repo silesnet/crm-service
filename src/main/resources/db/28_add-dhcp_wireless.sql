@@ -7,7 +7,7 @@ CREATE TABLE dhcp_wireless
    ip_class    text      DEFAULT 'static'::text NOT NULL
 );
 
-ALTER TABLE pppoe
-   ADD CONSTRAINT dhcp_wireless_service_id_key UNIQUE (service_id);
+ALTER TABLE dhcp_wireless
+   ADD CONSTRAINT dhcp_wireless_service_id_key UNIQUE(service_id);
 
 COMMIT;
