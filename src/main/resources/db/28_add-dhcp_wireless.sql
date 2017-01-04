@@ -4,6 +4,8 @@ CREATE TABLE dhcp_wireless
    mac         macaddr,
    interface   text      DEFAULT ''::text NOT NULL,
    master      text      DEFAULT ''::text NOT NULL,
+   area        text      DEFAULT ''::text NOT NULL,
+   location    text      DEFAULT ''::text NOT NULL,
    ip          inet,
    ip_class    text      DEFAULT 'static'::text NOT NULL
 );
