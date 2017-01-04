@@ -1,10 +1,23 @@
 package net.snet.crm.domain.shared.data
 
+import com.google.common.collect.ImmutableMap
 import org.joda.time.DateTime
 import spock.lang.Specification
 import spock.lang.Unroll
 
 class MapDataTest extends Specification {
+
+  def "should be able to create new updated data"() {
+    def data = MapData.of(ImmutableMap.of('key', 'value', 'key3', 'value3'))
+    def map = data.asMap()
+    map.put('key2', 'value2')
+    map.put('key', 'updated')
+    def updated = MapData.of(map)
+    expect:
+    updated.stringOf('key') == 'updated'
+    updated.stringOf('key2') == 'value2'
+    updated.stringOf('key3') == 'value3'
+  }
 
   def "should return empty list on non existing path"() {
     def data = MapData.of([:])
