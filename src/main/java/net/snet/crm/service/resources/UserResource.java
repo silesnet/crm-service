@@ -2,7 +2,9 @@ package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import net.snet.crm.service.bo.User;
 import net.snet.crm.service.dao.CrmRepository;
@@ -18,6 +20,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -68,8 +71,8 @@ public class UserResource {
 			user.put("user", "test");
 			user.put("name", "Test");
 			user.put("full_name", "Test Anonymous");
-			user.put("roles", "ANONYMOUS_ROLE");
-			user.put("operation_country", "PL");
+			user.put("roles", testUserRoles());
+			user.put("operation_country", testUserCountry());
 			return Response.ok(ImmutableMap.of("users", user)).build();
 		}
 		if (session.isPresent()) {
@@ -82,5 +85,26 @@ public class UserResource {
 		}
 		return Response.status(Response.Status.NOT_FOUND).build();
 	}
+
+  private String testUserCountry() {
+    return Iterables.find(
+        Arrays.asList(
+            System.getenv("SIS_TEST_USER_COUNTRY"),
+            "PL"
+        ),
+        Predicates.<String>notNull()
+    );
+  }
+
+  private String testUserRoles() {
+    return Iterables.find(
+        Arrays.asList(
+            System.getenv("SIS_TEST_USER_ROLES"),
+            "ANONYMOUS_ROLE"
+        ),
+        Predicates.<String>notNull()
+    );
+  }
+
 }
 
