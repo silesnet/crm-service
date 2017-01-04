@@ -185,6 +185,10 @@ public class DbiNetworkRepository implements NetworkRepository {
       checkState(dhcp.longOf("service_id") == serviceId,
                  "trying to add wireless DHCP of different service '%s'",
                  dhcp.longOf("service_id"));
+    } else {
+      final Map<String, Object> map = dhcp.asMap();
+      map.put("service_id", serviceId);
+      dhcp = MapData.of(map);
     }
     insertRecordWithoutKey(DHCP_WIRELESS_TABLE, dhcp, dbi);
     logger.info("added DHCP wireless for service '{}'", serviceId);
