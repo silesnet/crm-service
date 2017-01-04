@@ -4,6 +4,8 @@ INSERT INTO dhcp_wireless
   , mac
   , interface
   , master
+  , area
+  , location
   , ip
   , ip_class
 )
@@ -11,6 +13,8 @@ SELECT p.service_id
        , p.mac
        , p.interface
        , p.master
+       , p.area
+       , p.location
        , p.ip
        , p.ip_class
 FROM pppoe p

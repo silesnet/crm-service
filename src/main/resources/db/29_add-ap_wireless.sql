@@ -4,7 +4,6 @@ CREATE TABLE ap_wireless
    name        text      NOT NULL,
    mac         macaddr   NOT NULL,
    interface   text      NOT NULL,
-   master      text      DEFAULT ''::text NOT NULL
 );
 
 ALTER TABLE ap_wireless
