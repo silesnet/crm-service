@@ -1,8 +1,8 @@
 CREATE TABLE ap_wireless
 (
    id          bigserial NOT NULL,
-   name        text      NOT NULL,
-   mac         macaddr   NOT NULL,
+   name        text      NOT NULL UNIQUE,
+   mac         macaddr   NOT NULL UNIQUE,
    interface   text      NOT NULL
 );
 
