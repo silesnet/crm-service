@@ -1,7 +1,7 @@
 CREATE TABLE dhcp_wireless
 (
    service_id  bigint    NOT NULL,
-   mac         macaddr,
+   mac         macaddr   UNIQUE,
    interface   text      DEFAULT ''::text NOT NULL,
    master      text      DEFAULT ''::text NOT NULL,
    area        text      DEFAULT ''::text NOT NULL,
