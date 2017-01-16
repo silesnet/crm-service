@@ -1,5 +1,6 @@
 package net.snet.crm.infrastructure.network.access.action;
 
+import com.google.common.collect.Lists;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.infrastructure.network.access.Action;
@@ -10,8 +11,8 @@ import java.util.List;
 
 public class BaseAction implements Action
 {
-  private final NetworkRepository networkRepository;
-  private final NetworkService networkService;
+  final NetworkRepository networkRepository;
+  final NetworkService networkService;
 
   public BaseAction(NetworkRepository networkRepository, NetworkService networkService) {
     this.networkRepository = networkRepository;
@@ -20,14 +21,20 @@ public class BaseAction implements Action
 
   @Override
   public List<String> perform(long serviceId, Handle handle) {
-    updateDatabase(handle);
-    return updateNetwork();
+    updateDatabase(serviceId, handle);
+    try {
+      return updateNetwork(serviceId);
+    } catch (Exception e) {
+      return Lists.newArrayList(
+          String.format("warning: %s", e.getMessage())
+      );
+    }
   }
 
-  void updateDatabase(Handle handle) {
+  void updateDatabase(long serviceId, Handle handle) {
   }
 
-  List<String> updateNetwork() {
+  List<String> updateNetwork(long serviceId) {
     return new ArrayList<>();
   }
 

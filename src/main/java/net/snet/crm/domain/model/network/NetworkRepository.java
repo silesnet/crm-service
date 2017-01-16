@@ -1,6 +1,7 @@
 package net.snet.crm.domain.model.network;
 
 import net.snet.crm.domain.shared.data.Data;
+import org.skife.jdbi.v2.Handle;
 
 import java.util.List;
 import java.util.Map;
@@ -43,4 +44,6 @@ public interface NetworkRepository {
   void updatePppoe(long serviceId, Map<String, Object> update);
 
   void removePppoe(long serviceId);
+
+  void removePppoe(long serviceId, Handle handle);
 }
