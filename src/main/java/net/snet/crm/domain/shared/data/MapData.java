@@ -231,4 +231,9 @@ public class MapData implements Data {
       this.isLeaf = !(tmp instanceof Map);
     }
   }
+
+  @Override
+  public String toString() {
+    return map.toString();
+  }
 }

@@ -139,7 +139,8 @@ public class CrmService extends Application<CrmConfiguration> {
         crmRepository,
         agreementRepository,
         networkRepository,
-        networkService));
+        networkService,
+        dbi));
     jersey.register(new MessagingResource(messagingService));
     jersey.register(new EventResource(eventLog));
     jersey.register(new RuntimeExceptionMapper());

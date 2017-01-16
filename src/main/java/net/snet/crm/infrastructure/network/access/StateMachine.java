@@ -6,7 +6,7 @@ import static net.snet.crm.infrastructure.network.access.Transitions.*;
 
 public class StateMachine
 {
-  Transitions transitionOf(States state, Events event) {
+  public Transitions transitionOf(States state, Events event) {
     if (None == state) {
       switch (event) {
         case Created: return NULL;

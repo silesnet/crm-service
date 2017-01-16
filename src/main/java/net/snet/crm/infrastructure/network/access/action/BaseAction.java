@@ -5,6 +5,9 @@ import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.infrastructure.network.access.Action;
 import org.skife.jdbi.v2.Handle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BaseAction implements Action
 {
   private final NetworkRepository networkRepository;
@@ -16,9 +19,10 @@ public class BaseAction implements Action
   }
 
   @Override
-  public void perform(Handle handle) {
+  public List<String> perform(long serviceId, Handle handle) {
     updateDatabase(handle);
     updateNetwork();
+    return new ArrayList<>();
   }
 
   void updateDatabase(Handle handle) {

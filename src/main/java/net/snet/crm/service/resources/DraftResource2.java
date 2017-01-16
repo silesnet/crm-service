@@ -13,8 +13,13 @@ import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
+import net.snet.crm.domain.shared.data.Data;
+import net.snet.crm.domain.shared.data.MapData;
+import net.snet.crm.infrastructure.network.access.*;
+import net.snet.crm.infrastructure.network.access.action.NoAction;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
+import org.skife.jdbi.v2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,10 +29,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static net.snet.crm.domain.model.draft.Draft.Entity.SERVICES;
 import static net.snet.crm.service.utils.Entities.*;
@@ -36,7 +38,8 @@ import static net.snet.crm.service.utils.Resources.checkParam;
 @Path("/drafts2")
 @Produces({"application/json; charset=UTF-8"})
 @Consumes(MediaType.APPLICATION_JSON)
-public class DraftResource2 {
+public class DraftResource2
+{
   private static final Logger logger = LoggerFactory.getLogger(DraftResource2.class);
   private static final Function<Map<String, Object>, String> getLoginValue = getValueOf("login");
   private static final String AUTH_DHCP = "1";
@@ -45,28 +48,37 @@ public class DraftResource2 {
   private final CrmRepository crmRepository;
   @Context
   private UriInfo uriInfo;
-  private DraftRepository draftRepository;
-  private AgreementRepository agreementRepository;
-  private NetworkRepository networkRepository;
-  private NetworkService networkService;
+  private final DraftRepository draftRepository;
+  private final AgreementRepository agreementRepository;
+  private final NetworkRepository networkRepository;
+  private final NetworkService networkService;
+  private final StateMachine stateMachine;
+  private final ActionFactory actionFactory;
+  private final DBI dbi;
 
   public DraftResource2(
       DraftRepository draftRepository,
       CrmRepository crmRepository,
       AgreementRepository agreementRepository,
       NetworkRepository networkRepository,
-      NetworkService networkService) {
+      NetworkService networkService,
+      DBI dbi)
+  {
     this.draftRepository = draftRepository;
     this.crmRepository = crmRepository;
     this.agreementRepository = agreementRepository;
     this.networkRepository = networkRepository;
     this.networkService = networkService;
+    this.dbi = dbi;
+    this.stateMachine = new StateMachine();
+    this.actionFactory = new ActionFactory(networkRepository, networkService);
   }
 
   @GET
   public Response retrieveDraftsByOwner(
       @QueryParam("owner") final Optional<String> ownerParam,
-      @QueryParam("entityType") final Optional<String> entityType) {
+      @QueryParam("entityType") final Optional<String> entityType)
+  {
     checkParam(ownerParam.isPresent(), "'owner' query parameter is mandatory");
     final String owner = ownerParam.get();
     logger.debug("retrieving drafts by owner '{}'", owner);
@@ -75,13 +87,13 @@ public class DraftResource2 {
       if ("ROLE_TECH_ADMIN".equals(role)) {
         drafts.addAll(
             FluentIterable.from(draftRepository.findByStatus("SUBMITTED"))
-                .filter(ownedByOneOf(subordinatesOrSelf(owner))).toSet());
+                          .filter(ownedByOneOf(subordinatesOrSelf(owner))).toSet());
       }
       if ("ROLE_ACCOUNTING".equals(role)) {
         String ownerOperationCountry = userOperationCountry(owner);
         drafts.addAll(
             FluentIterable.from(draftRepository.findByStatus("APPROVED"))
-                .filter(draftCountryOf(ownerOperationCountry)).toList());
+                          .filter(draftCountryOf(ownerOperationCountry)).toList());
         drafts.addAll(draftRepository.findByOwnerAndStatus(owner, "SUBMITTED"));
       }
       if ("ROLE_NETWORK_ADMIN".equals(role)) {
@@ -98,7 +110,8 @@ public class DraftResource2 {
 
   private Predicate<? super Map<String, Object>> draftCountryOf(final String operationCountry) {
     final String countryPrefix = "CZ".equals(operationCountry) ? "1" : "2";
-    return new Predicate<Map<String, Object>>() {
+    return new Predicate<Map<String, Object>>()
+    {
       @Override
       public boolean apply(Map<String, Object> draft) {
         final String spate = "" + draft.get("entitySpate") + "X";
@@ -112,7 +125,7 @@ public class DraftResource2 {
     final Optional<Map<String, Object>> draftData = optionalMapOf("drafts", body);
     checkParam(draftData.isPresent(), "cannot create draft, data not sent");
     logger.debug("creating '{}' draft",
-        optionalOf("entityType", draftData.get()).get());
+                 optionalOf("entityType", draftData.get()).get());
     final long draftId = draftRepository.create(draftData.get());
     final Map<String, Object> draft = draftRepository.get(draftId);
     return Response
@@ -131,34 +144,91 @@ public class DraftResource2 {
 
   @GET
   @Path("/{entityType}/{entityId}")
-  public Response retrieveDraftByType(@PathParam("entityType") String entityType,
-                                      @PathParam("entityId") long entityId) {
+  public Response retrieveDraftByType(
+      @PathParam("entityType") String entityType,
+      @PathParam("entityId") long entityId)
+  {
     return Response
         .ok(ImmutableMap.of("drafts",
-            draftRepository.getEntity(entityType, entityId)))
+                            draftRepository.getEntity(entityType, entityId)))
         .build();
   }
 
   @PUT
   @Path("/{draftId}")
-  public Response updateDraft(LinkedHashMap<String, Object> body,
-                              @PathParam("draftId") long draftId) {
+  public Response updateDraft(
+      LinkedHashMap<String, Object> body,
+      @PathParam("draftId") final long draftId
+  )
+  {
     logger.debug("PUT /drafts2 '{}'", body);
-    final Optional<Map<String, Object>> draftData = optionalMapOf("drafts", body);
-    checkParam(draftData.isPresent(), "can't update draft, data not sent");
-    logger.debug("updating draft '{}'", draftId);
-    final Map<String, Object> originalDraft = draftRepository.get(draftId);
-    if ("IMPORTED".equals(originalDraft.get("status"))) {
-      throw new WebApplicationException(new IllegalStateException("trying on updated IMPORTED " +
-          "draft '" + draftId + "'"));
+    final Data data = MapData.of(body).dataOf("drafts");
+    final Data original = MapData.of(draftRepository.get(draftId));
+    ensureNotImported(original);
+
+    final List<String> messages =
+        dbi.inTransaction(new TransactionCallback<List<String>>()
+        {
+          @Override
+          public List<String> inTransaction(Handle handle, TransactionStatus status) throws Exception {
+            draftRepository.update(draftId, data, handle);
+            final Data draft = draftRepository.get(draftId, handle);
+
+            if (isServiceDraft(original)) {
+              final Action action = accessChangeAction(original, draft);
+              return action.perform(serviceId(original), handle);
+            }
+
+            return new ArrayList<>();
+          }
+        });
+
+    logger.info(
+        "updated draft '{}' of '{}/{}'", draftId,
+        original.stringOf("entityType"),
+        original.stringOf("entityId")
+    );
+
+    return Response.ok(
+        ImmutableMap.of("messages", messages)).build();
+  }
+
+  private long serviceId(Data draft) {
+    return draft.longOf("entityId");
+  }
+
+  private boolean isServiceDraft(Data draft) {
+    return "services".equals(draft.stringOf("entityType"));
+  }
+
+
+  private void ensureNotImported(Data draft) {
+    checkParam(
+        !"IMPORTED".equals(draft.stringOf("status")),
+        newWebException("trying to update IMPORTED draft '%d'", draft.longOf("id"))
+    );
+  }
+
+  private WebApplicationException newWebException(String message, Object... args) {
+    return new WebApplicationException(
+        new IllegalStateException(
+            String.format(message, args)
+        )
+    );
+  }
+
+  private Action accessChangeAction(Data original, Data draft)
+  {
+    if (!"services".equals(original.stringOf("entityType"))) {
+      return NoAction.INSTANCE;
     }
-    draftRepository.update(draftId, draftData.get()); // should be in transaction with handleConnectionChanges()
-    logger.debug("draft '{}' updated", draftId);
-    final Map<String, Object> draft = draftRepository.get(draftId);
-    handleConnectionChanges(originalDraft, draft);
-    return Response
-        .ok(ImmutableMap.of("drafts", draft))
-        .build();
+    final Access originalAccess = new Access(original);
+    final Access access = new Access(draft);
+    final Transitions transition = stateMachine.transitionOf(
+        originalAccess.state(),
+        access.event()
+    );
+    return actionFactory.actionOf(transition);
   }
 
   private void handleConnectionChanges(Map<String, Object> originalDraftMap, Map<String, Object> currentDraftMap) {
@@ -342,7 +412,8 @@ public class DraftResource2 {
   }
 
   private Predicate<Map<String, Object>> ownedByOneOf(final Set<String> users) {
-    return new Predicate<Map<String, Object>>() {
+    return new Predicate<Map<String, Object>>()
+    {
       @Override
       public boolean apply(final Map<String, Object> draft) {
         final String submittedDraftOwner = String.valueOf(draft.get("owner"));
@@ -351,8 +422,10 @@ public class DraftResource2 {
     };
   }
 
-  private void filterInPlaceByEntityType(final Set<Map<String, Object>> drafts,
-                                         @Nonnull final String entityType) {
+  private void filterInPlaceByEntityType(
+      final Set<Map<String, Object>> drafts,
+      @Nonnull final String entityType)
+  {
     final Iterator<Map<String, Object>> draftsIterator = drafts.iterator();
     while (draftsIterator.hasNext()) {
       Map<String, Object> draft = draftsIterator.next();
