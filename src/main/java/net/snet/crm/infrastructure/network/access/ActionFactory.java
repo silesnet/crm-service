@@ -3,9 +3,12 @@ package net.snet.crm.infrastructure.network.access;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.infrastructure.network.access.action.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ActionFactory
 {
+  private final static Logger log = LoggerFactory.getLogger(ActionFactory.class);
   private final NetworkRepository networkRepository;
   private final NetworkService networkService;
 
@@ -17,7 +20,8 @@ public class ActionFactory
     this.networkService = networkService;
   }
 
-  Action actionOf(final Transitions transition) {
+  public Action actionOf(final Transitions transition) {
+    log.debug("providing action for '{}'", transition);
     switch (transition) {
       case NULL:
         return NoAction.INSTANCE;
