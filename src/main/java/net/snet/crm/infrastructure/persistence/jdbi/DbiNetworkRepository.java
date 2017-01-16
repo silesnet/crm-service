@@ -283,13 +283,20 @@ public class DbiNetworkRepository implements NetworkRepository {
     dbi.inTransaction(new TransactionCallback<Void>() {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        handle.createStatement("DELETE FROM " + PPPOE_TABLE + " WHERE service_id=:service_id")
-            .bind("service_id", serviceId)
-            .execute();
+        removePppoe(serviceId, handle);
         return null;
       }
     });
   }
+
+  @Override
+  public void removePppoe(final long serviceId, Handle handle) {
+    handle.createStatement("DELETE FROM " + PPPOE_TABLE + " WHERE service_id=:service_id")
+        .bind("service_id", serviceId)
+        .execute();
+  }
+
+
 
   @Override
   public void updatePppoe(final long serviceId, final Map<String, Object> update) {
