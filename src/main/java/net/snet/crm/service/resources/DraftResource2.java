@@ -48,10 +48,10 @@ public class DraftResource2
   private final CrmRepository crmRepository;
   @Context
   private UriInfo uriInfo;
-  private final DraftRepository draftRepository;
-  private final AgreementRepository agreementRepository;
-  private final NetworkRepository networkRepository;
-  private final NetworkService networkService;
+  private DraftRepository draftRepository;
+  private AgreementRepository agreementRepository;
+  private NetworkRepository networkRepository;
+  private NetworkService networkService;
   private final StateMachine stateMachine;
   private final ActionFactory actionFactory;
   private final DBI dbi;
@@ -188,7 +188,6 @@ public class DraftResource2
         original.stringOf("entityType"),
         original.stringOf("entityId")
     );
-
     return Response.ok(
         ImmutableMap.of("messages", messages)).build();
   }

@@ -21,14 +21,14 @@ public class BaseAction implements Action
   @Override
   public List<String> perform(long serviceId, Handle handle) {
     updateDatabase(handle);
-    updateNetwork();
-    return new ArrayList<>();
+    return updateNetwork();
   }
 
   void updateDatabase(Handle handle) {
   }
 
-  void updateNetwork() {
+  List<String> updateNetwork() {
+    return new ArrayList<>();
   }
 
 }
