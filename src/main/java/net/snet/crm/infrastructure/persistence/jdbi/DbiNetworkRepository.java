@@ -24,7 +24,8 @@ import static net.snet.crm.domain.model.network.NetworkRepository.Country.PL;
 import static net.snet.crm.service.utils.Databases.*;
 import static net.snet.crm.service.utils.Entities.valueMapOf;
 
-public class DbiNetworkRepository implements NetworkRepository {
+public class DbiNetworkRepository implements NetworkRepository
+{
   private static final Logger logger = LoggerFactory.getLogger(DbiNetworkRepository.class);
   private static final String DHCP_TABLE = "dhcp";
   private static final String DHCP_WIRELESS_TABLE = "dhcp_wireless";
@@ -41,7 +42,8 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public List<Map<String, Object>> findConflictingAuthentications() {
-    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>()
+    {
       @Override
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
@@ -53,32 +55,34 @@ public class DbiNetworkRepository implements NetworkRepository {
                 "  LEFT JOIN dhcp AS d ON s.id = d.service_id\n" +
                 "WHERE p.service_id IS NOT NULL\n" +
                 "AND   d.service_id IS NOT NULL")
-            .list();
+                     .list();
       }
     });
   }
 
   @Override
   public List<String> findAllMasters() {
-    return dbi.withHandle(new HandleCallback<List<String>>() {
+    return dbi.withHandle(new HandleCallback<List<String>>()
+    {
       @Override
       public List<String> withHandle(Handle handle) throws Exception {
         return handle.createQuery("SELECT DISTINCT master FROM " + NETWORK_TABLE + " ORDER BY master;")
-            .map(StringMapper.FIRST)
-            .list();
+                     .map(StringMapper.FIRST)
+                     .list();
       }
     });
   }
 
   @Override
   public Map<String, Object> findDevice(final int deviceId) {
-    final Map<String, Object> device = dbi.withHandle(new HandleCallback<Map<String, Object>>() {
+    final Map<String, Object> device = dbi.withHandle(new HandleCallback<Map<String, Object>>()
+    {
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
             "SELECT * FROM " + NETWORK_TABLE + " WHERE id=:id")
-            .bind("id", deviceId)
-            .first();
+                     .bind("id", deviceId)
+                     .first();
       }
     });
     return device != null ? device : ImmutableMap.<String, Object>of();
@@ -87,19 +91,21 @@ public class DbiNetworkRepository implements NetworkRepository {
   @Override
   public List<Map<String, Object>> findDevicesByCountryAndType(
       final Country country,
-      final DeviceType deviceType) {
+      final DeviceType deviceType)
+  {
     final int countryId = Country.CZ.equals(country) ? 10 : PL.equals(country) ? 20 : 0;
     final int deviceTypeId = DeviceType.SWITCH.equals(deviceType) ? 40 : 0;
-    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>()
+    {
       @Override
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
             "SELECT id, name, master FROM " + NETWORK_TABLE +
                 " WHERE type = :type AND name ~ '^.+-br.?.?$' AND country = :country" +
                 " ORDER BY name")
-            .bind("type", deviceTypeId)
-            .bind("country", countryId)
-            .list();
+                     .bind("type", deviceTypeId)
+                     .bind("country", countryId)
+                     .list();
       }
     });
   }
@@ -224,13 +230,14 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public void bindDhcp(final long serviceId, final int switchId, final int port) {
-    dbi.inTransaction(new TransactionCallback<Object>() {
+    dbi.inTransaction(new TransactionCallback<Object>()
+    {
       @Override
       public Object inTransaction(Handle handle, TransactionStatus status) throws Exception {
         ValueMap currentDhcp = valueMapOf(handle
-            .createQuery("SELECT network_id, port FROM " + DHCP_TABLE + " WHERE service_id=:serviceId")
-            .bind("serviceId", serviceId)
-            .first());
+                                              .createQuery("SELECT network_id, port FROM " + DHCP_TABLE + " WHERE service_id=:serviceId")
+                                              .bind("serviceId", serviceId)
+                                              .first());
         if (currentDhcp.map() != null) {
           disableDhcpInternal(
               currentDhcp.get("network_id").asInteger(),
@@ -245,7 +252,8 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public void disableDhcp(final int switchId, final int port) {
-    dbi.inTransaction(new TransactionCallback<Void>() {
+    dbi.inTransaction(new TransactionCallback<Void>()
+    {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
         disableDhcpInternal(switchId, port, handle);
@@ -255,24 +263,33 @@ public class DbiNetworkRepository implements NetworkRepository {
   }
 
   @Override
-  public void addPppoe(long serviceId, final Map<String, Object> pppoe) {
+  public void addPppoe(final long serviceId, final Map<String, Object> pppoe) {
     pppoe.put("service_id", serviceId);
-    dbi.inTransaction(new TransactionCallback<Void>() {
+    dbi.inTransaction(new TransactionCallback<Void>()
+    {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        insertRecordWithoutKey(PPPOE_TABLE, pppoe, handle);
+        addPppoe(serviceId, MapData.of(pppoe), handle);
         return null;
       }
     });
   }
 
   @Override
+  public void addPppoe(long serviceId, Data pppoe, Handle handle) {
+    final Map<String, Object> map = pppoe.asMap();
+    map.put("service_id", serviceId);
+    insertRecordWithoutKey(PPPOE_TABLE, MapData.of(map), handle);
+  }
+
+  @Override
   public void updateDhcp(final long serviceId, final Map<String, Object> update) {
-    dbi.inTransaction(new TransactionCallback<Void>() {
+    dbi.inTransaction(new TransactionCallback<Void>()
+    {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
         updateRecordWithId(new RecordId(DHCP_TABLE, "service_id", serviceId),
-            update, handle);
+                           update, handle);
         return null;
       }
     });
@@ -280,7 +297,8 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public void removePppoe(final long serviceId) {
-    dbi.inTransaction(new TransactionCallback<Void>() {
+    dbi.inTransaction(new TransactionCallback<Void>()
+    {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
         removePppoe(serviceId, handle);
@@ -291,35 +309,48 @@ public class DbiNetworkRepository implements NetworkRepository {
 
   @Override
   public void removePppoe(final long serviceId, Handle handle) {
-    handle.createStatement("DELETE FROM " + PPPOE_TABLE + " WHERE service_id=:service_id")
-        .bind("service_id", serviceId)
-        .execute();
+    final int deleted =
+        handle.createStatement(
+            "DELETE FROM " + PPPOE_TABLE + " WHERE service_id=:service_id"
+        )
+              .bind("service_id", serviceId)
+              .execute();
+    if (deleted == 0) {
+      logger.warn("PPPoE for service '{}' was not removed as it does not exist", serviceId);
+    }
   }
-
-
 
   @Override
   public void updatePppoe(final long serviceId, final Map<String, Object> update) {
-    dbi.inTransaction(new TransactionCallback<Void>() {
+    dbi.inTransaction(new TransactionCallback<Void>()
+    {
       @Override
       public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        updateRecordWithId(new RecordId(PPPOE_TABLE, "service_id", serviceId),
-            update, handle);
+        updatePppoe(serviceId, MapData.of(update), handle);
         return null;
       }
     });
+  }
+
+  @Override
+  public void updatePppoe(long serviceId, Data pppoe, Handle handle) {
+    updateRecordWithId(
+        new RecordId(PPPOE_TABLE, "service_id", serviceId),
+        pppoe.asMap(),
+        handle
+    );
   }
 
   private void disableDhcpInternal(int switchId, int port, Handle handle) {
     final int updatedCount = handle.createStatement(
         "UPDATE " + DHCP_TABLE + " SET service_id=NULL" +
             " WHERE network_id=:switch_id AND port=:port")
-        .bind("switch_id", switchId)
-        .bind("port", port)
-        .execute();
+                                   .bind("switch_id", switchId)
+                                   .bind("port", port)
+                                   .execute();
     if (updatedCount == 0) {
       logger.warn("DHCP switch/port '{}/{}' was not disabled, its missing in database",
-          switchId, port);
+                  switchId, port);
     }
     logger.info("DHCP switch/port '{}/{}' was disabled", switchId, port);
   }
@@ -327,21 +358,21 @@ public class DbiNetworkRepository implements NetworkRepository {
   private void enableDhcpInternal(long serviceId, int switchId, int port, Handle handle) {
     final Long currentServiceId = handle.createQuery(
         "SELECT service_id FROM " + DHCP_TABLE + " WHERE network_id=:switch_id AND port=:port")
-        .bind("switch_id", switchId)
-        .bind("port", port)
-        .map(LongMapper.FIRST)
-        .first();
+                                        .bind("switch_id", switchId)
+                                        .bind("port", port)
+                                        .map(LongMapper.FIRST)
+                                        .first();
     if (currentServiceId != null) {
       checkState(currentServiceId == 0 || currentServiceId == serviceId,
-          "can't enable DHCP [%s, %s] for %s as it is already in use by %s",
-          switchId, port, serviceId, currentServiceId);
+                 "can't enable DHCP [%s, %s] for %s as it is already in use by %s",
+                 switchId, port, serviceId, currentServiceId);
       final int updatedCount = handle.createStatement(
           "UPDATE " + DHCP_TABLE + " SET service_id=:service_id" +
               " WHERE network_id=:switch_id AND port=:port")
-          .bind("service_id", serviceId)
-          .bind("switch_id", switchId)
-          .bind("port", port)
-          .execute();
+                                     .bind("service_id", serviceId)
+                                     .bind("switch_id", switchId)
+                                     .bind("port", port)
+                                     .execute();
       checkState(updatedCount > 0, "failed on updated dhcp record for " +
           "network_id='%s' and port='%s'", switchId, port);
     } else {

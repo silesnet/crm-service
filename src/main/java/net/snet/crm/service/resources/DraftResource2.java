@@ -176,7 +176,7 @@ public class DraftResource2
 
             if (isServiceDraft(original)) {
               final Action action = accessChangeAction(original, draft);
-              return action.perform(serviceId(original), handle);
+              return action.perform(serviceId(original), draft, handle);
             }
 
             return new ArrayList<>();

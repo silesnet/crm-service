@@ -40,8 +40,10 @@ public interface NetworkRepository {
   void updateDhcp(long serviceId, Map<String, Object> update);
 
   void addPppoe(long serviceId, Map<String, Object> pppoe);
+  void addPppoe(long serviceId, Data pppoe, Handle handle);
 
   void updatePppoe(long serviceId, Map<String, Object> update);
+  void updatePppoe(long serviceId, Data pppoe, Handle handle);
 
   void removePppoe(long serviceId);
 
