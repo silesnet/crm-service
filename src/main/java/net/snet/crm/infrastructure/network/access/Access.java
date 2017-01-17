@@ -26,6 +26,9 @@ public class Access
   }
 
   private States resolveState() {
+    if (draft.optionalStringOf("data.product_name", "").length() == 0) {
+      return None;
+    }
     if (draft.optionalIntOf("data.config", -1) == 2) {
       return Static;
     }

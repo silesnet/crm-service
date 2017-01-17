@@ -7,6 +7,19 @@ import spock.lang.Unroll
 
 class MapDataTest extends Specification {
 
+  def "should return defaults for given types"() {
+    def data = MapData.EMPTY
+    expect:
+    !data.optionalBooleanOf('k')
+    data.optionalIntOf('k') == 0
+    data.optionalLongOf('k') == 0L
+    data.optionalStringOf('k') == ''
+    !data.optionalDateTimeOf('k').minusMillis(1).isAfterNow()
+    data.optionalDataOf('k').isEmpty()
+    data.optionalMapOf('k').isEmpty()
+    data.optionalListOf('k').isEmpty()
+  }
+
   def "should be able to create new updated data"() {
     def data = MapData.of(ImmutableMap.of('key', 'value', 'key3', 'value3'))
     def map = data.asMap()

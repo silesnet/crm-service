@@ -51,6 +51,11 @@ public class MapData implements Data {
   }
 
   @Override
+  public boolean optionalBooleanOf(String path) {
+    return optionalBooleanOf(path, false);
+  }
+
+  @Override
   public int intOf(String path) {
     return asInt(assertValueExistsOn(path));
   }
@@ -62,8 +67,18 @@ public class MapData implements Data {
   }
 
   @Override
+  public int optionalIntOf(String path) {
+    return optionalIntOf(path, 0);
+  }
+
+  @Override
   public long longOf(final String path) {
     return asLong(assertValueExistsOn(path));
+  }
+
+  @Override
+  public long optionalLongOf(String path) {
+    return optionalLongOf(path, 0);
   }
 
   @Override
@@ -84,6 +99,11 @@ public class MapData implements Data {
   }
 
   @Override
+  public String optionalStringOf(String path) {
+    return optionalStringOf(path, "");
+  }
+
+  @Override
   public DateTime dateTimeOf(String path) {
     return asDateTime(assertValueExistsOn(path));
   }
@@ -92,6 +112,11 @@ public class MapData implements Data {
   public DateTime optionalDateTimeOf(String path, DateTime def) {
     final Value value = valueOf(path);
     return value.hasValue ? asDateTime(value) : def;
+  }
+
+  @Override
+  public DateTime optionalDateTimeOf(String path) {
+    return optionalDateTimeOf(path, DateTime.now());
   }
 
   @Override

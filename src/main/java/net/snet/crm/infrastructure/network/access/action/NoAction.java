@@ -1,5 +1,6 @@
 package net.snet.crm.infrastructure.network.access.action;
 
+import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.infrastructure.network.access.Action;
 import org.skife.jdbi.v2.Handle;
 
@@ -14,7 +15,7 @@ public final class NoAction implements Action
   }
 
   @Override
-  public List<String> perform(long serviceId, Handle handle) {
+  public List<String> perform(long serviceId, Data draft, Handle handle) {
     return new ArrayList<>();
   }
 }

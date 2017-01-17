@@ -63,7 +63,7 @@ class AccessTest extends Specification {
         status      : 'DRAFT',
         owner       : 'test',
         data        : [
-            :
+            product_name: 'LANaccess'
         ]
     ]
   }
