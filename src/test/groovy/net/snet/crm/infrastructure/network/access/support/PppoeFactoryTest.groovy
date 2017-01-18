@@ -10,7 +10,7 @@ class PppoeFactoryTest extends Specification {
       repo.findDevice(10) >> [name: 'some-ap', master: 'master']
     }
     def factory = new PppoeFactory(repository)
-    def pppoe = factory.pppoeOf(MapData.of(pppoe())).asMap()
+    def pppoe = factory.pppoeOf(MapData.of(pppoe())).record().asMap()
     expect:
     pppoe.login == 'login'
     pppoe.password == 'password'

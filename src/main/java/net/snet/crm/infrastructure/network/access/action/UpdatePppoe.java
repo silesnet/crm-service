@@ -2,12 +2,13 @@ package net.snet.crm.infrastructure.network.access.action;
 
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
-import net.snet.crm.domain.shared.data.Data;
+import net.snet.crm.infrastructure.network.access.support.Pppoe;
 import net.snet.crm.infrastructure.network.access.support.PppoeFactory;
 
 public class UpdatePppoe extends BaseAction
 {
-  private Data pppoe;
+  private Pppoe originalPppoe;
+  private Pppoe pppoe;
 
   public UpdatePppoe(
       NetworkRepository networkRepository,
@@ -17,23 +18,36 @@ public class UpdatePppoe extends BaseAction
   }
 
   @Override
-  boolean initialize() {
+  boolean initialize()
+  {
     final PppoeFactory factory = new PppoeFactory(networkRepository);
+    originalPppoe = factory.pppoeOf(serviceId);
     pppoe = factory.pppoeOf(draft);
-    return !pppoe.isEmpty();
+    return originalPppoe != Pppoe.NULL && pppoe != Pppoe.NULL;
   }
 
   @Override
-  void updateDatabase() {
-    networkRepository.updatePppoe(serviceId, pppoe, handle);
+  void updateDatabase()
+  {
+    networkRepository.updatePppoe(
+        serviceId,
+        pppoe.record(),
+        handle
+    );
     log.info("updated PPPoE for service '{}'", serviceId);
   }
 
   @Override
-  void updateNetwork() {
-    final String master = pppoe.stringOf("master");
-    final String login = pppoe.stringOf("login");
-    networkService.kickPppoeUser(master, login);
-    appendMessage("info: kicked '%s' from '%s'", login, master);
+  void updateNetwork()
+  {
+    networkService.kickPppoeUser(
+        originalPppoe.master(),
+        originalPppoe.login()
+    );
+    appendMessage(
+        "info: kicked '%s' from '%s'",
+        originalPppoe.login(),
+        originalPppoe.master()
+    );
   }
 }

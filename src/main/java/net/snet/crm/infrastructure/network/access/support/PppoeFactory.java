@@ -17,14 +17,15 @@ public class PppoeFactory
     this.networkRepository = networkRepository;
   }
 
-  public Data pppoeOf(Data draft)
+  public Pppoe pppoeOf(Data draft)
   {
-    final Map<String, Object> pppoe = Maps.newHashMap();
     final Data data = draft.optDataOf("data");
     if (data.optStringOf("auth_a").isEmpty() &&
-        data.optStringOf("password").isEmpty()) {
-      return MapData.EMPTY;
+        data.optStringOf("auth_b").isEmpty()) {
+      return Pppoe.NULL;
     }
+
+    final Map<String, Object> pppoe = Maps.newHashMap();
     pppoe.put("login", data.optStringOf("auth_a"));
     pppoe.put("password", data.optStringOf("auth_b"));
     pppoe.put("mac", macOf(data.optStringOf("mac_address")).asMap());
@@ -39,7 +40,15 @@ public class PppoeFactory
         deviceOf(data)
             .asMap()
     );
-    return MapData.of(pppoe);
+    return Pppoe.of(MapData.of(pppoe));
+  }
+
+  public Pppoe pppoeOf(long serviceId) {
+    final Data data = MapData.of(networkRepository.findServicePppoe(serviceId));
+    if (data.isEmpty()) {
+      return Pppoe.NULL;
+    }
+    return Pppoe.of(data);
   }
 
   private Data macOf(String mac)

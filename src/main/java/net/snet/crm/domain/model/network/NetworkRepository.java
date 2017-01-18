@@ -34,8 +34,10 @@ public interface NetworkRepository {
   void removeDhcpWireless(long serviceId);
 
   void bindDhcp(long serviceId, int switchId, int port);
+  void bindDhcp(long serviceId, int switchId, int port, Handle handle);
 
   void disableDhcp(int switchId, int port);
+  void disableDhcp(int switchId, int port, Handle handle);
 
   void updateDhcp(long serviceId, Map<String, Object> update);
 
