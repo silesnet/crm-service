@@ -2,12 +2,12 @@ package net.snet.crm.infrastructure.network.access.action;
 
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
-import net.snet.crm.domain.shared.data.Data;
-import net.snet.crm.domain.shared.data.MapData;
+import net.snet.crm.infrastructure.network.access.support.Pppoe;
+import net.snet.crm.infrastructure.network.access.support.PppoeFactory;
 
 public class DisablePppoe extends BaseAction
 {
-  private Data pppoe;
+  private Pppoe originalPppoe;
 
   public DisablePppoe(NetworkRepository networkRepository, NetworkService networkService) {
     super(networkRepository, networkService);
@@ -15,8 +15,8 @@ public class DisablePppoe extends BaseAction
 
   @Override
   boolean initialize() {
-    pppoe = MapData.of(networkRepository.findServicePppoe(serviceId));
-    return !pppoe.isEmpty();
+    originalPppoe = new PppoeFactory(networkRepository).pppoeOf(serviceId);
+    return originalPppoe != Pppoe.NULL;
   }
 
   @Override
@@ -27,9 +27,14 @@ public class DisablePppoe extends BaseAction
 
   @Override
   void updateNetwork() {
-    final String master = pppoe.stringOf("master");
-    final String login = pppoe.stringOf("login");
-    networkService.kickPppoeUser(master, login);
-    appendMessage("info: kicked '%s' from '%s'", login, master);
+    networkService.kickPppoeUser(
+        originalPppoe.master(),
+        originalPppoe.login()
+    );
+    appendMessage(
+        "info: kicked '%s' from '%s'",
+        originalPppoe.login(),
+        originalPppoe.master()
+    );
   }
 }

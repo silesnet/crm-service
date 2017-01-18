@@ -176,6 +176,10 @@ public class DraftResource2
 
             if (isServiceDraft(original)) {
               final Action action = accessChangeAction(original, draft);
+              logger.debug(
+                  "performing transition action '{}'",
+                  action.getClass().getSimpleName()
+              );
               return action.perform(serviceId(original), draft, handle);
             }
 

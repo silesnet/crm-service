@@ -5,11 +5,9 @@ import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.service.utils.Entities.ValueMap;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.TransactionCallback;
-import org.skife.jdbi.v2.TransactionStatus;
+import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.tweak.HandleCallback;
+import org.skife.jdbi.v2.tweak.VoidHandleCallback;
 import org.skife.jdbi.v2.util.LongMapper;
 import org.skife.jdbi.v2.util.StringMapper;
 import org.slf4j.Logger;
@@ -230,36 +228,46 @@ public class DbiNetworkRepository implements NetworkRepository
 
   @Override
   public void bindDhcp(final long serviceId, final int switchId, final int port) {
-    dbi.inTransaction(new TransactionCallback<Object>()
+    dbi.inTransaction(new VoidTransactionCallback()
     {
       @Override
-      public Object inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        ValueMap currentDhcp = valueMapOf(handle
-                                              .createQuery("SELECT network_id, port FROM " + DHCP_TABLE + " WHERE service_id=:serviceId")
-                                              .bind("serviceId", serviceId)
-                                              .first());
-        if (currentDhcp.map() != null) {
-          disableDhcpInternal(
-              currentDhcp.get("network_id").asInteger(),
-              currentDhcp.get("port").asInteger(),
-              handle);
-        }
-        enableDhcpInternal(serviceId, switchId, port, handle);
-        return null;
+      protected void execute(Handle handle, TransactionStatus status) throws Exception {
+        bindDhcp(serviceId, switchId, port, handle);
       }
     });
   }
 
   @Override
+  public void bindDhcp(long serviceId, int switchId, int port, Handle handle) {
+    ValueMap currentDhcp =
+        valueMapOf(
+            handle
+                .createQuery("SELECT network_id, port FROM " + DHCP_TABLE + " WHERE service_id=:serviceId")
+                .bind("serviceId", serviceId)
+                .first());
+    if (currentDhcp.map() != null) {
+      disableDhcpInternal(
+          currentDhcp.get("network_id").asInteger(),
+          currentDhcp.get("port").asInteger(),
+          handle);
+    }
+    enableDhcpInternal(serviceId, switchId, port, handle);
+  }
+
+  @Override
   public void disableDhcp(final int switchId, final int port) {
-    dbi.inTransaction(new TransactionCallback<Void>()
+    dbi.withHandle(new VoidHandleCallback()
     {
       @Override
-      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        disableDhcpInternal(switchId, port, handle);
-        return null;
+      protected void execute(Handle handle) throws Exception {
+        disableDhcp(switchId, port);
       }
     });
+  }
+
+  @Override
+  public void disableDhcp(int switchId, int port, Handle handle) {
+    disableDhcpInternal(switchId, port, handle);
   }
 
   @Override

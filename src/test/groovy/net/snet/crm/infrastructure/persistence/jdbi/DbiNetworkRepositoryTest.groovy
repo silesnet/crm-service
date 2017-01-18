@@ -45,7 +45,7 @@ class DbiNetworkRepositoryTest extends Specification {
     given:
       def service = [id: 11234501, switchId: 15, port: 20]
     when:
-      repo.bindDhcp(service.id, service.switchId, service.port)
+      repo.bindDhcp(service.id, service.switchId, service.port, handle)
     then:
       def dhcp = handle.select(
           'SELECT service_id, network_id, port FROM dhcp WHERE network_id=15 AND port=20').first()
@@ -59,7 +59,7 @@ class DbiNetworkRepositoryTest extends Specification {
       def service = [id: 11234501, switchId: 15, port: 20]
       handle.insert('INSERT INTO dhcp (service_id, network_id, port) VALUES (11234501, 15, 20)')
     when:
-      repo.disableDhcp(service.switchId, service.port)
+      repo.disableDhcp(service.switchId, service.port, handle)
     then:
       def dhcp = handle.select(
           'SELECT service_id, network_id, port FROM dhcp' +
