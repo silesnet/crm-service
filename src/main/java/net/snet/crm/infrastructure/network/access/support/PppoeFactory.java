@@ -20,18 +20,18 @@ public class PppoeFactory
   public Data pppoeOf(Data draft)
   {
     final Map<String, Object> pppoe = Maps.newHashMap();
-    final Data data = draft.optionalDataOf("data");
-    if (data.optionalStringOf("auth_a").isEmpty() &&
-        data.optionalStringOf("password").isEmpty()) {
+    final Data data = draft.optDataOf("data");
+    if (data.optStringOf("auth_a").isEmpty() &&
+        data.optStringOf("password").isEmpty()) {
       return MapData.EMPTY;
     }
-    pppoe.put("login", data.optionalStringOf("auth_a"));
-    pppoe.put("password", data.optionalStringOf("auth_b"));
-    pppoe.put("mac", macOf(data.optionalStringOf("mac_address")).asMap());
-    pppoe.put("mode", data.optionalStringOf("product_channel"));
+    pppoe.put("login", data.optStringOf("auth_a"));
+    pppoe.put("password", data.optStringOf("auth_b"));
+    pppoe.put("mac", macOf(data.optStringOf("mac_address")).asMap());
+    pppoe.put("mode", data.optStringOf("product_channel"));
     pppoe.putAll(
         ipOf(
-            data.optionalStringOf("ip"),
+            data.optStringOf("ip"),
             data.longOf("service_id")
         ).asMap()
     );
@@ -73,19 +73,19 @@ public class PppoeFactory
 
   private Data deviceOf(Data data)
   {
-    final String channel = data.optionalStringOf("product_channel");
+    final String channel = data.optStringOf("product_channel");
     if (channel.length() == 0) {
       return MapData.EMPTY;
     }
     final Map<String, Object> record = Maps.newHashMap();
     if ("LAN".equals(channel) || "FIBER".equals(channel)) {
       record.put("interface", "");
-      final Data router = findDevice(data.optionalIntOf("core_router", 0));
-      record.put("master", router.optionalStringOf("name"));
+      final Data router = findDevice(data.optIntOf("core_router", 0));
+      record.put("master", router.optStringOf("name"));
     } else {
-      final Data ssid = findDevice(data.optionalIntOf("ssid", 0));
-      record.put("interface", ssid.optionalStringOf("name"));
-      record.put("master", ssid.optionalStringOf("master"));
+      final Data ssid = findDevice(data.optIntOf("ssid", 0));
+      record.put("interface", ssid.optStringOf("name"));
+      record.put("master", ssid.optStringOf("master"));
     }
     return MapData.of(record);
   }

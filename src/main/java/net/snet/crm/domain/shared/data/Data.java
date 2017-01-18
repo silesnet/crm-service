@@ -6,7 +6,8 @@ import org.joda.time.DateTime;
 import java.util.List;
 import java.util.Map;
 
-public interface Data {
+public interface Data
+{
   Data EMPTY = MapData.of(ImmutableMap.<String, Object>of());
 
   boolean hasValue(String path);
@@ -16,33 +17,46 @@ public interface Data {
   boolean isEmpty();
 
   boolean booleanOf(String path);
-  boolean optionalBooleanOf(String path, boolean def);
-  boolean optionalBooleanOf(String path);
+
+  boolean optBooleanOf(String path, boolean def);
+
+  boolean optBooleanOf(String path);
 
   int intOf(String path);
-  int optionalIntOf(String path, int def);
-  int optionalIntOf(String path);
+
+  int optIntOf(String path, int def);
+
+  int optIntOf(String path);
 
   long longOf(String path);
-  long optionalLongOf(String path, long def);
-  long optionalLongOf(String path);
+
+  long optLongOf(String path, long def);
+
+  long optLongOf(String path);
 
   String stringOf(String path);
-  String optionalStringOf(String path, String def);
-  String optionalStringOf(String path);
+
+  String optStringOf(String path, String def);
+
+  String optStringOf(String path);
 
   DateTime dateTimeOf(String path);
-  DateTime optionalDateTimeOf(String path, DateTime def);
-  DateTime optionalDateTimeOf(String path);
+
+  DateTime optDateTimeOf(String path, DateTime def);
+
+  DateTime optDateTimeOf(String path);
 
   Data dataOf(String path);
-  Data optionalDataOf(String path);
+
+  Data optDataOf(String path);
 
   Map<String, Object> mapOf(String path);
-  Map<String, Object> optionalMapOf(String path);
+
+  Map<String, Object> optMapOf(String path);
 
   List<Object> listOf(String path);
-  List<Object> optionalListOf(String path);
+
+  List<Object> optListOf(String path);
 
   Map<String, Object> asMap();
 

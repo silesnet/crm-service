@@ -5,8 +5,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -45,14 +43,14 @@ public class MapData implements Data {
   }
 
   @Override
-  public boolean optionalBooleanOf(String path, boolean def) {
+  public boolean optBooleanOf(String path, boolean def) {
     final Value value = valueOf(path);
     return value.hasValue ? asBoolean(value) : def;
   }
 
   @Override
-  public boolean optionalBooleanOf(String path) {
-    return optionalBooleanOf(path, false);
+  public boolean optBooleanOf(String path) {
+    return optBooleanOf(path, false);
   }
 
   @Override
@@ -61,14 +59,14 @@ public class MapData implements Data {
   }
 
   @Override
-  public int optionalIntOf(String path, int def) {
+  public int optIntOf(String path, int def) {
     final Value value = valueOf(path);
     return value.hasValue ? asInt(value) : def;
   }
 
   @Override
-  public int optionalIntOf(String path) {
-    return optionalIntOf(path, 0);
+  public int optIntOf(String path) {
+    return optIntOf(path, 0);
   }
 
   @Override
@@ -77,12 +75,12 @@ public class MapData implements Data {
   }
 
   @Override
-  public long optionalLongOf(String path) {
-    return optionalLongOf(path, 0);
+  public long optLongOf(String path) {
+    return optLongOf(path, 0);
   }
 
   @Override
-  public long optionalLongOf(String path, long def) {
+  public long optLongOf(String path, long def) {
     final Value value = valueOf(path);
     return value.hasValue ? asLong(value) : def;
   }
@@ -93,14 +91,14 @@ public class MapData implements Data {
   }
 
   @Override
-  public String optionalStringOf(String path, String def) {
+  public String optStringOf(String path, String def) {
     final Value value = valueOf(path);
     return value.hasValue ? asString(value) : def;
   }
 
   @Override
-  public String optionalStringOf(String path) {
-    return optionalStringOf(path, "");
+  public String optStringOf(String path) {
+    return optStringOf(path, "");
   }
 
   @Override
@@ -109,14 +107,14 @@ public class MapData implements Data {
   }
 
   @Override
-  public DateTime optionalDateTimeOf(String path, DateTime def) {
+  public DateTime optDateTimeOf(String path, DateTime def) {
     final Value value = valueOf(path);
     return value.hasValue ? asDateTime(value) : def;
   }
 
   @Override
-  public DateTime optionalDateTimeOf(String path) {
-    return optionalDateTimeOf(path, DateTime.now());
+  public DateTime optDateTimeOf(String path) {
+    return optDateTimeOf(path, DateTime.now());
   }
 
   @Override
@@ -126,7 +124,7 @@ public class MapData implements Data {
   }
 
   @Override
-  public Map<String, Object> optionalMapOf(String path) {
+  public Map<String, Object> optMapOf(String path) {
     final Value value = valueOf(path);
     return value.hasValue ? asMap(value) : ImmutableMap.<String, Object>of();
   }
@@ -138,7 +136,7 @@ public class MapData implements Data {
   }
 
   @Override
-  public List<Object> optionalListOf(String path) {
+  public List<Object> optListOf(String path) {
     final Value value = valueOf(path);
     return value.hasValue ? asList(value) : ImmutableList.of();
   }
@@ -150,7 +148,7 @@ public class MapData implements Data {
   }
 
   @Override
-  public Data optionalDataOf(String path) {
+  public Data optDataOf(String path) {
     final Value value = valueOf(path);
     return value.hasValue ? asData(value) : Data.EMPTY;
   }

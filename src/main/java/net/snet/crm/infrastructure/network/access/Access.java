@@ -26,18 +26,18 @@ public class Access
   }
 
   private States resolveState() {
-    if (draft.optionalStringOf("data.product_name", "").length() == 0) {
+    if (draft.optStringOf("data.product_name", "").length() == 0) {
       return None;
     }
-    if (draft.optionalIntOf("data.config", -1) == 2) {
+    if (draft.optIntOf("data.config", -1) == 2) {
       return Static;
     }
-    final int authType = draft.optionalIntOf("data.auth_type", -1);
+    final int authType = draft.optIntOf("data.auth_type", -1);
     if (authType == 2) {
       return Pppoe;
     }
     if (authType == 1) {
-      return "wireless".equals(draft.optionalStringOf("data.product_channel", ""))
+      return "wireless".equals(draft.optStringOf("data.product_channel", ""))
           ? DhcpWireless
           : Dhcp;
     }
