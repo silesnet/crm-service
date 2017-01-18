@@ -10,14 +10,14 @@ class MapDataTest extends Specification {
   def "should return defaults for given types"() {
     def data = MapData.EMPTY
     expect:
-    !data.optionalBooleanOf('k')
-    data.optionalIntOf('k') == 0
-    data.optionalLongOf('k') == 0L
-    data.optionalStringOf('k') == ''
-    !data.optionalDateTimeOf('k').minusMillis(1).isAfterNow()
-    data.optionalDataOf('k').isEmpty()
-    data.optionalMapOf('k').isEmpty()
-    data.optionalListOf('k').isEmpty()
+    !data.optBooleanOf('k')
+    data.optIntOf('k') == 0
+    data.optLongOf('k') == 0L
+    data.optStringOf('k') == ''
+    !data.optDateTimeOf('k').minusMillis(1).isAfterNow()
+    data.optDataOf('k').isEmpty()
+    data.optMapOf('k').isEmpty()
+    data.optListOf('k').isEmpty()
   }
 
   def "should be able to create new updated data"() {
@@ -34,7 +34,7 @@ class MapDataTest extends Specification {
 
   def "should return empty list on non existing path"() {
     def data = MapData.of([:])
-    def list = data.optionalListOf('k')
+    def list = data.optListOf('k')
     expect:
       list.size() == 0
   }
@@ -53,13 +53,13 @@ class MapDataTest extends Specification {
   }
 
   def "should return empty data on non existing path"() {
-      def data = MapData.of([:]).optionalDataOf('k')
+      def data = MapData.of([:]).optDataOf('k')
     expect:
       data.isEmpty()
   }
 
   def "should return empty map on non existing path"() {
-      def map = MapData.of([:]).optionalMapOf('k')
+      def map = MapData.of([:]).optMapOf('k')
     expect:
       map.isEmpty()
   }
@@ -120,11 +120,11 @@ class MapDataTest extends Specification {
 
   def "should return default on absent value"() {
     expect:
-      MapData.of([:]).optionalBooleanOf('k', true)
-      MapData.of([:]).optionalIntOf('k', 1) == 1
-      MapData.of([:]).optionalLongOf('k', 1) == 1
-      MapData.of([:]).optionalStringOf('k', '1') == '1'
-      MapData.of([:]).optionalDateTimeOf('k', DateTime.parse('2016-11-11T10:20:50.123')) == DateTime.parse('2016-11-11T10:20:50.123')
+      MapData.of([:]).optBooleanOf('k', true)
+      MapData.of([:]).optIntOf('k', 1) == 1
+      MapData.of([:]).optLongOf('k', 1) == 1
+      MapData.of([:]).optStringOf('k', '1') == '1'
+      MapData.of([:]).optDateTimeOf('k', DateTime.parse('2016-11-11T10:20:50.123')) == DateTime.parse('2016-11-11T10:20:50.123')
   }
 
   def "should throw on null path"() {

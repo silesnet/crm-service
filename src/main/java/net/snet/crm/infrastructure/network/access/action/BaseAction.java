@@ -80,6 +80,6 @@ public class BaseAction implements Action
   private void clearFields() {
     this.serviceId = -1;
     this.draft = null;
-    this.handle = handle;
+    this.handle = null;
   }
 }

@@ -116,7 +116,7 @@ public class DbiDraftRepository implements DraftRepository
     if (!record.isEmpty()) {
       updateRecord(DRAFTS_TABLE, draftId, record, handle);
     }
-    final Map<String, Object> links = update.optionalMapOf("links");
+    final Map<String, Object> links = update.optMapOf("links");
     if (!links.isEmpty()) {
       deleteLinks(draftId, handle);
       insertLinks(draftId, links, handle);

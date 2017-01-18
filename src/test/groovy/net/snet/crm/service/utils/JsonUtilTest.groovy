@@ -11,6 +11,6 @@ class JsonUtilTest extends Specification {
     expect:
       data.hasPath('key')
       !data.hasValue('key')
-      data.optionalStringOf('key', '') == ''
+      data.optStringOf('key', '') == ''
   }
 }
