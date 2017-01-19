@@ -7,8 +7,12 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class MapData implements Data {
+
+  private static final Pattern NUMBER = Pattern.compile("\\d+");
+
   public static Data of(Map<String, Object> map) {
     return new MapData(map);
   }
@@ -30,6 +34,11 @@ public class MapData implements Data {
   @Override
   public boolean hasValue(String path) {
     return valueOf(path).hasValue;
+  }
+
+  @Override
+  public boolean hasNumber(String path) {
+    return isNumeric(valueOf(path));
   }
 
   @Override
@@ -61,7 +70,7 @@ public class MapData implements Data {
   @Override
   public int optIntOf(String path, int def) {
     final Value value = valueOf(path);
-    return value.hasValue ? asInt(value) : def;
+    return isNumeric(value) ? asInt(value) : def;
   }
 
   @Override
@@ -82,7 +91,7 @@ public class MapData implements Data {
   @Override
   public long optLongOf(String path, long def) {
     final Value value = valueOf(path);
-    return value.hasValue ? asLong(value) : def;
+    return isNumeric(value) ? asLong(value) : def;
   }
 
   @Override
@@ -212,6 +221,18 @@ public class MapData implements Data {
       throw new IllegalArgumentException("value doesn't exist on '" + value.path + "' path");
     }
     return value;
+  }
+
+  private boolean isNumeric(Value value) {
+    if (!value.hasValue) {
+      return false;
+    }
+    return NUMBER.matcher(value.value.toString()).matches();
+  }
+
+  private boolean isDateTime(Value value) {
+    // TODO: implement it
+    return false;
   }
 
   private Value valueOf(String path) {
