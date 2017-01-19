@@ -2,6 +2,7 @@ package net.snet.crm.domain.shared.data;
 
 import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.util.List;
 import java.util.Map;
@@ -10,11 +11,23 @@ public interface Data
 {
   Data EMPTY = MapData.of(ImmutableMap.<String, Object>of());
 
-  boolean hasValue(String path);
-
   boolean hasPath(String path);
 
+  boolean hasValue(String path);
+
+  boolean hasBoolean(String path);
+
   boolean hasNumber(String path);
+
+  boolean hasDate(String path);
+
+  boolean hasDateTime(String path);
+
+  boolean hasMap(String path);
+
+  boolean hasData(String path);
+
+  boolean hasList(String path);
 
   boolean isEmpty();
 
@@ -47,6 +60,12 @@ public interface Data
   DateTime optDateTimeOf(String path, DateTime def);
 
   DateTime optDateTimeOf(String path);
+
+  LocalDate dateOf(String path);
+
+  LocalDate optDateOf(String path, LocalDate def);
+
+  LocalDate optDateOf(String path);
 
   Data dataOf(String path);
 
