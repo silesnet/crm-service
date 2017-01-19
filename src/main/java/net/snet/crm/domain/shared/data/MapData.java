@@ -4,12 +4,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
 
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-public class MapData implements Data {
+public class MapData implements Data
+{
 
   private static final Pattern NUMBER = Pattern.compile("\\d+");
 
@@ -37,8 +39,38 @@ public class MapData implements Data {
   }
 
   @Override
+  public boolean hasBoolean(String path) {
+    return isBoolean(valueOf(path));
+  }
+
+  @Override
   public boolean hasNumber(String path) {
     return isNumeric(valueOf(path));
+  }
+
+  @Override
+  public boolean hasDate(String path) {
+    return isDate(valueOf(path));
+  }
+
+  @Override
+  public boolean hasDateTime(String path) {
+    return isDateTime(valueOf(path));
+  }
+
+  @Override
+  public boolean hasMap(String path) {
+    return isMap(valueOf(path));
+  }
+
+  @Override
+  public boolean hasData(String path) {
+    return isMap(valueOf(path));
+  }
+
+  @Override
+  public boolean hasList(String path) {
+    return isList(valueOf(path));
   }
 
   @Override
@@ -111,6 +143,22 @@ public class MapData implements Data {
   }
 
   @Override
+  public LocalDate dateOf(String path) {
+    return asDate(assertValueExistsOn(path));
+  }
+
+  @Override
+  public LocalDate optDateOf(String path, LocalDate def) {
+    final Value value = valueOf(path);
+    return isDate(value) ? asDate(value) : def;
+  }
+
+  @Override
+  public LocalDate optDateOf(String path) {
+    return optDateOf(path, LocalDate.now());
+  }
+
+  @Override
   public DateTime dateTimeOf(String path) {
     return asDateTime(assertValueExistsOn(path));
   }
@@ -118,7 +166,7 @@ public class MapData implements Data {
   @Override
   public DateTime optDateTimeOf(String path, DateTime def) {
     final Value value = valueOf(path);
-    return value.hasValue ? asDateTime(value) : def;
+    return isDateTime(value) ? asDateTime(value) : def;
   }
 
   @Override
@@ -191,6 +239,12 @@ public class MapData implements Data {
         : value.value.toString();
   }
 
+  private LocalDate asDate(Value value) {
+    return (value.value instanceof LocalDate)
+        ? (LocalDate) value.value
+        : LocalDate.parse(value.value.toString());
+  }
+
   private DateTime asDateTime(Value value) {
     return (value.value instanceof DateTime)
         ? (DateTime) value.value
@@ -199,14 +253,14 @@ public class MapData implements Data {
 
   private Map<String, Object> asMap(Value value) {
     if (!(value.value instanceof Map)) {
-      throw new IllegalStateException("value is not map");
+      throw new IllegalStateException("value is not a map");
     }
     return (Map<String, Object>) value.value;
   }
 
   private List<Object> asList(Value value) {
     if (!(value.value instanceof List)) {
-      throw new IllegalStateException("value is not list");
+      throw new IllegalStateException("value is not a list");
     }
     return (List<Object>) value.value;
   }
@@ -223,6 +277,13 @@ public class MapData implements Data {
     return value;
   }
 
+  private boolean isBoolean(Value value) {
+    if (!value.hasValue) {
+      return false;
+    }
+    return "true".equalsIgnoreCase(value.value.toString());
+  }
+
   private boolean isNumeric(Value value) {
     if (!value.hasValue) {
       return false;
@@ -231,15 +292,52 @@ public class MapData implements Data {
   }
 
   private boolean isDateTime(Value value) {
-    // TODO: implement it
+    if (!value.hasValue) {
+      return false;
+    }
+    try {
+      DateTime.parse(value.value.toString());
+      return true;
+    } catch (Exception e) {
+      // ignore
+    }
     return false;
   }
+
+  private boolean isDate(Value value) {
+    if (!value.hasValue) {
+      return false;
+    }
+    try {
+      LocalDate.parse(value.value.toString());
+      return true;
+    } catch (Exception e) {
+      // ignore
+    }
+    return false;
+  }
+
+  private boolean isMap(Value value) {
+    if (!value.hasValue) {
+      return false;
+    }
+    return value.value instanceof Map;
+  }
+
+  private boolean isList(Value value) {
+    if (!value.hasValue) {
+      return false;
+    }
+    return value.value instanceof List;
+  }
+
 
   private Value valueOf(String path) {
     return new Value(path);
   }
 
-  private class Value {
+  private class Value
+  {
     private final boolean exists;
     private final boolean isNull;
     private final boolean hasValue;
