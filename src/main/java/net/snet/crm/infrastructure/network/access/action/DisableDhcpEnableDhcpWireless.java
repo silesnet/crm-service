@@ -20,42 +20,44 @@ public class DisableDhcpEnableDhcpWireless extends BaseAction
   }
 
   @Override
-  boolean initialize() {
+  boolean initialize()
+  {
     originalDhcp = new DhcpFactory(networkRepository).dhcpOf(serviceId);
     dhcpWireless = new DhcpWirelessFactory(networkRepository).dhcpWirelessOf(draft);
-    return originalDhcp != Dhcp.NULL && dhcpWireless != DhcpWireless.NULL;
+    return originalDhcp.isValid() || dhcpWireless.isValid();
   }
 
   @Override
-  void updateDatabase() {
-    networkRepository.disableDhcp(
-        originalDhcp.switchId(),
-        originalDhcp.port(),
-        handle
-    );
-    log.info(
-        "disabled DHCP switch port '{}/{} for service '{}'",
-        originalDhcp.switchName(),
-        originalDhcp.port(),
-        serviceId
-    );
-    networkRepository.addDhcpWireless(
-        serviceId,
-        dhcpWireless.record()
-    );
-    log.info("enabled DHCP Wireless service '{}'", serviceId);
+  void updateDatabase()
+  {
+    if (originalDhcp.isValid()) {
+      networkRepository.disableDhcp(
+          originalDhcp.switchId(),
+          originalDhcp.port(),
+          handle
+      );
+    }
+    if (dhcpWireless.isValid()) {
+      networkRepository.addDhcpWireless(
+          serviceId,
+          dhcpWireless.record()
+      );
+    }
   }
 
   @Override
-  void updateNetwork() {
-    networkService.disableSwitchPort(
-        originalDhcp.switchName(),
-        originalDhcp.port()
-    );
-    appendMessage(
-        "info: closed DHCP switch/port of '%s/%s'",
-        originalDhcp.switchName(),
-        originalDhcp.port()
-    );
+  void updateNetwork()
+  {
+    if (originalDhcp.isValid()) {
+      networkService.disableSwitchPort(
+          originalDhcp.switchName(),
+          originalDhcp.port()
+      );
+      appendMessage(
+          "info: closed DHCP switch/port of '%s/%s'",
+          originalDhcp.switchName(),
+          originalDhcp.port()
+      );
+    }
   }
 }

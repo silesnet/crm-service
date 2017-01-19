@@ -25,21 +25,22 @@ public class DisableDhcpWirelessEnablePppoe extends BaseAction
     originalDhcpWireless =
         new DhcpWirelessFactory(networkRepository).dhcpWirelessOf(serviceId);
     pppoe = new PppoeFactory(networkRepository).pppoeOf(draft);
-    return originalDhcpWireless != DhcpWireless.NULL && pppoe != Pppoe.NULL;
+    return originalDhcpWireless.isValid() || pppoe.isValid();
   }
 
   @Override
   void updateDatabase()
   {
-    networkRepository.removeDhcpWireless(serviceId);
-    log.info("disabled DHCP Wireless service '{}'", serviceId);
-
-    networkRepository.addPppoe(
-        serviceId,
-        pppoe.record(),
-        handle
-    );
-    log.info("added PPPoE for service '{}'", serviceId);
+    if (originalDhcpWireless.isValid()) {
+      networkRepository.removeDhcpWireless(serviceId);
+    }
+    if (pppoe.isValid()) {
+      networkRepository.addPppoe(
+          serviceId,
+          pppoe.record(),
+          handle
+      );
+    }
   }
 
 }

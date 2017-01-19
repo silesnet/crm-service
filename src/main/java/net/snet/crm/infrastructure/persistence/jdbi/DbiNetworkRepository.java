@@ -195,7 +195,7 @@ public class DbiNetworkRepository implements NetworkRepository
       dhcp = MapData.of(map);
     }
     insertRecordWithoutKey(DHCP_WIRELESS_TABLE, dhcp, dbi);
-    logger.info("added DHCP wireless for service '{}'", serviceId);
+    logger.info("DHCP wireless for service '{}' was added", serviceId);
   }
 
   @Override
@@ -207,7 +207,7 @@ public class DbiNetworkRepository implements NetworkRepository
                  update.longOf("service_id"));
     }
     updateRecord(dhcpWirelessRecordIdOf(serviceId), update, dbi);
-    logger.info("updated DHCP wireless for service '{}'", serviceId);
+    logger.info("DHCP wireless for service '{}' was updated", serviceId);
   }
 
   @Override
@@ -215,7 +215,7 @@ public class DbiNetworkRepository implements NetworkRepository
     logger.debug("removing DHCP wireless for service '{}'", serviceId);
     final boolean deleted = deleteRecord(dhcpWirelessRecordIdOf(serviceId), dbi);
     if (deleted) {
-      logger.info("removed DHCP wireless for service '{}'", serviceId);
+      logger.info("DHCP wireless for service '{}' was removed", serviceId);
     } else {
       logger.info("DHCP wireless for service '{}' not found", serviceId);
     }
@@ -288,6 +288,7 @@ public class DbiNetworkRepository implements NetworkRepository
     final Map<String, Object> map = pppoe.asMap();
     map.put("service_id", serviceId);
     insertRecordWithoutKey(PPPOE_TABLE, MapData.of(map), handle);
+    logger.info("PPPoE for service '{}' was added", serviceId);
   }
 
   @Override
@@ -325,6 +326,8 @@ public class DbiNetworkRepository implements NetworkRepository
               .execute();
     if (deleted == 0) {
       logger.warn("PPPoE for service '{}' was not removed as it does not exist", serviceId);
+    } else {
+      logger.info("PPPoE for service '{}' was removed", serviceId);
     }
   }
 
@@ -347,6 +350,7 @@ public class DbiNetworkRepository implements NetworkRepository
         pppoe.asMap(),
         handle
     );
+    logger.info("PPPoE for service '{}' was updated", serviceId);
   }
 
   private void disableDhcpInternal(int switchId, int port, Handle handle) {
@@ -359,8 +363,9 @@ public class DbiNetworkRepository implements NetworkRepository
     if (updatedCount == 0) {
       logger.warn("DHCP switch/port '{}/{}' was not disabled, its missing in database",
                   switchId, port);
+    } else {
+      logger.info("DHCP switch/port '{}/{}' was disabled", switchId, port);
     }
-    logger.info("DHCP switch/port '{}/{}' was disabled", switchId, port);
   }
 
   private void enableDhcpInternal(long serviceId, int switchId, int port, Handle handle) {
@@ -381,7 +386,7 @@ public class DbiNetworkRepository implements NetworkRepository
                                      .bind("switch_id", switchId)
                                      .bind("port", port)
                                      .execute();
-      checkState(updatedCount > 0, "failed on updated dhcp record for " +
+      checkState(updatedCount > 0, "failed on updating dhcp record for " +
           "network_id='%s' and port='%s'", switchId, port);
     } else {
       final Map<String, Object> record = ImmutableMap.<String, Object>builder()

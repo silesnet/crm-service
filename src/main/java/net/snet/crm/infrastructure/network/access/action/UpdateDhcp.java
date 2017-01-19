@@ -23,57 +23,53 @@ public class UpdateDhcp extends BaseAction
     final DhcpFactory factory = new DhcpFactory(networkRepository);
     originalDhcp = factory.dhcpOf(serviceId);
     dhcp = factory.dhcpOf(draft);
-    return originalDhcp != Dhcp.NULL && dhcp != Dhcp.NULL;
+    return originalDhcp.isValid() || dhcp.isValid();
   }
 
   @Override
   void updateDatabase()
   {
-    networkRepository.disableDhcp(
-        originalDhcp.switchId(),
-        originalDhcp.port(),
-        handle
-    );
-    log.info(
-        "disabled DHCP switch port '{}/{} for service '{}'",
-        originalDhcp.switchName(),
-        originalDhcp.port(),
-        serviceId
-    );
-    networkRepository.bindDhcp(
-        serviceId,
-        dhcp.switchId(),
-        dhcp.port(),
-        handle
-    );
-    log.info(
-        "enabled DHCP switch port '{}/{} for service '{}'",
-        dhcp.switchName(),
-        dhcp.port(),
-        serviceId
-    );
+    if (originalDhcp.isValid()) {
+      networkRepository.disableDhcp(
+          originalDhcp.switchId(),
+          originalDhcp.port(),
+          handle
+      );
+    }
+    if (dhcp.isValid()) {
+      networkRepository.bindDhcp(
+          serviceId,
+          dhcp.switchId(),
+          dhcp.port(),
+          handle
+      );
+    }
   }
 
   @Override
   void updateNetwork()
   {
-    networkService.disableSwitchPort(
-        originalDhcp.switchName(),
-        originalDhcp.port()
-    );
-    appendMessage(
-        "info: closed DHCP switch/port of '%s/%s'",
-        originalDhcp.switchName(),
-        originalDhcp.port()
-    );
-    networkService.enableSwitchPort(
-        dhcp.switchName(),
-        dhcp.port()
-    );
-    appendMessage(
-        "info: opened DHCP switch port of '%s/%s'",
-        dhcp.switchName(),
-        dhcp.port()
-    );
+    if (originalDhcp.isValid()) {
+      networkService.disableSwitchPort(
+          originalDhcp.switchName(),
+          originalDhcp.port()
+      );
+      appendMessage(
+          "info: closed DHCP switch/port of '%s/%s'",
+          originalDhcp.switchName(),
+          originalDhcp.port()
+      );
+    }
+    if (dhcp.isValid()) {
+      networkService.enableSwitchPort(
+          dhcp.switchName(),
+          dhcp.port()
+      );
+      appendMessage(
+          "info: opened DHCP switch port of '%s/%s'",
+          dhcp.switchName(),
+          dhcp.port()
+      );
+    }
   }
 }

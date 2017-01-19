@@ -16,6 +16,14 @@ public class DhcpWireless
     this.record = record;
   }
 
+  public boolean isValid() {
+    return this != NULL;
+  }
+
+  public boolean isNotValid() {
+    return this == NULL;
+  }
+
   public Data record() {
     return record;
   }

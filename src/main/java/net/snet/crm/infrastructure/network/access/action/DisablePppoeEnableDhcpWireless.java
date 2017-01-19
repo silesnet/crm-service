@@ -25,30 +25,33 @@ public class DisablePppoeEnableDhcpWireless extends BaseAction
     originalPppoe = new PppoeFactory(networkRepository).pppoeOf(serviceId);
     dhcpWireless =
         new DhcpWirelessFactory(networkRepository).dhcpWirelessOf(draft);
-    return originalPppoe != Pppoe.NULL && dhcpWireless != DhcpWireless.NULL;
+    return originalPppoe.isValid() || dhcpWireless.isValid();
   }
 
   @Override
   void updateDatabase()
   {
-    networkRepository.removePppoe(serviceId, handle);
-    log.info("removed PPPoE for service '{}'", serviceId);
-
-    networkRepository.addDhcpWireless(serviceId, dhcpWireless.record());
-    log.info("enabled DHCP Wireless service '{}'", serviceId);
+    if (originalPppoe.isValid()) {
+      networkRepository.removePppoe(serviceId, handle);
+    }
+    if (dhcpWireless.isValid()) {
+      networkRepository.addDhcpWireless(serviceId, dhcpWireless.record());
+    }
   }
 
   @Override
   void updateNetwork()
   {
-    networkService.kickPppoeUser(
-        originalPppoe.master(),
-        originalPppoe.login()
-    );
-    appendMessage(
-        "info: kicked '%s' from '%s'",
-        originalPppoe.login(),
-        originalPppoe.master()
-    );
+    if (originalPppoe.isValid()) {
+      networkService.kickPppoeUser(
+          originalPppoe.master(),
+          originalPppoe.login()
+      );
+      appendMessage(
+          "info: kicked '%s' from '%s'",
+          originalPppoe.login(),
+          originalPppoe.master()
+      );
+    }
   }
 }

@@ -21,7 +21,7 @@ public class DisableDhcp extends BaseAction
   boolean initialize()
   {
     originalDhcp = new DhcpFactory(networkRepository).dhcpOf(serviceId);
-    return originalDhcp != Dhcp.NULL;
+    return originalDhcp.isValid();
   }
 
   @Override
@@ -31,12 +31,6 @@ public class DisableDhcp extends BaseAction
         originalDhcp.switchId(),
         originalDhcp.port(),
         handle
-    );
-    log.info(
-        "disabled DHCP switch port '{}/{} for service '{}'",
-        originalDhcp.switchName(),
-        originalDhcp.port(),
-        serviceId
     );
   }
 

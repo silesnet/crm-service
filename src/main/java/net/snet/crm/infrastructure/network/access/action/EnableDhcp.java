@@ -20,7 +20,7 @@ public class EnableDhcp extends BaseAction
   boolean initialize()
   {
     dhcp = new DhcpFactory(networkRepository).dhcpOf(draft);
-    return dhcp != Dhcp.NULL;
+    return dhcp.isValid();
   }
 
   @Override
@@ -31,12 +31,6 @@ public class EnableDhcp extends BaseAction
         dhcp.switchId(),
         dhcp.port(),
         handle
-    );
-    log.info(
-        "enabled DHCP switch port '{}/{} for service '{}'",
-        dhcp.switchName(),
-        dhcp.port(),
-        serviceId
     );
   }
 

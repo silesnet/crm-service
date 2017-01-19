@@ -40,6 +40,14 @@ public class Dhcp
     this.switchName = switchName;
   }
 
+  public boolean isValid() {
+    return this != NULL;
+  }
+
+  public boolean isNotValid() {
+    return this == NULL;
+  }
+
   public int switchId() {
     return switchId;
   }

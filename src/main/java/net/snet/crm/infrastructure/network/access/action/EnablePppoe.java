@@ -20,7 +20,7 @@ public class EnablePppoe extends BaseAction
   boolean initialize()
   {
     pppoe = new PppoeFactory(networkRepository).pppoeOf(draft);
-    return pppoe != Pppoe.NULL;
+    return pppoe.isValid();
   }
 
   @Override
@@ -31,7 +31,6 @@ public class EnablePppoe extends BaseAction
         pppoe.record(),
         handle
     );
-    log.info("added PPPoE for service '{}'", serviceId);
   }
 
 }
