@@ -23,31 +23,42 @@ public class UpdatePppoe extends BaseAction
     final PppoeFactory factory = new PppoeFactory(networkRepository);
     originalPppoe = factory.pppoeOf(serviceId);
     pppoe = factory.pppoeOf(draft);
-    return originalPppoe != Pppoe.NULL && pppoe != Pppoe.NULL;
+    return originalPppoe.isValid() || pppoe.isValid();
   }
 
   @Override
   void updateDatabase()
   {
-    networkRepository.updatePppoe(
-        serviceId,
-        pppoe.record(),
-        handle
-    );
-    log.info("updated PPPoE for service '{}'", serviceId);
+    if (originalPppoe.isValid() && pppoe.isValid()) {
+      networkRepository.updatePppoe(
+          serviceId,
+          pppoe.record(),
+          handle
+      );
+    } else if (originalPppoe.isNotValid() && pppoe.isValid()) {
+      networkRepository.addPppoe(
+          serviceId,
+          pppoe.record(),
+          handle
+      );
+    } else {
+      // pppoe is not valid => NOP
+    }
   }
 
   @Override
   void updateNetwork()
   {
-    networkService.kickPppoeUser(
-        originalPppoe.master(),
-        originalPppoe.login()
-    );
-    appendMessage(
-        "info: kicked '%s' from '%s'",
-        originalPppoe.login(),
-        originalPppoe.master()
-    );
+    if (originalPppoe.isValid()) {
+      networkService.kickPppoeUser(
+          originalPppoe.master(),
+          originalPppoe.login()
+      );
+      appendMessage(
+          "info: kicked '%s' from '%s'",
+          originalPppoe.login(),
+          originalPppoe.master()
+      );
+    }
   }
 }

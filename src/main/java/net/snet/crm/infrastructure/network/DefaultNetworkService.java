@@ -85,7 +85,7 @@ public class DefaultNetworkService implements NetworkService {
     final Runnable task = new Runnable() {
       @Override
       public void run() {
-        logger.info("enabled switch port '{}/{}'", switchName, port);
+        logger.info("enabled network switch port '{}/{}'", switchName, port);
       }
     };
     final Thread thread = new Thread(task);
@@ -97,7 +97,7 @@ public class DefaultNetworkService implements NetworkService {
     final Runnable task = new Runnable() {
       @Override
       public void run() {
-        logger.info("disabled switch port '{}/{}'", switchName, port);
+        logger.info("disabled network switch port '{}/{}'", switchName, port);
       }
     };
     final Thread thread = new Thread(task);
@@ -115,6 +115,7 @@ public class DefaultNetworkService implements NetworkService {
         "kickPppoeUser",
         "-d", master,
         "-u", login));
+    logger.info("kicked '{}' from '{}' network device", login, master);
   }
 
   @Override

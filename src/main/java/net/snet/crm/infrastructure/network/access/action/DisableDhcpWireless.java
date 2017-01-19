@@ -21,13 +21,12 @@ public class DisableDhcpWireless extends BaseAction
   {
     originalDhcpWireless =
         new DhcpWirelessFactory(networkRepository).dhcpWirelessOf(serviceId);
-    return originalDhcpWireless != DhcpWireless.NULL;
+    return originalDhcpWireless.isValid();
   }
 
   @Override
   void updateDatabase()
   {
     networkRepository.removeDhcpWireless(serviceId);
-    log.info("disabled DHCP Wireless service '{}'", serviceId);
   }
 }

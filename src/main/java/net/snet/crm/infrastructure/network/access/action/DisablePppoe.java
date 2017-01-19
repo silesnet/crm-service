@@ -16,13 +16,12 @@ public class DisablePppoe extends BaseAction
   @Override
   boolean initialize() {
     originalPppoe = new PppoeFactory(networkRepository).pppoeOf(serviceId);
-    return originalPppoe != Pppoe.NULL;
+    return originalPppoe.isValid();
   }
 
   @Override
   void updateDatabase() {
     networkRepository.removePppoe(serviceId, handle);
-    log.info("removed PPPoE for service '{}'", serviceId);
   }
 
   @Override

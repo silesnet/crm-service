@@ -24,6 +24,14 @@ public class Pppoe
     this.login = login;
   }
 
+  public boolean isValid() {
+    return this != NULL;
+  }
+
+  public boolean isNotValid() {
+    return this == NULL;
+  }
+
   public Data record() {
     return record;
   }

@@ -24,48 +24,49 @@ public class DisablePppoeEnableDhcp extends BaseAction
   {
     originalPppoe = new PppoeFactory(networkRepository).pppoeOf(serviceId);
     dhcp = new DhcpFactory(networkRepository).dhcpOf(draft);
-    return originalPppoe != Pppoe.NULL && dhcp != Dhcp.NULL;
+    return originalPppoe.isValid() || dhcp.isValid();
   }
 
   @Override
-  void updateDatabase() {
-    networkRepository.removePppoe(serviceId, handle);
-    log.info("removed PPPoE for service '{}'", serviceId);
-
-    networkRepository.bindDhcp(
-        serviceId,
-        dhcp.switchId(),
-        dhcp.port(),
-        handle
-    );
-    log.info(
-        "enabled DHCP switch port '{}/{} for service '{}'",
-        dhcp.switchName(),
-        dhcp.port(),
-        serviceId
-    );
+  void updateDatabase()
+  {
+    if (originalPppoe.isValid()) {
+      networkRepository.removePppoe(serviceId, handle);
+    }
+    if (dhcp.isValid()) {
+      networkRepository.bindDhcp(
+          serviceId,
+          dhcp.switchId(),
+          dhcp.port(),
+          handle
+      );
+    }
   }
 
   @Override
-  void updateNetwork() {
-    networkService.kickPppoeUser(
-        originalPppoe.master(),
-        originalPppoe.login()
-    );
-    appendMessage(
-        "info: kicked '%s' from '%s'",
-        originalPppoe.login(),
-        originalPppoe.master()
-    );
-
-    networkService.enableSwitchPort(
-        dhcp.switchName(),
-        dhcp.port()
-    );
-    appendMessage(
-        "info: opened DHCP switch port of '%s/%s'",
-        dhcp.switchName(),
-        dhcp.port()
-    );
+  void updateNetwork()
+  {
+    if (originalPppoe.isValid()) {
+      networkService.kickPppoeUser(
+          originalPppoe.master(),
+          originalPppoe.login()
+      );
+      appendMessage(
+          "info: kicked '%s' from '%s'",
+          originalPppoe.login(),
+          originalPppoe.master()
+      );
+    }
+    if (dhcp.isValid()) {
+      networkService.enableSwitchPort(
+          dhcp.switchName(),
+          dhcp.port()
+      );
+      appendMessage(
+          "info: opened DHCP switch port of '%s/%s'",
+          dhcp.switchName(),
+          dhcp.port()
+      );
+    }
   }
 }

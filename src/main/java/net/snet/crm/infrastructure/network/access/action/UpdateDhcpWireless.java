@@ -18,17 +18,23 @@ public class UpdateDhcpWireless extends BaseAction
   }
 
   @Override
-  boolean initialize() {
+  boolean initialize()
+  {
     final DhcpWirelessFactory factory = new DhcpWirelessFactory(networkRepository);
     originalDhcpWireless = factory.dhcpWirelessOf(serviceId);
     dhcpWireless = factory.dhcpWirelessOf(draft);
-    return originalDhcpWireless != DhcpWireless.NULL &&
-        dhcpWireless != DhcpWireless.NULL;
+    return originalDhcpWireless.isValid() || dhcpWireless.isValid();
   }
 
   @Override
-  void updateDatabase() {
-    networkRepository.updateDhcpWireless(serviceId, dhcpWireless.record());
-    log.info("updated DHCP Wireless service '{}'", serviceId);
+  void updateDatabase()
+  {
+    if (originalDhcpWireless.isValid() && dhcpWireless.isValid()) {
+      networkRepository.updateDhcpWireless(serviceId, dhcpWireless.record());
+    } else if (originalDhcpWireless.isNotValid() && dhcpWireless.isValid()) {
+      networkRepository.addDhcpWireless(serviceId, dhcpWireless.record());
+    } else {
+      // dhcpWireless is not valid => NOP
+    }
   }
 }

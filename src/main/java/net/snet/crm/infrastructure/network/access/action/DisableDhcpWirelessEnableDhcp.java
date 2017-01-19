@@ -25,40 +25,38 @@ public class DisableDhcpWirelessEnableDhcp extends BaseAction
     originalDhcpWireless =
         new DhcpWirelessFactory(networkRepository).dhcpWirelessOf(serviceId);
     dhcp = new DhcpFactory(networkRepository).dhcpOf(draft);
-    return originalDhcpWireless != DhcpWireless.NULL && dhcp != Dhcp.NULL;
+    return originalDhcpWireless.isValid() || dhcp.isValid();
   }
 
   @Override
   void updateDatabase()
   {
-    networkRepository.removeDhcpWireless(serviceId);
-    log.info("disabled DHCP Wireless service '{}'", serviceId);
-
-    networkRepository.bindDhcp(
-        serviceId,
-        dhcp.switchId(),
-        dhcp.port(),
-        handle
-    );
-    log.info(
-        "enabled DHCP switch port '{}/{} for service '{}'",
-        dhcp.switchName(),
-        dhcp.port(),
-        serviceId
-    );
+    if (originalDhcpWireless.isValid()) {
+      networkRepository.removeDhcpWireless(serviceId);
+    }
+    if (dhcp.isValid()) {
+      networkRepository.bindDhcp(
+          serviceId,
+          dhcp.switchId(),
+          dhcp.port(),
+          handle
+      );
+    }
   }
 
   @Override
   void updateNetwork()
   {
-    networkService.enableSwitchPort(
-        dhcp.switchName(),
-        dhcp.port()
-    );
-    appendMessage(
-        "info: opened DHCP switch port of '%s/%s'",
-        dhcp.switchName(),
-        dhcp.port()
-    );
+    if (dhcp.isValid()) {
+      networkService.enableSwitchPort(
+          dhcp.switchName(),
+          dhcp.port()
+      );
+      appendMessage(
+          "info: opened DHCP switch port of '%s/%s'",
+          dhcp.switchName(),
+          dhcp.port()
+      );
+    }
   }
 }

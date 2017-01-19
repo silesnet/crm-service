@@ -21,12 +21,11 @@ public class EnableDhcpWireless extends BaseAction
   boolean initialize() {
     dhcpWireless =
         new DhcpWirelessFactory(networkRepository).dhcpWirelessOf(draft);
-    return dhcpWireless != DhcpWireless.NULL;
+    return dhcpWireless.isValid();
   }
 
   @Override
   void updateDatabase() {
     networkRepository.addDhcpWireless(serviceId, dhcpWireless.record());
-    log.info("enabled DHCP Wireless service '{}'", serviceId);
   }
 }
