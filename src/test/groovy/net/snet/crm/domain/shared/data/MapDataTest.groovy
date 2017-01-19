@@ -7,6 +7,39 @@ import spock.lang.Unroll
 
 class MapDataTest extends Specification {
 
+  def "should detect numeric value"() {
+    def data = MapData.of([k: '1', l: 2, m: ''])
+    expect:
+    data.hasValue('k')
+    data.hasValue('l')
+    data.hasValue('m')
+
+    data.hasNumber('k')
+    data.hasNumber('l')
+    !data.hasNumber('m')
+
+    data.intOf('k') == 1
+    data.intOf('l') == 2
+  }
+
+  def "should convert string to number correctly"() {
+    def data = MapData.of([k: '1'])
+    expect:
+    data.intOf('k') == 1
+    data.optIntOf('k') == 1
+  }
+
+  def "should return default when has value of wrong type"() {
+    def data = MapData.of([k: '', k2: null])
+    expect:
+    data.hasValue('k')
+    !data.hasValue('k2')
+    !data.optBooleanOf('k2')
+    !data.optBooleanOf('k')
+    data.optIntOf('k2') == 0
+    data.optIntOf('k') == 0
+  }
+
   def "should return defaults for given types"() {
     def data = MapData.EMPTY
     expect:

@@ -1,12 +1,18 @@
 package net.snet.crm.infrastructure.network.access;
 
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static net.snet.crm.infrastructure.network.access.States.*;
 import static net.snet.crm.infrastructure.network.access.Transitions.*;
 
 public class StateMachine
 {
+  private static final Logger log = LoggerFactory.getLogger(StateMachine.class);
+
   public Transitions transitionOf(States state, Events event) {
+    log.debug("resolving transition for '{}.{}'", state, event);
     if (None == state) {
       switch (event) {
         case Created: return NULL;
