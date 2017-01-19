@@ -42,7 +42,9 @@ public class BaseAction implements Action
       updateDatabase();
     } catch (Exception e) {
       throw new RuntimeException(
-          String.format("database update of access protocol failed for service '%s'", serviceId),
+          String.format("database update of access protocol failed for service '%s': %s",
+                        serviceId,
+                        e.getMessage()),
           e
       );
     }
