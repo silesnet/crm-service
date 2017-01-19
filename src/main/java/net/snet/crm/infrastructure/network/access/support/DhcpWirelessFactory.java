@@ -20,7 +20,7 @@ public class DhcpWirelessFactory
     final Data data = draft.optDataOf("data");
     final Map<String, Object> dhcpWireless = Maps.newHashMap();
     dhcpWireless.put("mac", macOf(data.optStringOf("mac_address")).asMap());
-    dhcpWireless.put("interface", findDeviceName(data.optIntOf("ssid", 0)));
+    dhcpWireless.putAll(interfaceAndMasterOf(data.optIntOf("ssid")).asMap());
     dhcpWireless.putAll(
         ipOf(
             data.optStringOf("ip"),
@@ -67,18 +67,26 @@ public class DhcpWirelessFactory
     return MapData.of(record);
   }
 
-  private String findDeviceName(int id)
-  {
-    return MapData.of(
-        networkRepository.findDevice(id)
-    ).optStringOf("name");
-  }
 
   private String defaultIpClass(long serviceId)
   {
     return ("" + serviceId).startsWith("1")
         ? "internal-cz"
         : "public-pl";
+  }
+
+  private Data interfaceAndMasterOf(int id)
+  {
+    final Map<String, Object> record = Maps.newHashMap();
+    final Data device = findDevice(id);
+    record.put("interface", device.optStringOf("name"));
+    record.put("master", device.optStringOf("master"));
+    return MapData.of(record);
+  }
+
+  private Data findDevice(int id)
+  {
+    return MapData.of(networkRepository.findDevice(id));
   }
 
 }
