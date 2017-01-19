@@ -37,11 +37,7 @@ public class DefaultNetworkService implements NetworkService {
     final Data dhcp = MapData.of(networkRepository.findServiceDhcp(serviceId));
     final boolean hasDhcp = !dhcp.asMap().isEmpty();
     if (hasDhcp) {
-      executeSystemCommand(commandFactory.systemCommand(
-          "configureDhcpPort",
-          "-s", dhcp.stringOf("switch"),
-          "-p", dhcp.stringOf("port"),
-          "-v", "1"));
+      enableSwitchPort(dhcp.stringOf("switch"), dhcp.intOf("port"));
     }
     if (!hasPppoe && !hasDhcp) {
       executeSystemCommand(commandFactory.systemCommand(
@@ -64,11 +60,7 @@ public class DefaultNetworkService implements NetworkService {
     final Data dhcp = MapData.of(networkRepository.findServiceDhcp(serviceId));
     final boolean hasDhcp = !dhcp.asMap().isEmpty();
     if (hasDhcp) {
-      executeSystemCommand(commandFactory.systemCommand(
-          "configureDhcpPort",
-          "-s", dhcp.stringOf("switch"),
-          "-p", dhcp.stringOf("port"),
-          "-v", "2"));
+      disableSwitchPort(dhcp.stringOf("switch"), dhcp.intOf("port"));
     }
     if (!hasPppoe && !hasDhcp) {
       executeSystemCommand(commandFactory.systemCommand(
@@ -82,26 +74,22 @@ public class DefaultNetworkService implements NetworkService {
 
   @Override
   public void enableSwitchPort(final String switchName, final int port) {
-    final Runnable task = new Runnable() {
-      @Override
-      public void run() {
-        logger.info("enabled network switch port '{}/{}'", switchName, port);
-      }
-    };
-    final Thread thread = new Thread(task);
-    thread.start();
+    executeSystemCommand(commandFactory.systemCommand(
+        "configureDhcpPort",
+        "-s", switchName,
+        "-p", "" + port,
+        "-v", "1"));
+    logger.info("enabled network switch port '{}/{}'", switchName, port);
   }
 
   @Override
   public void disableSwitchPort(final String switchName, final int port) {
-    final Runnable task = new Runnable() {
-      @Override
-      public void run() {
-        logger.info("disabled network switch port '{}/{}'", switchName, port);
-      }
-    };
-    final Thread thread = new Thread(task);
-    thread.start();
+    executeSystemCommand(commandFactory.systemCommand(
+        "configureDhcpPort",
+        "-s", switchName,
+        "-p", "" + port,
+        "-v", "2"));
+    logger.info("disabled network switch port '{}/{}'", switchName, port);
   }
 
   @Override
