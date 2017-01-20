@@ -31,6 +31,7 @@ class DraftResource2Test extends Specification {
     LoggingFactory.bootstrap(Level.DEBUG)
   }
 
+  @Ignore
   def 'should disable dhcp when deleting dhcp draft'() {
     given:
       def original = [id: 1, entityType: 'services', entitySpate: '1', entityId: 10, entityName: '',
