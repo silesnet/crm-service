@@ -17,7 +17,10 @@ import net.snet.crm.infrastructure.network.access.*;
 import net.snet.crm.infrastructure.network.access.action.NoAction;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
-import org.skife.jdbi.v2.*;
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.TransactionCallback;
+import org.skife.jdbi.v2.TransactionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +32,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.util.*;
 
-import static net.snet.crm.domain.model.draft.Draft.Entity.SERVICES;
 import static net.snet.crm.service.utils.Entities.*;
 import static net.snet.crm.service.utils.Resources.checkParam;
 
@@ -40,16 +42,12 @@ public class DraftResource2
 {
   private static final Logger logger = LoggerFactory.getLogger(DraftResource2.class);
   private static final Function<Map<String, Object>, String> getLoginValue = getValueOf("login");
-  private static final String AUTH_DHCP = "1";
-  private static final String AUTH_PPPOE = "2";
 
   private final CrmRepository crmRepository;
   @Context
   private UriInfo uriInfo;
   private DraftRepository draftRepository;
   private AgreementRepository agreementRepository;
-  private NetworkRepository networkRepository;
-  private NetworkService networkService;
   private final StateMachine stateMachine;
   private final ActionFactory actionFactory;
   private final DBI dbi;
@@ -65,8 +63,6 @@ public class DraftResource2
     this.draftRepository = draftRepository;
     this.crmRepository = crmRepository;
     this.agreementRepository = agreementRepository;
-    this.networkRepository = networkRepository;
-    this.networkService = networkService;
     this.dbi = dbi;
     this.stateMachine = new StateMachine();
     this.actionFactory = new ActionFactory(networkRepository, networkService);
@@ -283,33 +279,6 @@ public class DraftResource2
         access.event()
     );
     return actionFactory.actionOf(transition);
-  }
-
-  private void kickPppoeOf(final Draft draft) {
-    final ValueMap data = valueMapOf(draft.data());
-    final String productChannel = data.get("product_channel").toString().toUpperCase();
-    if (productChannel.length() > 0) {
-      final int interfaceId = data.get("core_router").asIntegerOr(-1);
-      if (interfaceId > 0) {
-        final ValueMap interfaceData = valueMapOf(networkRepository.findDevice(interfaceId));
-        final String login = data.get("auth_a").toString();
-        final String master = interfaceData.get("name").toString();
-        networkService.kickPppoeUser(master, login);
-      }
-    }
-  }
-
-
-  private void disableDhcp(int switchId, int port) {
-    if (switchId != -1 && port != -1) {
-      networkRepository.disableDhcp(switchId, port);
-    }
-  }
-
-  private void bindDhcp(long serviceId, int switchId, int port) {
-    if (switchId != -1 && port != -1) {
-      networkRepository.bindDhcp(serviceId, switchId, port);
-    }
   }
 
   private Optional<Draft> customerDraftOf(final Map<String, String> links) {
