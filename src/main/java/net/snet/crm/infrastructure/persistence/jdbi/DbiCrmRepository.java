@@ -1,4 +1,4 @@
-package net.snet.crm.service.dao;
+package net.snet.crm.infrastructure.persistence.jdbi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
@@ -7,6 +7,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import net.snet.crm.domain.model.agreement.CrmRepository;
 import net.snet.crm.service.utils.Databases;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
@@ -35,7 +36,8 @@ import java.util.Map;
 import static com.google.common.base.Preconditions.*;
 import static net.snet.crm.service.utils.Databases.updateRecordWithId;
 
-public class DbiCrmRepository implements CrmRepository {
+public class DbiCrmRepository implements CrmRepository
+{
   private static final Logger logger = LoggerFactory.getLogger(DbiCrmRepository.class);
 
   private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);

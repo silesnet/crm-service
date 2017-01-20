@@ -1,4 +1,4 @@
-package net.snet.crm.service.dao;
+package net.snet.crm.infrastructure.persistence.jdbi;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +7,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.snet.crm.domain.model.draft.Draft;
+import net.snet.crm.domain.model.draft.DraftRepository;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
+import net.snet.crm.service.dao.EntityId;
 import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.tweak.VoidHandleCallback;

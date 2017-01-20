@@ -1,6 +1,8 @@
 package net.snet.crm.service.dao
 
 import com.google.common.io.Resources
+import net.snet.crm.domain.model.agreement.CrmRepository
+import net.snet.crm.infrastructure.persistence.jdbi.DbiCrmRepository
 import org.joda.time.DateTime
 import org.skife.jdbi.v2.DBI
 import org.skife.jdbi.v2.Handle

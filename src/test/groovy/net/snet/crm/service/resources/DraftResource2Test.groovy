@@ -6,7 +6,7 @@ import io.dropwizard.logging.LoggingFactory
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.crm.domain.model.network.NetworkRepository
 import net.snet.crm.domain.model.network.NetworkService
-import net.snet.crm.service.dao.DraftRepository
+import net.snet.crm.domain.model.draft.DraftRepository
 import org.junit.ClassRule
 import spock.lang.Ignore
 import spock.lang.Shared

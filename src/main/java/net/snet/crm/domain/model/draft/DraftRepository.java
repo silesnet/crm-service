@@ -1,4 +1,4 @@
-package net.snet.crm.service.dao;
+package net.snet.crm.domain.model.draft;
 
 import net.snet.crm.domain.shared.data.Data;
 import org.skife.jdbi.v2.Handle;
