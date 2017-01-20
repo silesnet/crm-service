@@ -6,9 +6,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.common.net.InetAddresses;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.domain.model.network.NetworkRepository;
@@ -19,7 +17,10 @@ import net.snet.crm.infrastructure.network.access.*;
 import net.snet.crm.infrastructure.network.access.action.NoAction;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
-import org.skife.jdbi.v2.*;
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.TransactionCallback;
+import org.skife.jdbi.v2.TransactionStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -196,6 +197,40 @@ public class DraftResource2
         ImmutableMap.of("messages", messages)).build();
   }
 
+  @DELETE
+  @Path("/{draftId}")
+  public Response deleteDraft(@PathParam("draftId") long draftId) {
+    final Draft original = new Draft(draftRepository.get(draftId));
+    if (SERVICES.equals(original.entity())) {
+      final ValueMap service = valueMapOf(original.data());
+      final String authentication = service.get("auth_type").asStringOr("0");
+      if (AUTH_DHCP.equals(authentication)) {
+        final int switchId = service.get("auth_a").asIntegerOr(-1);
+        final int port = service.get("auth_b").asIntegerOr(-1);
+        disableDhcp(switchId, port);
+      }
+      if (AUTH_PPPOE.equals(authentication)) {
+        networkRepository.removePppoe(original.entityId());
+        logger.info("removed PPPoE for {}", original.entityId());
+        kickPppoeOf(original);
+      }
+    }
+    draftRepository.delete(draftId);
+    return Response.noContent().build();
+  }
+
+  @POST
+  @Path("/{draftId}")
+  public Response importServiceDraft(@PathParam("draftId") final long draftId) {
+    logger.debug("import service draft '{}'", draftId);
+    final Draft serviceDraft = new Draft(draftRepository.get(draftId));
+    final Optional<Draft> customerDraft = customerDraftOf(serviceDraft.links());
+    final Optional<Draft> agreementDraft = agreementDraftOf(serviceDraft.links());
+    agreementRepository.addService(customerDraft, agreementDraft, serviceDraft);
+    logger.info("service draft '{}' was imported", draftId);
+    return Response.created(uriInfo.getRequestUri()).entity(ImmutableMap.of()).build();
+  }
+
   private long serviceId(Data draft) {
     return draft.longOf("entityId");
   }
@@ -234,41 +269,6 @@ public class DraftResource2
     return actionFactory.actionOf(transition);
   }
 
-  private void handleConnectionChanges(Map<String, Object> originalDraftMap, Map<String, Object> currentDraftMap) {
-    final Draft originalDraft = new Draft(originalDraftMap);
-    final Draft currentDraft = new Draft(currentDraftMap);
-    if (SERVICES.equals(originalDraft.entity()) && SERVICES.equals(currentDraft.entity())) {
-      final ValueMap original = valueMapOf(originalDraft.data());
-      final ValueMap current = valueMapOf(currentDraft.data());
-      final String originalAuth = original.get("auth_type").asStringOr("0");
-      final String currentAuth = current.get("auth_type").asStringOr("0");
-      if (AUTH_DHCP.equals(originalAuth) && !AUTH_DHCP.equals(currentAuth)) {
-        final int originalSwitchId = original.get("auth_a").asIntegerOr(-1);
-        final int originalPort = original.get("auth_b").asIntegerOr(-1);
-        disableDhcp(originalSwitchId, originalPort);
-      }
-      if (AUTH_PPPOE.equals(originalAuth) && !AUTH_PPPOE.equals(currentAuth)) {
-        networkRepository.removePppoe(originalDraft.entityId());
-        logger.info("removed PPPoE for {}", originalDraft.entityId());
-        kickPppoeOf(originalDraft);
-      }
-      if (AUTH_DHCP.equals(currentAuth)) {
-        final int switchId = current.get("auth_a").asIntegerOr(-1);
-        final int port = current.get("auth_b").asIntegerOr(-1);
-        bindDhcp(currentDraft.entityId(), switchId, port);
-      } else if (AUTH_PPPOE.equals(currentAuth)) {
-        if (AUTH_PPPOE.equals(originalAuth)) {
-          networkRepository.updatePppoe(currentDraft.entityId(), mapDraftToPppoe(currentDraft));
-          logger.info("updated PPPoE for {}", currentDraft.entityId());
-          kickPppoeOf(currentDraft);
-        } else {
-          networkRepository.addPppoe(currentDraft.entityId(), mapDraftToPppoe(currentDraft));
-          logger.info("created PPPoE for {}", currentDraft.entityId());
-        }
-      }
-    }
-  }
-
   private void kickPppoeOf(final Draft draft) {
     final ValueMap data = valueMapOf(draft.data());
     final String productChannel = data.get("product_channel").toString().toUpperCase();
@@ -283,88 +283,6 @@ public class DraftResource2
     }
   }
 
-  private Map<String, Object> mapDraftToPppoe(final Draft draft) {
-    final ValueMap data = valueMapOf(draft.data());
-    final Map<String, Object> pppoe = Maps.newHashMap();
-    final String productChannel = data.get("product_channel").toString().toUpperCase();
-    if (productChannel.length() > 0) {
-      pppoe.put("login", data.get("auth_a").toString());
-      pppoe.put("password", data.get("auth_b").toString());
-      pppoe.put("mac", ImmutableMap.<String, Object>of("type", "macaddr", "value", data.get("mac_address").toString()));
-      populateIpAddressTo(pppoe, data.get("ip"), draft.entityId());
-      pppoe.put("mode", productChannel);
-      if ("LAN".equals(productChannel) || "FIBER".equals(productChannel)) {
-        pppoe.put("interface", "");
-        final ValueMap router = deviceOf(data.get("core_router"));
-        pppoe.put("master", router.get("name").toString());
-      } else {
-        final ValueMap ssid = deviceOf(data.get("ssid"));
-        pppoe.put("interface", ssid.get("name").toString());
-        pppoe.put("master", ssid.get("master").toString());
-      }
-    }
-    return pppoe;
-  }
-
-  private ValueMap deviceOf(Value id) {
-    return valueMapOf(networkRepository.findDevice(id.asInteger()));
-  }
-
-  private void populateIpAddressTo(Map<String, Object> map, Object ipValue, long serviceId) {
-    if (ipValue == null || ipValue.toString().isEmpty()) {
-      map.put("ip", null);
-      map.put("ip_class", ipClass(serviceId));
-    } else {
-      final String ip = ipValue.toString();
-      try {
-        InetAddresses.forString(ip); // throws if not valid IP
-        map.put("ip", ImmutableMap.<String, Object>of("type", "inet", "value", ip));
-        map.put("ip_class", "static");
-      } catch (IllegalArgumentException e) {
-        map.put("ip", null);
-        map.put("ip_class", ip);
-      }
-    }
-  }
-
-  private String ipClass(long serviceId) {
-    return Long.valueOf(serviceId).toString().startsWith("1") ?
-        "internal-cz" : "public-pl";
-  }
-
-  @DELETE
-  @Path("/{draftId}")
-  public Response deleteDraft(@PathParam("draftId") long draftId) {
-    final Draft original = new Draft(draftRepository.get(draftId));
-    if (SERVICES.equals(original.entity())) {
-      final ValueMap service = valueMapOf(original.data());
-      final String authentication = service.get("auth_type").asStringOr("0");
-      if (AUTH_DHCP.equals(authentication)) {
-        final int switchId = service.get("auth_a").asIntegerOr(-1);
-        final int port = service.get("auth_b").asIntegerOr(-1);
-        disableDhcp(switchId, port);
-      }
-      if (AUTH_PPPOE.equals(authentication)) {
-        networkRepository.removePppoe(original.entityId());
-        logger.info("removed PPPoE for {}", original.entityId());
-        kickPppoeOf(original);
-      }
-    }
-    draftRepository.delete(draftId);
-    return Response.noContent().build();
-  }
-
-  @POST
-  @Path("/{draftId}")
-  public Response importServiceDraft(@PathParam("draftId") final long draftId) {
-    logger.debug("import service draft '{}'", draftId);
-    final Draft serviceDraft = new Draft(draftRepository.get(draftId));
-    final Optional<Draft> customerDraft = customerDraftOf(serviceDraft.links());
-    final Optional<Draft> agreementDraft = agreementDraftOf(serviceDraft.links());
-    agreementRepository.addService(customerDraft, agreementDraft, serviceDraft);
-    logger.info("service draft '{}' was imported", draftId);
-    return Response.created(uriInfo.getRequestUri()).entity(ImmutableMap.of()).build();
-  }
 
   private void disableDhcp(int switchId, int port) {
     if (switchId != -1 && port != -1) {
