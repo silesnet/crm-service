@@ -260,7 +260,7 @@ public class DbiNetworkRepository implements NetworkRepository
     {
       @Override
       protected void execute(Handle handle) throws Exception {
-        disableDhcp(switchId, port);
+        disableDhcp(switchId, port, handle);
       }
     });
   }
