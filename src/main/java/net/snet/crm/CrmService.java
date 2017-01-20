@@ -29,10 +29,10 @@ import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
 import net.snet.crm.infrastructure.system.FileSystemCommandFactory;
 import net.snet.crm.infrastructure.system.SystemCommandFactory;
 import net.snet.crm.service.CommandBroker;
+import net.snet.crm.service.DefaultUserService;
 import net.snet.crm.service.dao.DbiCrmRepository;
 import net.snet.crm.service.dao.DbiDraftRepository;
 import net.snet.crm.service.dao.DbiTodoRepository;
-import net.snet.crm.service.dao.DraftDAO;
 import net.snet.crm.service.resources.*;
 import net.snet.crm.service.resources.modules.DataModule;
 import net.snet.crm.service.resources.modules.EventModule;
@@ -123,17 +123,11 @@ public class CrmService extends Application<CrmConfiguration> {
 
     final JerseyEnvironment jersey = environment.jersey();
     jersey.register(new CustomerResource(dbi, crmRepository));
-    jersey.register(new AgreementResource(crmRepository));
     jersey.register(new ServiceResource(crmRepository, networkRepository, todoRepository));
-    jersey.register(new ConnectionResource(crmRepository));
-    jersey.register(new DraftResource(dbi.onDemand(DraftDAO.class), mapper, crmRepository));
-    jersey.register(new RouterResource(dbi));
     jersey.register(new NetworkResource(dbi, networkService));
     jersey.register(new UserResource(dbi, crmRepository,
         new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository)));
     jersey.register(new ProductResource(dbi));
-    jersey.register(new ContractResource(dbi));
-    jersey.register(new BaseResource());
     jersey.register(new DraftResource2(
         draftRepository,
         crmRepository,
