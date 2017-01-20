@@ -17,10 +17,7 @@ import net.snet.crm.infrastructure.network.access.*;
 import net.snet.crm.infrastructure.network.access.action.NoAction;
 import net.snet.crm.service.dao.CrmRepository;
 import net.snet.crm.service.dao.DraftRepository;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.TransactionCallback;
-import org.skife.jdbi.v2.TransactionStatus;
+import org.skife.jdbi.v2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,9 +170,9 @@ public class DraftResource2
           @Override
           public List<String> inTransaction(Handle handle, TransactionStatus status) throws Exception {
             draftRepository.update(draftId, data, handle);
-            final Data draft = draftRepository.get(draftId, handle);
 
             if (isServiceDraft(original)) {
+              final Data draft = draftRepository.get(draftId, handle);
               final Action action = accessChangeAction(original, draft);
               logger.debug(
                   "performing transition action '{}'",
@@ -199,24 +196,43 @@ public class DraftResource2
 
   @DELETE
   @Path("/{draftId}")
-  public Response deleteDraft(@PathParam("draftId") long draftId) {
-    final Draft original = new Draft(draftRepository.get(draftId));
-    if (SERVICES.equals(original.entity())) {
-      final ValueMap service = valueMapOf(original.data());
-      final String authentication = service.get("auth_type").asStringOr("0");
-      if (AUTH_DHCP.equals(authentication)) {
-        final int switchId = service.get("auth_a").asIntegerOr(-1);
-        final int port = service.get("auth_b").asIntegerOr(-1);
-        disableDhcp(switchId, port);
-      }
-      if (AUTH_PPPOE.equals(authentication)) {
-        networkRepository.removePppoe(original.entityId());
-        logger.info("removed PPPoE for {}", original.entityId());
-        kickPppoeOf(original);
-      }
-    }
-    draftRepository.delete(draftId);
-    return Response.noContent().build();
+  public Response deleteDraft(@PathParam("draftId") final long draftId)
+  {
+    final Data original = MapData.of(draftRepository.get(draftId));
+    ensureNotImported(original);
+
+    final List<String> messages =
+        dbi.inTransaction(new TransactionCallback<List<String>>()
+        {
+          @Override
+          public List<String> inTransaction(Handle handle, TransactionStatus status) throws Exception {
+            draftRepository.delete(draftId, handle);
+            if (isServiceDraft(original)) {
+              final Action action = actionFactory
+                  .actionOf(
+                      stateMachine
+                          .transitionOf(
+                              new Access(original).state(),
+                              Events.Deleted)
+                  );
+              logger.debug(
+                  "performing transition action '{}'",
+                  action.getClass().getSimpleName()
+              );
+              return action.perform(serviceId(original), Data.EMPTY, handle);
+            }
+            return new ArrayList<>();
+          }
+        });
+
+    logger.info(
+        "deleted draft '{}' of '{}/{}'", draftId,
+        original.stringOf("entityType"),
+        original.stringOf("entityId")
+    );
+
+    return Response.ok(
+        ImmutableMap.of("messages", messages)).build();
   }
 
   @POST
