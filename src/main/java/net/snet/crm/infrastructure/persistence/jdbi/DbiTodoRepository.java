@@ -1,15 +1,16 @@
-package net.snet.crm.service.dao;
+package net.snet.crm.infrastructure.persistence.jdbi;
 
+import net.snet.crm.domain.model.todo.TodoRepository;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.util.LongMapper;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DbiTodoRepository implements TodoRepository {
+public class DbiTodoRepository implements TodoRepository
+{
   private final DBI dbi;
 
   public DbiTodoRepository(DBI dbi) {

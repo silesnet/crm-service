@@ -3,7 +3,7 @@ package net.snet.crm.service.resources
 import com.sun.jersey.api.client.ClientResponse
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.crm.service.UserService
-import net.snet.crm.service.dao.CrmRepository
+import net.snet.crm.domain.model.agreement.CrmRepository
 import org.junit.ClassRule
 import org.skife.jdbi.v2.DBI
 import spock.lang.Shared

@@ -1,4 +1,4 @@
-package net.snet.crm.service.dao;
+package net.snet.crm.domain.model.agreement;
 
 import java.util.List;
 import java.util.Map;

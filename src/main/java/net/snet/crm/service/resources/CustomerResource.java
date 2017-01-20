@@ -4,7 +4,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
 import com.google.common.collect.*;
 import net.snet.crm.service.bo.CustomerSearch;
-import net.snet.crm.service.dao.CrmRepository;
+import net.snet.crm.domain.model.agreement.CrmRepository;
 import net.snet.crm.service.dao.CustomerDAO;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;

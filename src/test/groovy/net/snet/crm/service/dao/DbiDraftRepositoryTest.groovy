@@ -3,13 +3,14 @@ package net.snet.crm.service.dao
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.Maps
 import com.google.common.io.Resources
+import net.snet.crm.infrastructure.persistence.jdbi.DbiDraftRepository
 import org.skife.jdbi.v2.DBI
 import org.skife.jdbi.v2.Handle
 import spock.lang.Shared
 import spock.lang.Specification
 
-import static net.snet.crm.service.dao.DbiDraftRepository.DRAFTS_LINKS_TABLE
-import static net.snet.crm.service.dao.DbiDraftRepository.DRAFTS_TABLE
+import static net.snet.crm.infrastructure.persistence.jdbi.DbiDraftRepository.DRAFTS_LINKS_TABLE
+import static net.snet.crm.infrastructure.persistence.jdbi.DbiDraftRepository.DRAFTS_TABLE
 
 class DbiDraftRepositoryTest extends Specification {
   @Shared DBI dbi = new DBI("jdbc:h2:mem:customerRepositoryTest")

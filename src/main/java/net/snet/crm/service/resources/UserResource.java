@@ -8,7 +8,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import net.snet.crm.service.UserService;
 import net.snet.crm.service.bo.User;
-import net.snet.crm.service.dao.CrmRepository;
+import net.snet.crm.domain.model.agreement.CrmRepository;
 import net.snet.crm.service.dao.UserDAO;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;

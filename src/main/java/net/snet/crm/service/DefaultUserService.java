@@ -3,7 +3,7 @@ package net.snet.crm.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.sun.jersey.api.client.Client;
-import net.snet.crm.service.dao.CrmRepository;
+import net.snet.crm.domain.model.agreement.CrmRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,8 @@ import java.util.Map;
 /**
  * Created by admin on 21.8.14.
  */
-public class DefaultUserService implements UserService {
+public class DefaultUserService implements UserService
+{
 	private static final Logger logger = LoggerFactory.getLogger(DefaultUserService.class);
 
 	private final Client httpClient;
