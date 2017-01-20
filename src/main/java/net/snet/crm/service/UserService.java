@@ -1,4 +1,4 @@
-package net.snet.crm.service.resources;
+package net.snet.crm.service;
 
 import java.util.Map;
 
