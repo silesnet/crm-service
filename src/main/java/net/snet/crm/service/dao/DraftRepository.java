@@ -23,4 +23,5 @@ public interface DraftRepository {
   void update(long draftId, Data update, Handle handle);
 
   void delete(long draftId);
+  void delete(long draftId, Handle handle);
 }

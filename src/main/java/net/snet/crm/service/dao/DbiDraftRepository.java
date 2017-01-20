@@ -9,10 +9,7 @@ import com.google.common.collect.Maps;
 import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.TransactionCallback;
-import org.skife.jdbi.v2.TransactionStatus;
+import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.tweak.VoidHandleCallback;
 import org.skife.jdbi.v2.util.LongMapper;
@@ -125,22 +122,29 @@ public class DbiDraftRepository implements DraftRepository
 
   @Override
   public void delete(final long draftId) {
-    logger.debug("deleting draft '{}'", draftId);
-    final Draft draft = new Draft(get(draftId));
-    dbi.inTransaction(new TransactionCallback<Void>()
+    dbi.inTransaction(new VoidTransactionCallback()
     {
       @Override
-      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
-        if (AGREEMENTS.equals(draft.entity())) {
-          updateRecord(
-              DRAFTS_TABLE, draftId, ImmutableMap.<String, Object>of("status", "AVAILABLE"), handle);
-        } else {
-          deleteDraft(draftId, handle);
-        }
-        deleteLinks(draftId, handle);
-        return null;
+      protected void execute(Handle handle, TransactionStatus status) throws Exception {
+        delete(draftId, handle);
       }
     });
+  }
+
+  @Override
+  public void delete(long draftId, Handle handle) {
+    final Draft draft = new Draft(get(draftId, handle).asMap());
+    if (AGREEMENTS.equals(draft.entity())) {
+      updateRecord(
+          DRAFTS_TABLE, draftId, ImmutableMap.<String, Object>of("status", "AVAILABLE"), handle
+      );
+    } else {
+      deleteDraft(draftId, handle);
+    }
+    deleteLinks(draftId, handle);
+    logger.info(
+        "draft '{}' of '{}/{}' deleted", draftId, draft.entity(), draft.entityId()
+    );
   }
 
   @Override
