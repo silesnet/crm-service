@@ -350,6 +350,7 @@ public class DbiCrmRepository implements CrmRepository
                 "  INNER JOIN customers AS c ON s.customer_id = c.id\n" +
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
                 "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
+                "  LEFT JOIN dhcp_wireless AS d ON s.id = d.service_id\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   " + isActiveRestriction + "\n" +
                 "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
@@ -357,6 +358,7 @@ public class DbiCrmRepository implements CrmRepository
                 "  OR lower(translate(p.interface, '-', '')) ~* :query\n" +
                 "  OR lower(translate(p.location, '-', '')) ~* :query\n" +
                 "  OR lower(translate(p.mac\\:\\:text, '\\:', '')) ~* :query\n" +
+                "  OR lower(translate(d.mac\\:\\:text, '\\:', '')) ~* :query\n" +
                 "  OR translate(phone, ' ', '') ~* :query\n" +
                 "  OR (a.id % 100000)\\:\\:text ~ :query)\n" +
                 "\n" +
