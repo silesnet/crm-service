@@ -29,7 +29,7 @@ public class PppoeFactory
     pppoe.put("login", data.optStringOf("auth_a"));
     pppoe.put("password", data.optStringOf("auth_b"));
     pppoe.put("mac", macOf(data.optStringOf("mac_address")).asMap());
-    pppoe.put("mode", data.optStringOf("product_channel"));
+    pppoe.put("mode", data.optStringOf("product_channel").toUpperCase());
     pppoe.putAll(
         ipOf(
             data.optStringOf("ip"),
