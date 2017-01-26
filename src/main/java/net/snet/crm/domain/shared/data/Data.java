@@ -81,4 +81,6 @@ public interface Data
 
   Map<String, Object> asMap();
 
+  Map<String, Object> asModifiableContent();
+
 }

@@ -7,6 +7,15 @@ import spock.lang.Specification
 import spock.lang.Unroll
 
 class MapDataTest extends Specification {
+
+  def "should return modifiable content"() {
+    def data = MapData.of([:])
+    when:
+    data.asModifiableContent().put('k', 'v')
+    then:
+    data.stringOf('k') == 'v'
+  }
+
   def "should return data from list of data"() {
     def data = MapData.of([links:
                     [
