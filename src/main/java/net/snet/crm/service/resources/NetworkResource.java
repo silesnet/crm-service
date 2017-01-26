@@ -2,6 +2,7 @@ package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.net.InetAddresses;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkRepository.Country;
 import net.snet.crm.domain.model.network.NetworkRepository.DeviceType;
@@ -142,6 +143,7 @@ public class NetworkResource
         checkState(port >= 0, "new switch port not provided");
         networkRepository.bindDhcp(serviceId, networkId, port);
         final Map<String, Object> propsUpdate = dhcpUpdate.asMap().map();
+        propsUpdate.put("ip", resolveIpAddress(dhcpUpdate.asMap().get("ip").asStringValueOr("AUTO")));
         propsUpdate.remove("network_id");
         propsUpdate.remove("port");
         if (!propsUpdate.isEmpty()) {
@@ -150,6 +152,13 @@ public class NetworkResource
       }
     }
     return Response.ok(ImmutableMap.of()).build();
+  }
+
+  private String resolveIpAddress(String ip) {
+    if ("AUTO".equals(ip) || InetAddresses.isInetAddress(ip)) {
+      return ip;
+    }
+    throw new IllegalArgumentException("invalid ip address: '" + ip + "'");
   }
 
   @GET
