@@ -14,7 +14,7 @@ class PppoeFactoryTest extends Specification {
     expect:
     pppoe.login == 'login'
     pppoe.password == 'password'
-    pppoe.mode == 'wireless'
+    pppoe.mode == 'WIRELESS'
     pppoe.mac.type == 'macaddr'
     pppoe.mac.value == '12'
     pppoe.ip.type == 'inet'
