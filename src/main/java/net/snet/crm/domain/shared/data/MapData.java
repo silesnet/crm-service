@@ -215,6 +215,11 @@ public class MapData implements Data
     return Maps.newHashMap(map);
   }
 
+  @Override
+  public Map<String, Object> asModifiableContent() {
+    return map;
+  }
+
   private boolean asBoolean(Value value) {
     return (value.value instanceof Boolean)
         ? (Boolean) value.value

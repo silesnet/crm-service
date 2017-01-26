@@ -2,10 +2,11 @@ package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.*;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.agreement.CrmRepository;
 import net.snet.crm.domain.model.todo.TodoRepository;
+import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.service.utils.Entities.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,23 @@ public class ServiceResource {
   public Response serviceComments(@PathParam("serviceId") long serviceId) {
     return Response.ok(ImmutableMap.of(
           "comments", todoRepository.findServiceComments(serviceId))).build();
+  }
+
+  @GET
+  @Path("/{serviceId}/todos")
+  public Response serviceTodos(@PathParam("serviceId") long serviceId) {
+    final List<Data> comments = todoRepository.findServiceComments(serviceId);
+    final Multimap<Long, Data> todoComments = LinkedListMultimap.create();
+    for (Data comment : comments) {
+      todoComments.put(comment.longOf("todo_id"), comment);
+    }
+    List<Data> todos = Lists.newArrayList();
+    for (Long todoId : todoComments.keySet()) {
+      final Data todo = todoRepository.findTodo(todoId);
+      todo.asModifiableContent().put("comments", todoComments.get(todoId));
+      todos.add(todo);
+    }
+    return Response.ok(ImmutableMap.of("todos", todos)).build();
   }
 
   @PUT

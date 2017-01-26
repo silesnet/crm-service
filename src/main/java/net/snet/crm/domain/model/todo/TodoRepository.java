@@ -1,8 +1,12 @@
 package net.snet.crm.domain.model.todo;
 
-import java.util.List;
-import java.util.Map;
+import net.snet.crm.domain.shared.data.Data;
 
-public interface TodoRepository {
-  List<Map<String, Object>> findServiceComments(long serviceId);
+import java.util.List;
+
+public interface TodoRepository
+{
+  List<Data> findServiceComments(long serviceId);
+
+  Data findTodo(long todoId);
 }
