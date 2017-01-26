@@ -8,19 +8,16 @@ import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
+import net.snet.crm.domain.model.agreement.CrmRepository;
 import net.snet.crm.domain.model.draft.Draft;
+import net.snet.crm.domain.model.draft.DraftRepository;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.infrastructure.network.access.*;
 import net.snet.crm.infrastructure.network.access.action.NoAction;
-import net.snet.crm.domain.model.agreement.CrmRepository;
-import net.snet.crm.domain.model.draft.DraftRepository;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.TransactionCallback;
-import org.skife.jdbi.v2.TransactionStatus;
+import org.skife.jdbi.v2.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,13 +41,13 @@ public class DraftResource2
   private static final Function<Map<String, Object>, String> getLoginValue = getValueOf("login");
 
   private final CrmRepository crmRepository;
+  private final StateMachine stateMachine;
+  private final ActionFactory actionFactory;
+  private final DBI dbi;
   @Context
   private UriInfo uriInfo;
   private DraftRepository draftRepository;
   private AgreementRepository agreementRepository;
-  private final StateMachine stateMachine;
-  private final ActionFactory actionFactory;
-  private final DBI dbi;
 
   public DraftResource2(
       DraftRepository draftRepository,
@@ -146,6 +143,27 @@ public class DraftResource2
         .ok(ImmutableMap.of("drafts",
                             draftRepository.getEntity(entityType, entityId)))
         .build();
+  }
+
+  @PUT
+  @Path("/{draftId}/status")
+  public Response updateDraftStatus(
+      @PathParam("draftId") final long draftId,
+      final Data body)
+  {
+    final String status = body.stringOf("status");
+    dbi.inTransaction(new VoidTransactionCallback()
+    {
+      @Override
+      protected void execute(Handle handle, TransactionStatus tx) throws Exception {
+        final String original = draftRepository.statusOf(draftId, handle);
+        if ("IMPORTED".equals(original)) {
+          throw new IllegalStateException("can't update status of imported draft " + draftId);
+        }
+        draftRepository.updateStatusGraphOf(draftId, status, handle);
+      }
+    });
+    return Response.ok(ImmutableMap.of()).build();
   }
 
   @PUT

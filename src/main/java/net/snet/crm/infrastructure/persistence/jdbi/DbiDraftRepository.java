@@ -15,6 +15,7 @@ import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.tweak.VoidHandleCallback;
 import org.skife.jdbi.v2.util.LongMapper;
+import org.skife.jdbi.v2.util.StringMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +23,7 @@ import javax.annotation.Nonnull;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -120,6 +122,57 @@ public class DbiDraftRepository implements DraftRepository
       deleteLinks(draftId, handle);
       insertLinks(draftId, links, handle);
     }
+  }
+
+  @Override
+  public String statusOf(long draftId, Handle handle) {
+    return handle
+        .createQuery(
+            "SELECT status FROM drafts2 WHERE id = :draftId")
+        .bind("draftId", draftId)
+        .map(StringMapper.FIRST)
+        .first();
+  }
+
+  @Override
+  public void updateStatusGraphOf(final long draftId, final String status, Handle handle) {
+    safeUpdateStatusOf(draftId, status, handle);
+    for (Long linkedDraftId : linkedDraftIdsOf(draftId, handle)) {
+      safeUpdateStatusOf(linkedDraftId, status, handle);
+    }
+  }
+
+  private void safeUpdateStatusOf(final long draftId, final String status, Handle handle) {
+    final int updated = handle
+        .createStatement(
+            "UPDATE " + DRAFTS_TABLE + " SET status=:status WHERE id=:draftId")
+        .bind("status", status)
+        .bind("draftId", draftId)
+        .execute();
+    if (updated == 1) {
+      logger.info("updated status of draft '{}' to '{}'", draftId, status);
+    } else {
+      logger.warn("failed draft status update of '{}' to '{}'", draftId, status);
+    }
+  }
+
+  private List<Long> linkedDraftIdsOf(final long draftId, Handle handle) {
+    return handle
+        .createQuery(
+            "SELECT d.id\n" +
+                "FROM drafts2 AS d\n" +
+                "  INNER JOIN (SELECT\n" +
+                "                  right(entity, length(entity) - 7) AS entity_type\n" +
+                "                , entity_id\n" +
+                "              FROM draft_links\n" +
+                "              WHERE draft_id = :draftId\n" +
+                "              AND left(entity, 7) = 'drafts.') AS l\n" +
+                "          ON d.entity_type = l.entity_type\n" +
+                "         AND d.entity_id = l.entity_id\n" +
+                "ORDER BY id")
+        .bind("draftId", draftId)
+        .map(LongMapper.FIRST)
+        .list();
   }
 
   @Override
@@ -237,6 +290,8 @@ public class DbiDraftRepository implements DraftRepository
       }
     });
   }
+
+
 
   private Map<String, Object> getByDraftId(
       final long draftId,
