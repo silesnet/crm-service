@@ -82,7 +82,7 @@ public class PppoeFactory
 
   private Data deviceOf(Data data)
   {
-    final String channel = data.optStringOf("product_channel");
+    final String channel = data.optStringOf("product_channel").toUpperCase();
     if (channel.length() == 0) {
       return MapData.EMPTY;
     }
