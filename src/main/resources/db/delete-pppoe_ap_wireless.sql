@@ -1,0 +1,5 @@
+DELETE
+FROM pppoe
+WHERE mode='50'
+
+COMMIT;
