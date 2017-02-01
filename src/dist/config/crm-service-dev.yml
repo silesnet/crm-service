@@ -10,6 +10,8 @@ database:
 
 systemCommandHome: src/test/resources/commands
 
+version: 14.4.1-326 388872d
+
 logging:
   level: WARN
   loggers:

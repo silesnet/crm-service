@@ -43,6 +43,9 @@ public class CrmConfiguration extends Configuration {
   @JsonProperty
   private String systemCommandHome;
 
+  @JsonProperty
+  private String version;
+
 	@Valid
 	@NotNull
 	@JsonProperty
@@ -74,5 +77,9 @@ public class CrmConfiguration extends Configuration {
 
   public SmsMessagingConfiguration getSmsMessaging() {
 		return smsMessaging;
+  }
+
+  public String getVersion() {
+    return version;
   }
 }

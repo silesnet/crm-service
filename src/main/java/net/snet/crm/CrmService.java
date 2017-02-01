@@ -137,6 +137,7 @@ public class CrmService extends Application<CrmConfiguration> {
         dbi));
     jersey.register(new MessagingResource(messagingService));
     jersey.register(new EventResource(eventLog));
+    jersey.register(new AdminResource(configuration.getVersion()));
     jersey.register(new RuntimeExceptionMapper());
 
     final TaskFactory taskFactory = new DefaultTaskFactory(dbi, networkService, eventLog);
