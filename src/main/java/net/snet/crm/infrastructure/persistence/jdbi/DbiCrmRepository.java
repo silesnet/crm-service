@@ -38,18 +38,15 @@ import static net.snet.crm.service.utils.Databases.updateRecordWithId;
 
 public class DbiCrmRepository implements CrmRepository
 {
-  private static final Logger logger = LoggerFactory.getLogger(DbiCrmRepository.class);
-
-  private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
   public static final int SERVICE_COUNTRY_MULTIPLIER = 100000;
-  private final String TRANSLATE_FROM_CHARS = "ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź.-,;:&+? ";
-  private final String TRANSLATE_TO_CHARS = "aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz";
+  private static final Logger logger = LoggerFactory.getLogger(DbiCrmRepository.class);
+  private static final Map<String, Long> COUNTRIES = ImmutableMap.of("CZ", 10L, "PL", 20L);
   private static final String DRAFT_TABLE = "drafts2";
   private static final String PRODUCT_TABLE = "products";
-
   private static final Map<String, String> CONNECTION_FIELDS;
 
-  static {
+  static
+  {
     CONNECTION_FIELDS = Maps.newHashMap();
     CONNECTION_FIELDS.put("auth_type", "auth_type");
     CONNECTION_FIELDS.put("auth_name", "auth_name");
@@ -60,18 +57,23 @@ public class DbiCrmRepository implements CrmRepository
     CONNECTION_FIELDS.put("ip", "ip");
   }
 
+  private final String TRANSLATE_FROM_CHARS = "ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź.-,;:&+? ";
+  private final String TRANSLATE_TO_CHARS = "aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz";
   private final CrmDatabase db;
   private final DBI dbi;
 
-  public DbiCrmRepository(final DBI dbi) {
+  public DbiCrmRepository(final DBI dbi)
+  {
     this.dbi = dbi;
     this.db = dbi.onDemand(CrmDatabase.class);
   }
 
   @Override
-  public Map<String, Object> insertCustomer(Map<String, Object> customer) {
+  public Map<String, Object> insertCustomer(Map<String, Object> customer)
+  {
     db.begin();
-    try {
+    try
+    {
       long id = db.lastCustomerId() + 1;
       long auditId = db.lastAuditId() + 1;
       String name = customer.get("name").toString();
@@ -80,100 +82,123 @@ public class DbiCrmRepository implements CrmRepository
       db.insertAudit(auditItemId, auditId, 41, 2, now(), "Customer.fName", "", name);
       db.commit();
       return findCustomerById(id);
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       db.rollback();
       throw new RuntimeException(e);
     }
   }
 
-  private Timestamp now() {
+  private Timestamp now()
+  {
     return new Timestamp(new DateTime().getMillis());
   }
 
   @Override
-  public Map<String, Object> findCustomerById(final long customerId) {
-    return db.withHandle(new HandleCallback<Map<String, Object>>() {
+  public Map<String, Object> findCustomerById(final long customerId)
+  {
+    return db.withHandle(new HandleCallback<Map<String, Object>>()
+    {
       @Override
-      public Map<String, Object> withHandle(Handle handle) throws Exception {
+      public Map<String, Object> withHandle(Handle handle) throws Exception
+      {
         return handle.createQuery("SELECT * FROM customers WHERE id=:id")
-            .bind("id", customerId)
-            .first();
+                     .bind("id", customerId)
+                     .first();
       }
     });
   }
 
   @Override
-  public void deleteCustomer(final long customerId) {
-    db.withHandle(new HandleCallback<Object>() {
+  public void deleteCustomer(final long customerId)
+  {
+    db.withHandle(new HandleCallback<Object>()
+    {
       @Override
-      public Object withHandle(Handle handle) throws Exception {
+      public Object withHandle(Handle handle) throws Exception
+      {
         handle.createStatement("DELETE from customers WHERE id=:id")
-            .bind("id", customerId)
-            .execute();
+              .bind("id", customerId)
+              .execute();
         return null;
       }
     });
   }
 
   @Override
-  public Map<String, Object> updateCustomer(final long customerId, final Map<String, Object> updates) {
-    if (updates.size() == 0) {
+  public Map<String, Object> updateCustomer(final long customerId, final Map<String, Object> updates)
+  {
+    if (updates.size() == 0)
+    {
       logger.debug("nothing on update returning original customer '{}'", customerId);
       return findCustomerById(customerId);
     }
     final String sql = sqlUpdate("customers", updates, "id");
     db.begin();
-    try {
-      Integer updated = db.withHandle(new HandleCallback<Integer>() {
+    try
+    {
+      Integer updated = db.withHandle(new HandleCallback<Integer>()
+      {
         @Override
-        public Integer withHandle(Handle handle) throws Exception {
+        public Integer withHandle(Handle handle) throws Exception
+        {
           return handle.createStatement(sql)
-              .bind("id", customerId)
-              .bindFromMap(updates)
-              .execute();
+                       .bind("id", customerId)
+                       .bindFromMap(updates)
+                       .execute();
         }
       });
-      if (updated != 1) {
+      if (updated != 1)
+      {
         throw new IllegalStateException("failed on update customer '" + customerId + "'");
       }
       db.commit();
       return findCustomerById(customerId);
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       db.rollback();
       throw new RuntimeException(e);
     }
   }
 
-  private String sqlUpdate(String table, Map<String, Object> updates, String identity) {
+  private String sqlUpdate(String table, Map<String, Object> updates, String identity)
+  {
     return "UPDATE " + table + " SET " + updateExpression(updates) +
         " WHERE " + identity + "=:" + identity;
   }
 
-  private String updateExpression(Map<String, Object> updates) {
+  private String updateExpression(Map<String, Object> updates)
+  {
     final ArrayList<String> items = Lists.newArrayList();
-    for (String column : updates.keySet()) {
+    for (String column : updates.keySet())
+    {
       items.add(column + "=:" + column);
     }
     return Joiner.on(", ").join(items);
   }
 
   @Override
-  public void setCustomerAgreements(long customerId, String agreements) {
+  public void setCustomerAgreements(long customerId, String agreements)
+  {
     db.setCustomerAgreements(customerId, agreements);
   }
 
   @Override
-  public Map<String, Object> insertAgreement(long customerId, String country) {
+  public Map<String, Object> insertAgreement(long customerId, String country)
+  {
     checkArgument(COUNTRIES.keySet().contains(country), "unknown country '%s'", country);
     Map<String, Object> customer = findCustomerById(customerId);
     checkNotNull(customer, "customer with id '%s' does not exist", customerId);
     db.begin();
-    try {
+    try
+    {
       long agreementId = db.reusableAgreementIdByCountry(country);
-      if (agreementId == 0) {
+      if (agreementId == 0)
+      {
         agreementId = nextAgreementId(country);
         db.insertAgreement(agreementId, country, customerId);
-      } else {
+      } else
+      {
         int changes = 0;
         changes += db.updateAgreementCustomer(agreementId, customerId);
         changes += db.updateAgreementStatus(agreementId, "DRAFT");
@@ -181,114 +206,143 @@ public class DbiCrmRepository implements CrmRepository
       }
       db.commit();
       return findAgreementById(agreementId);
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       db.rollback();
       throw new RuntimeException(e);
     }
   }
 
-  private long nextAgreementId(String country) {
+  private long nextAgreementId(String country)
+  {
     long lastAgreementId = db.lastAgreementIdByCountry(country);
-    if (lastAgreementId == 0) {
+    if (lastAgreementId == 0)
+    {
       lastAgreementId = COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10);
     }
     long agreementId = lastAgreementId + 1;
-    checkState(agreementId > COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10), "inconsistent agreement id '%s', check agreements table consistency", agreementId);
+    checkState(agreementId > COUNTRIES.get(country) * (SERVICE_COUNTRY_MULTIPLIER / 10),
+               "inconsistent agreement id '%s', check agreements table consistency",
+               agreementId);
     return agreementId;
   }
 
   @Override
-  public Map<String, Object> findAgreementById(final long agreementId) {
-    return db.withHandle(new HandleCallback<Map<String, Object>>() {
+  public Map<String, Object> findAgreementById(final long agreementId)
+  {
+    return db.withHandle(new HandleCallback<Map<String, Object>>()
+    {
       @Override
-      public Map<String, Object> withHandle(Handle handle) throws Exception {
+      public Map<String, Object> withHandle(Handle handle) throws Exception
+      {
         return handle.createQuery("SELECT * FROM agreements WHERE id=:id")
-            .bind("id", agreementId)
-            .first();
+                     .bind("id", agreementId)
+                     .first();
       }
     });
   }
 
   @Override
-  public List<Map<String, Object>> findAgreementsByCustomerId(final long customerId) {
-    return db.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+  public List<Map<String, Object>> findAgreementsByCustomerId(final long customerId)
+  {
+    return db.withHandle(new HandleCallback<List<Map<String, Object>>>()
+    {
       @Override
-      public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+      public List<Map<String, Object>> withHandle(Handle handle) throws Exception
+      {
         return handle.createQuery("SELECT * FROM agreements WHERE customer_id=:customer_id")
-            .bind("customer_id", customerId)
-            .list();
+                     .bind("customer_id", customerId)
+                     .list();
       }
     });
   }
 
   @Override
-  public Map<String, Object> updateAgreementStatus(final long agreementId, final String status) {
+  public Map<String, Object> updateAgreementStatus(final long agreementId, final String status)
+  {
     int rowsChanged = db.updateAgreementStatus(agreementId, status);
     checkState(rowsChanged == 1, "agreement with id '%s' does not exist or cannot be changed", agreementId);
     return findAgreementById(agreementId);
   }
 
   @Override
-  public Map<String, Object> insertService(long agreementId) {
+  public Map<String, Object> insertService(long agreementId)
+  {
     Map<String, Object> agreement = findAgreementById(agreementId);
     checkNotNull(agreement, "agreement with id '%s' does not exist", agreementId);
     checkNotNull(agreement.get("customer_id"), "agreement with id '%s' is not associated with a customer", agreementId);
     db.begin();
-    try {
+    try
+    {
       long lastServiceId = lastServiceIdByAgreement(agreementId);
-      checkState((lastServiceId % 100) < 99, "cannot add new service on the agreement '%s', max get 99 services already exists", agreementId);
+      checkState((lastServiceId % 100) < 99,
+                 "cannot add new service on the agreement '%s', max get 99 services already exists",
+                 agreementId);
       long serviceId = lastServiceId + 1;
       db.insertService(serviceId, Long.valueOf(agreement.get("customer_id").toString()), now());
 //      db.insertServiceInfo(serviceId);
       db.commit();
       return findServiceById(serviceId);
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       db.rollback();
       throw new RuntimeException(e);
     }
   }
 
   @Override
-  public Map<String, Object> findServiceById(final long serviceId) {
-    return db.withHandle(new HandleCallback<Map<String, Object>>() {
+  public Map<String, Object> findServiceById(final long serviceId)
+  {
+    return db.withHandle(new HandleCallback<Map<String, Object>>()
+    {
       @Override
-      public Map<String, Object> withHandle(Handle handle) throws Exception {
-        Map<String, Object> service = handle.createQuery("SELECT s.*, c.status AS actual_status, false AS is_draft, true AS has_customer\n" +
-            "FROM services AS s LEFT JOIN service_connections AS c ON s.id=c.service_id  WHERE s.id=:id")
+      public Map<String, Object> withHandle(Handle handle) throws Exception
+      {
+        Map<String, Object> service = handle
+            .createQuery("SELECT s.*, c.status AS actual_status, false AS is_draft, true AS has_customer\n" +
+                             "FROM services AS s LEFT JOIN service_connections AS c ON s.id=c.service_id  WHERE s.id=:id")
             .bind("id", serviceId)
             .first();
-        if (service == null) {
+        if (service == null)
+        {
           service = handle.createQuery("SELECT\n" +
-              "  s.service_id AS id\n" +
-              "  , s.customer_id\n" +
-              "  , s.service_name AS name\n" +
-              "  , s.service_price AS price\n" +
-              "  , s.service_download AS download\n" +
-              "  , s.service_upload AS upload\n" +
-              "  , '' AS info\n" +
-              "  , 'ACTIVE' AS status\n" +
-              "  , c.status AS actual_status\n" +
-              "  , true is_draft\n" +
-              "  , s.has_existing_customer AS has_customer\n" +
-              "FROM service_drafts AS s\n" +
-              "LEFT JOIN service_connections AS c ON s.service_id=c.service_id  WHERE s.service_id=:id")
-              .bind("id", serviceId)
-              .first();
+                                           "  s.service_id AS id\n" +
+                                           "  , s.customer_id\n" +
+                                           "  , s.service_name AS name\n" +
+                                           "  , s.service_price AS price\n" +
+                                           "  , s.service_download AS download\n" +
+                                           "  , s.service_upload AS upload\n" +
+                                           "  , '' AS info\n" +
+                                           "  , 'ACTIVE' AS status\n" +
+                                           "  , c.status AS actual_status\n" +
+                                           "  , true is_draft\n" +
+                                           "  , s.has_existing_customer AS has_customer\n" +
+                                           "FROM service_drafts AS s\n" +
+                                           "LEFT JOIN service_connections AS c ON s.service_id=c.service_id  WHERE s.service_id=:id")
+                          .bind("id", serviceId)
+                          .first();
         }
-        if (service != null) {
-          final Map<String, Object> draft = handle.createQuery("SELECT data FROM " + DRAFT_TABLE + " WHERE entity_type='services' " +
-              "AND entity_id=:id")
+        if (service != null)
+        {
+          final Map<String, Object> draft = handle
+              .createQuery("SELECT data FROM " + DRAFT_TABLE + " WHERE entity_type='services' " +
+                               "AND entity_id=:id")
               .bind("id", serviceId)
               .first();
-          if (!(draft == null || draft.isEmpty())) {
+          if (!(draft == null || draft.isEmpty()))
+          {
             final Object data = draft.get("data");
-            if (data != null) {
+            if (data != null)
+            {
               final Map dataMap = new ObjectMapper().readValue(data.toString(), Map.class);
               String country = "";
               final Object countryId = dataMap.get("location_country");
-              if (countryId != null) {
-                for (Map.Entry<String, Long> countryEntry : COUNTRIES.entrySet()) {
-                  if (countryEntry.getValue().toString().equals(countryId)) {
+              if (countryId != null)
+              {
+                for (Map.Entry<String, Long> countryEntry : COUNTRIES.entrySet())
+                {
+                  if (countryEntry.getValue().toString().equals(countryId))
+                  {
                     country = countryEntry.getKey();
                   }
                 }
@@ -304,10 +358,12 @@ public class DbiCrmRepository implements CrmRepository
               service.put("address", address);
             }
           }
-          final Map<String, Object> productChannel = handle.createQuery("SELECT channel FROM " + PRODUCT_TABLE + " WHERE name like :name")
-                .bind("name", service.get("name") + "%")
-                .first();
-          if (!(productChannel == null || productChannel.isEmpty())) {
+          final Map<String, Object> productChannel = handle
+              .createQuery("SELECT channel FROM " + PRODUCT_TABLE + " WHERE name like :name")
+              .bind("name", service.get("name") + "%")
+              .first();
+          if (!(productChannel == null || productChannel.isEmpty()))
+          {
             service.put("channel", productChannel.get("channel"));
           }
         }
@@ -321,15 +377,21 @@ public class DbiCrmRepository implements CrmRepository
       final String rawQuery,
       final String country,
       final Boolean isActive
-  ) {
+  )
+  {
     final String query = Utils.replaceChars(rawQuery, TRANSLATE_FROM_CHARS, TRANSLATE_TO_CHARS);
-    if (query.isEmpty()) return Lists.newArrayList();
+    if (query.isEmpty())
+    {
+      return Lists.newArrayList();
+    }
     final Long countryId = COUNTRIES.get(country.toUpperCase());
     final String countryRestriction = countryId != null ? "c.country = " + countryId : "1 = 1";
     final String isActiveRestriction = isActive != null ? "c.is_active = " + isActive : "1 = 1";
-    return db.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+    return db.withHandle(new HandleCallback<List<Map<String, Object>>>()
+    {
       @Override
-      public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+      public List<Map<String, Object>> withHandle(Handle handle) throws Exception
+      {
         return handle.createQuery(
             "SELECT\n" +
                 "       a.id AS agreement_id\n" +
@@ -389,40 +451,47 @@ public class DbiCrmRepository implements CrmRepository
                 "\n" +
                 "ORDER BY customer_name, service_id \n" +
                 "LIMIT 25")
-            .bind("query", query)
-            .bind("fromChars", TRANSLATE_FROM_CHARS)
-            .bind("toChars", TRANSLATE_TO_CHARS)
-            .list();
+                     .bind("query", query)
+                     .bind("fromChars", TRANSLATE_FROM_CHARS)
+                     .bind("toChars", TRANSLATE_TO_CHARS)
+                     .list();
       }
     });
   }
 
-  private long lastServiceIdByAgreement(long agreementId) {
+  private long lastServiceIdByAgreement(long agreementId)
+  {
     final long first = agreementId * 100;
     final long last = (agreementId + 1) * 100;
     long lastUsed = db.lastServiceIdInRange(first, last);
-    if (lastUsed == 0) {
+    if (lastUsed == 0)
+    {
       lastUsed = first;
     }
     return lastUsed;
   }
 
   @Override
-  public void deleteService(final long serviceId) {
-    db.withHandle(new HandleCallback<Object>() {
+  public void deleteService(final long serviceId)
+  {
+    db.withHandle(new HandleCallback<Object>()
+    {
       @Override
-      public Object withHandle(Handle handle) throws Exception {
+      public Object withHandle(Handle handle) throws Exception
+      {
         handle.begin();
-        try {
+        try
+        {
           handle.createStatement("DELETE from services WHERE id=:id")
-              .bind("id", serviceId)
-              .execute();
+                .bind("id", serviceId)
+                .execute();
           handle.createStatement("DELETE from services_info WHERE service_id=:service_id")
-              .bind("service_" +
-                  "id", serviceId)
-              .execute();
+                .bind("service_" +
+                          "id", serviceId)
+                .execute();
           handle.commit();
-        } catch (Exception e) {
+        } catch (Exception e)
+        {
           handle.rollback();
           throw new RuntimeException(e);
         }
@@ -432,10 +501,13 @@ public class DbiCrmRepository implements CrmRepository
   }
 
   @Override
-  public Map<String, Object> updateService(final long serviceId, final Map<String, Object> update) {
-    dbi.inTransaction(new TransactionCallback<Void>() {
+  public Map<String, Object> updateService(final long serviceId, final Map<String, Object> update)
+  {
+    dbi.inTransaction(new TransactionCallback<Void>()
+    {
       @Override
-      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception {
+      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception
+      {
         updateRecordWithId(new Databases.RecordId("services", "id", serviceId), update, handle);
         return null;
       }
@@ -445,113 +517,138 @@ public class DbiCrmRepository implements CrmRepository
   }
 
   @Override
-  public Map<String, Object> insertConnection(long serviceId) {
+  public Map<String, Object> insertConnection(long serviceId)
+  {
     Map<String, Object> service = findServiceById(serviceId);
     checkNotNull(service.get("id"), "service with id '%s' does not exist", serviceId);
     Map<String, Object> existingConnection = findConnectionByServiceId(serviceId);
     checkState(existingConnection == null, "connection for service '%s' already exist", serviceId);
     db.begin();
-    try {
+    try
+    {
       db.insertConnection(serviceId);
       db.commit();
       return findConnectionByServiceId(serviceId);
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       db.rollback();
       throw new RuntimeException(e);
     }
   }
 
   @Override
-  public Map<String, Object> findConnectionByServiceId(final long serviceId) {
-    return db.withHandle(new HandleCallback<Map<String, Object>>() {
+  public Map<String, Object> findConnectionByServiceId(final long serviceId)
+  {
+    return db.withHandle(new HandleCallback<Map<String, Object>>()
+    {
       @Override
-      public Map<String, Object> withHandle(Handle handle) throws Exception {
+      public Map<String, Object> withHandle(Handle handle) throws Exception
+      {
         return handle.createQuery("SELECT * FROM connections WHERE service_id=:service_id")
-            .bind("service_id", serviceId)
-            .first();
+                     .bind("service_id", serviceId)
+                     .first();
       }
     });
   }
 
   @Override
-  public Map<String, Object> updateConnection(final long serviceId, Iterable<Map.Entry<String, Object>> rawUpdates) {
+  public Map<String, Object> updateConnection(final long serviceId, Iterable<Map.Entry<String, Object>> rawUpdates)
+  {
     final Map<String, Object> connection = findConnectionByServiceId(serviceId);
     checkNotNull(connection, "connection for service '%s' does not exist", serviceId);
-    Iterable<Map.Entry<String, Object>> updates = Iterables.filter(rawUpdates, new Predicate<Map.Entry<String, Object>>() {
+    Iterable<Map.Entry<String, Object>> updates = Iterables.filter(rawUpdates, new Predicate<Map.Entry<String, Object>>()
+    {
       @Override
-      public boolean apply(@Nullable Map.Entry<String, Object> update) {
+      public boolean apply(@Nullable Map.Entry<String, Object> update)
+      {
         return CONNECTION_FIELDS.containsKey(update.getKey())
             && !update.getValue().equals(connection.get(update.getKey()));
       }
     });
     final HashMap<String, Object> updateMap = Maps.newHashMap();
     List<String> fields = Lists.newArrayList();
-    for (Map.Entry<String, Object> update : updates) {
+    for (Map.Entry<String, Object> update : updates)
+    {
       updateMap.put(update.getKey(), update.getValue());
       fields.add(update.getKey() + "=:" + update.getKey());
     }
-    if (updateMap.size() == 0) {
+    if (updateMap.size() == 0)
+    {
       logger.debug("nothing on update returning original connection for service '{}'", serviceId);
       return findConnectionByServiceId(serviceId);
     }
     final String sqlTemplate = "UPDATE connections SET " + Joiner.on(", ").join(fields) + " WHERE service_id=:service_id";
     db.begin();
-    try {
-      Integer updated = db.withHandle(new HandleCallback<Integer>() {
+    try
+    {
+      Integer updated = db.withHandle(new HandleCallback<Integer>()
+      {
         @Override
-        public Integer withHandle(Handle handle) throws Exception {
+        public Integer withHandle(Handle handle) throws Exception
+        {
           return handle.createStatement(sqlTemplate)
-              .bind("service_id", serviceId)
-              .bindFromMap(updateMap)
-              .execute();
+                       .bind("service_id", serviceId)
+                       .bindFromMap(updateMap)
+                       .execute();
         }
       });
-      if (updated != 1) {
+      if (updated != 1)
+      {
         throw new IllegalStateException("failed on update connection for service '" + serviceId + "'");
       }
       db.commit();
       return findConnectionByServiceId(serviceId);
-    } catch (Exception e) {
+    } catch (Exception e)
+    {
       db.rollback();
       throw new RuntimeException(e);
     }
   }
 
   @Override
-  public void deleteConnection(final long serviceId) {
-    db.withHandle(new HandleCallback<Object>() {
+  public void deleteConnection(final long serviceId)
+  {
+    db.withHandle(new HandleCallback<Object>()
+    {
       @Override
-      public Object withHandle(Handle handle) throws Exception {
+      public Object withHandle(Handle handle) throws Exception
+      {
         handle.createStatement("DELETE from connections WHERE service_id=:service_id")
-            .bind("service_id", serviceId)
-            .execute();
+              .bind("service_id", serviceId)
+              .execute();
         return null;
       }
     });
   }
 
   @Override
-  public List<Map<String, Object>> findUserSubordinates(final String login) {
-    return db.withHandle(new HandleCallback<List<Map<String, Object>>>() {
+  public List<Map<String, Object>> findUserSubordinates(final String login)
+  {
+    return db.withHandle(new HandleCallback<List<Map<String, Object>>>()
+    {
       @Override
-      public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
+      public List<Map<String, Object>> withHandle(Handle handle) throws Exception
+      {
         Long managerId = handle.createQuery("SELECT id FROM users where login=:login")
-            .bind("login", login)
-            .map(LongMapper.FIRST)
-            .first();
+                               .bind("login", login)
+                               .map(LongMapper.FIRST)
+                               .first();
         return handle.createQuery("SELECT id, login, name, full_name, roles, operation_country " +
-            "FROM users WHERE reports_to=:manager_id")
-            .bind("manager_id", managerId)
-            .list();
+                                      "FROM users WHERE reports_to=:manager_id")
+                     .bind("manager_id", managerId)
+                     .list();
       }
     });
   }
 
   @Override
-  public Map<String, Object> findUserByLogin(final String login) {
-    return db.withHandle(new HandleCallback<Map<String, Object>>() {
+  public Map<String, Object> findUserByLogin(final String login)
+  {
+    return db.withHandle(new HandleCallback<Map<String, Object>>()
+    {
       @Override
-      public Map<String, Object> withHandle(Handle handle) throws Exception {
+      public Map<String, Object> withHandle(Handle handle) throws Exception
+      {
         return handle
             .createQuery(
                 "SELECT id, login, name, full_name, roles, operation_country FROM users where " +
@@ -563,7 +660,8 @@ public class DbiCrmRepository implements CrmRepository
     });
   }
 
-  public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe {
+  public interface CrmDatabase extends Transactional<CrmDatabase>, GetHandle, CloseMe
+  {
 
     @SqlQuery("SELECT max(id) FROM customers")
     long lastCustomerId();
@@ -585,20 +683,23 @@ public class DbiCrmRepository implements CrmRepository
 
     @SqlUpdate("INSERT INTO customers (id, history_id, name, public_id, inserted_on, is_active) " +
         "VALUES (:id, :history_id, :name, '9999999', :inserted_on, false)")
-    void insertCustomer(@Bind("id") long id, @Bind("history_id") long auditId,
-                        @Bind("name") String name, @Bind("inserted_on") Timestamp insertedOn);
+    void insertCustomer(
+        @Bind("id") long id, @Bind("history_id") long auditId,
+        @Bind("name") String name, @Bind("inserted_on") Timestamp insertedOn);
 
     @SqlUpdate("INSERT INTO audit_items (id, history_id, history_type_label_id, user_id, time_stamp, field_name, old_value, new_value) " +
         "VALUES (:id, :history_id, :history_type_label_id, :user_id, :time_stamp, :field_name, :old_value, :new_value)")
-    void insertAudit(@Bind("id") long id, @Bind("history_id") long auditId,
-                     @Bind("history_type_label_id") long auditType, @Bind("user_id") long userId,
-                     @Bind("time_stamp") Timestamp stamp, @Bind("field_name") String field,
-                     @Bind("old_value") String oldValue, @Bind("new_value") String newValue);
+    void insertAudit(
+        @Bind("id") long id, @Bind("history_id") long auditId,
+        @Bind("history_type_label_id") long auditType, @Bind("user_id") long userId,
+        @Bind("time_stamp") Timestamp stamp, @Bind("field_name") String field,
+        @Bind("old_value") String oldValue, @Bind("new_value") String newValue);
 
     @SqlUpdate("INSERT INTO agreements (id, country, customer_id) " +
         "VALUES (:id, :country, :customer_id)")
-    void insertAgreement(@Bind("id") long id, @Bind("country") String country,
-                         @Bind("customer_id") long customerId);
+    void insertAgreement(
+        @Bind("id") long id, @Bind("country") String country,
+        @Bind("customer_id") long customerId);
 
     @SqlUpdate("UPDATE agreements SET customer_id=:customer_id WHERE id=:agreement_id")
     int updateAgreementCustomer(@Bind("agreement_id") long agreementId, @Bind("customer_id") long customerId);
@@ -611,8 +712,9 @@ public class DbiCrmRepository implements CrmRepository
 
     @SqlUpdate("INSERT INTO services (id, customer_id, period_from, name, price) " +
         "VALUES (:service_id, :customer_id, :period_from, 'DRAFT', 0)")
-    void insertService(@Bind("service_id") long serviceId, @Bind("customer_id") long customerId,
-                       @Bind("period_from") Timestamp periodFrom);
+    void insertService(
+        @Bind("service_id") long serviceId, @Bind("customer_id") long customerId,
+        @Bind("period_from") Timestamp periodFrom);
 
     @SqlUpdate("INSERT INTO services_info (service_id, status, other_info) " +
         "VALUES (:service_id, 'DRAFT', '{}')")
