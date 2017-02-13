@@ -8,13 +8,12 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.snet.crm.domain.model.agreement.CrmRepository;
+import net.snet.crm.domain.shared.data.Data;
+import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.service.utils.Databases;
 import net.snet.crm.service.utils.Utils;
 import org.joda.time.DateTime;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.TransactionCallback;
-import org.skife.jdbi.v2.TransactionStatus;
+import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.sqlobject.Bind;
 import org.skife.jdbi.v2.sqlobject.SqlQuery;
 import org.skife.jdbi.v2.sqlobject.SqlUpdate;
@@ -501,19 +500,18 @@ public class DbiCrmRepository implements CrmRepository
   }
 
   @Override
-  public Map<String, Object> updateService(final long serviceId, final Map<String, Object> update)
+  public Data updateService(final long serviceId, final Data update)
   {
-    dbi.inTransaction(new TransactionCallback<Void>()
+    dbi.inTransaction(new VoidTransactionCallback()
     {
       @Override
-      public Void inTransaction(Handle handle, TransactionStatus status) throws Exception
+      protected void execute(Handle handle, TransactionStatus status) throws Exception
       {
         updateRecordWithId(new Databases.RecordId("services", "id", serviceId), update, handle);
-        return null;
       }
     });
     logger.info("service '{}' has been updated", serviceId);
-    return findServiceById(serviceId);
+    return MapData.of(findServiceById(serviceId));
   }
 
   @Override

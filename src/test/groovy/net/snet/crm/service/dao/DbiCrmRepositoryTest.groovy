@@ -2,6 +2,7 @@ package net.snet.crm.service.dao
 
 import com.google.common.io.Resources
 import net.snet.crm.domain.model.agreement.CrmRepository
+import net.snet.crm.domain.shared.data.MapData
 import net.snet.crm.infrastructure.persistence.jdbi.DbiCrmRepository
 import org.joda.time.DateTime
 import org.skife.jdbi.v2.DBI
@@ -286,11 +287,11 @@ class DbiCrmRepositoryTest extends Specification {
 		and: 'existing service'
 			def service = repository.insertService(agreement.id as Long)
 		and: 'service update map'
-			def update = [ name: 'Updated Name', price: 10, status: 'SUSPENDED']
+			def update = MapData.of([name: 'Updated Name', price: 10, status: 'SUSPENDED'])
 		expect:
 			service.status.value.string == 'ACTIVE'
 		when: 'service update is called'
-			def updated = repository.updateService(service.id as Long, update)
+			def updated = repository.updateService(service.id as Long, update).asMap()
 		then:
 			updated != null
 			updated.id == service.id

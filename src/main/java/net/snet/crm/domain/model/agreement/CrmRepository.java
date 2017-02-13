@@ -1,5 +1,7 @@
 package net.snet.crm.domain.model.agreement;
 
+import net.snet.crm.domain.shared.data.Data;
+
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +39,7 @@ public interface CrmRepository {
 
     void deleteService(long serviceId);
 
-    Map<String, Object> updateService(long serviceId, Map<String, Object> updates);
+    Data updateService(long serviceId, Data updates);
 
     // connection
 

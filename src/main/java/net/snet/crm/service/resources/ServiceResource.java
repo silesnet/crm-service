@@ -86,11 +86,11 @@ public class ServiceResource
   @Path("/{serviceId}")
   public Response updateService(
       @PathParam("serviceId") long serviceId,
-      Map<String, Object> updateBody)
+      Data body)
   {
-    final Value serviceUpdate = valueMapOf(updateBody).get("services");
-    checkState(!serviceUpdate.isNull(), "no service update body sent");
-    crmRepository.updateService(serviceId, serviceUpdate.asMap().map());
+//    final Value serviceUpdate = valueMapOf(body).get("services");
+    checkState(body.hasData("services"), "no service update body sent");
+    crmRepository.updateService(serviceId, body.dataOf("services"));
     return Response.ok(ImmutableMap.of()).build();
   }
 

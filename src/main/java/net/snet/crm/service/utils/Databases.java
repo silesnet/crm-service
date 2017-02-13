@@ -218,9 +218,11 @@ public class Databases {
     updateRecordWithId(new RecordId(table, "id", id), update, handle);
   }
 
-  public static void updateRecordWithId(final RecordId recordId,
-                                        final Map<String, Object> update,
-                                        final Handle handle) {
+  public static void updateRecordWithId(
+      final RecordId recordId,
+      final Map<String, Object> update,
+      final Handle handle)
+  {
     checkTableName(recordId.table());
     toPgTypesInPlace(update);
     final int updatedRows = handle
@@ -230,6 +232,14 @@ public class Databases {
         .execute();
     checkState(updatedRows == 1, "failed on update record '%s' in '%s'",
                recordId.value(), recordId.table());
+  }
+
+  public static void updateRecordWithId(
+      final RecordId recordId,
+      final Data update,
+      final Handle handle)
+  {
+    updateRecordWithId(recordId, update.asModifiableContent(), handle);
   }
 
   public static void updateRecords(final RecordId recordId,
