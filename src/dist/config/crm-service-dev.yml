@@ -12,6 +12,8 @@ systemCommandHome: src/test/resources/commands
 
 version: 14.4.1-326+388872d
 
+addressServiceUri: http://localhost:8095/api/addresses
+
 logging:
   level: WARN
   loggers:

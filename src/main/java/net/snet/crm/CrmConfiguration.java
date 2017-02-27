@@ -51,6 +51,11 @@ public class CrmConfiguration extends Configuration {
 	@JsonProperty
 	private SmsMessagingConfiguration smsMessaging = new SmsMessagingConfiguration();
 
+	@Valid
+	@NotNull
+	@JsonProperty
+	private String addressServiceUri;
+
 	public Boolean getJsonPrettyPrint() {
 		return jsonPrettyPrint;
 	}
@@ -82,4 +87,9 @@ public class CrmConfiguration extends Configuration {
   public String getVersion() {
     return version;
   }
+
+	public String getAddressServiceUri()
+	{
+		return addressServiceUri;
+	}
 }

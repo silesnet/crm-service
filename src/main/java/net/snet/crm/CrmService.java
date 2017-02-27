@@ -18,6 +18,7 @@ import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.domain.shared.command.CommandQueue;
 import net.snet.crm.domain.shared.event.EventLog;
+import net.snet.crm.infrastructure.addresses.RemoteAddressRepository;
 import net.snet.crm.infrastructure.command.DefaultTaskFactory;
 import net.snet.crm.infrastructure.command.TaskFactory;
 import net.snet.crm.infrastructure.messaging.SmtpMessagingService;
@@ -120,6 +121,7 @@ public class CrmService extends Application<CrmConfiguration> {
 
     final NetworkService networkService = new DefaultNetworkService(systemCommandFactory, networkRepository);
     final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessaging());
+    final RemoteAddressRepository addressRepository = new RemoteAddressRepository(httpClient, configuration.getAddressServiceUri());
 
     final JerseyEnvironment jersey = environment.jersey();
     jersey.register(new CustomerResource(dbi, crmRepository));
@@ -138,6 +140,7 @@ public class CrmService extends Application<CrmConfiguration> {
     jersey.register(new MessagingResource(messagingService));
     jersey.register(new EventResource(eventLog));
     jersey.register(new AdminResource(configuration.getVersion()));
+    jersey.register(new AddressResource(addressRepository));
     jersey.register(new RuntimeExceptionMapper());
 
     final TaskFactory taskFactory = new DefaultTaskFactory(dbi, networkService, eventLog);
