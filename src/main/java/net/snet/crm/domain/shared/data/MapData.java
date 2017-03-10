@@ -380,7 +380,31 @@ public class MapData implements Data
   }
 
   @Override
+  public boolean equals(Object o)
+  {
+    if (this == o)
+    {
+      return true;
+    }
+    if (!(o instanceof MapData))
+    {
+      return false;
+    }
+
+    MapData mapData = (MapData) o;
+
+    return map != null ? map.equals(mapData.map) : mapData.map == null;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    return map != null ? map.hashCode() : 0;
+  }
+
+  @Override
   public String toString() {
     return map.toString();
   }
+
 }
