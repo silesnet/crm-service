@@ -179,6 +179,11 @@ public class DbiNetworkRepository implements NetworkRepository
         if (!record.hasValue("mac")) {
           map.put("mac", EMPTY_MAC);
         }
+        else if (record.asMap().get("mac") instanceof PGobject) {
+          final PGobject mac = (PGobject) record.asMap().get("mac");
+          final String value = mac.getValue() != null ? mac.getValue() : "";
+          map.put("mac", ImmutableMap.of("type", mac.getType(), "value", value));
+        }
         if (!record.hasValue("ip")) {
           map.put("ip", EMPTY_IP);
         }
