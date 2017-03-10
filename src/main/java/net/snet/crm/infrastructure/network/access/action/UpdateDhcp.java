@@ -23,7 +23,7 @@ public class UpdateDhcp extends BaseAction
     final DhcpFactory factory = new DhcpFactory(networkRepository);
     originalDhcp = factory.dhcpOf(serviceId);
     dhcp = factory.dhcpOf(draft);
-    return originalDhcp.isValid() || dhcp.isValid();
+    return !originalDhcp.equals(dhcp);
   }
 
   @Override

@@ -2,7 +2,7 @@ package net.snet.crm.infrastructure.network.access.support;
 
 import net.snet.crm.domain.shared.data.Data;
 
-public class Dhcp
+public final class Dhcp
 {
   public static Dhcp NULL = new Dhcp();
 
@@ -11,10 +11,10 @@ public class Dhcp
   private final String switchName;
 
   public static Dhcp of(int switchId, int port, String switchName) {
-    if (switchId == -1 ||
-        port == -1 ||
+    if (switchId < 0 ||
+        port < 0 ||
         switchName == null ||
-        switchName.length() == 0) {
+        switchName.trim().length() == 0) {
       return NULL;
     }
     return new Dhcp(switchId, port, switchName);
@@ -22,9 +22,9 @@ public class Dhcp
 
   public static Dhcp of(Data data) {
     return of(
-      data.intOf("switchId"),
-      data.intOf("port"),
-      data.stringOf("switch")
+      data.optIntOf("switchId", -1),
+      data.optIntOf("port", -1),
+      data.optStringOf("switch")
     );
   }
 
@@ -44,10 +44,6 @@ public class Dhcp
     return this != NULL;
   }
 
-  public boolean isNotValid() {
-    return this == NULL;
-  }
-
   public int switchId() {
     return switchId;
   }
@@ -58,6 +54,40 @@ public class Dhcp
 
   public String switchName() {
     return switchName;
+  }
+
+  @Override
+  public boolean equals(Object o)
+  {
+    if (this == o)
+    {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass())
+    {
+      return false;
+    }
+
+    Dhcp dhcp = (Dhcp) o;
+
+    if (switchId != dhcp.switchId)
+    {
+      return false;
+    }
+    if (port != dhcp.port)
+    {
+      return false;
+    }
+    return switchName != null ? switchName.equals(dhcp.switchName) : dhcp.switchName == null;
+  }
+
+  @Override
+  public int hashCode()
+  {
+    int result = switchId;
+    result = 31 * result + port;
+    result = 31 * result + (switchName != null ? switchName.hashCode() : 0);
+    return result;
   }
 }
 
