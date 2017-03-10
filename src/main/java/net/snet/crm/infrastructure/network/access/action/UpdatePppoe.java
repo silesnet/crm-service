@@ -23,33 +23,37 @@ public class UpdatePppoe extends BaseAction
     final PppoeFactory factory = new PppoeFactory(networkRepository);
     originalPppoe = factory.pppoeOf(serviceId);
     pppoe = factory.pppoeOf(draft);
-    return originalPppoe.isValid() || pppoe.isValid();
+    return !originalPppoe.equals(pppoe);
   }
 
   @Override
   void updateDatabase()
   {
-    if (originalPppoe.isValid() && pppoe.isValid()) {
+    if (originalPppoe.isValid() && pppoe.isValid())
+    {
       networkRepository.updatePppoe(
           serviceId,
           pppoe.record(),
           handle
       );
-    } else if (originalPppoe.isNotValid() && pppoe.isValid()) {
+    } else if (originalPppoe.isNotValid() && pppoe.isValid())
+    {
       networkRepository.addPppoe(
           serviceId,
           pppoe.record(),
           handle
       );
-    } else {
-      // pppoe is not valid => NOP
+    } else
+    {
+      networkRepository.removePppoe(serviceId);
     }
   }
 
   @Override
   void updateNetwork()
   {
-    if (originalPppoe.isValid()) {
+    if (originalPppoe.isValid())
+    {
       networkService.kickPppoeUser(
           originalPppoe.master(),
           originalPppoe.login()

@@ -5,6 +5,16 @@ import net.snet.crm.domain.shared.data.MapData
 import spock.lang.Specification
 
 class PppoeFactoryTest extends Specification {
+
+  def "should remove data that are not in the request"() {
+    def original = [a: 1, b:2]
+    def current = [b: 3]
+    def result = new HashMap(original)
+    result.keySet().retainAll(current.keySet())
+    expect:
+    result.a == null
+  }
+
   def "should pppoe mapping"() {
     def repository = Stub(NetworkRepository) { repo ->
       repo.findDevice(10) >> [name: 'some-ap', master: 'master']

@@ -70,7 +70,7 @@ public class PppoeFactory
       ipRecord.put("value", ip);
       ipClass = "static";
     } catch (IllegalArgumentException e) {
-      ipRecord.put("value", null);
+      ipRecord.put("value", "");
       ipClass = ip.length() > 0 ? ip : defaultIpClass(serviceId);
     }
 

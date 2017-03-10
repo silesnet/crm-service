@@ -5,6 +5,7 @@ import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.service.utils.Entities.ValueMap;
+import org.postgresql.util.PGobject;
 import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 import org.skife.jdbi.v2.tweak.VoidHandleCallback;
@@ -132,6 +133,11 @@ public class DbiNetworkRepository implements NetworkRepository
       }
       if (pppoe.get("mac") == null) {
         pppoe.put("mac", EMPTY_MAC);
+      }
+      else if (pppoe.get("mac") instanceof PGobject) {
+        final PGobject mac = (PGobject) pppoe.get("mac");
+        final String value = mac.getValue() != null ? mac.getValue() : "";
+        pppoe.put("mac", ImmutableMap.of("type", mac.getType(), "value", value));
       }
       pppoe.put("radius", getRecord(
           "SELECT * FROM radius WHERE id=:serviceId",
