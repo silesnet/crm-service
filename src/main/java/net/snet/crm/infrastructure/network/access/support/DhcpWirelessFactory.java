@@ -27,7 +27,7 @@ public class DhcpWirelessFactory
             data.longOf("service_id")
         ).asMap()
     );
-    return DhcpWireless.NULL.of(MapData.of(dhcpWireless));
+    return DhcpWireless.of(MapData.of(dhcpWireless));
   }
 
   public DhcpWireless dhcpWirelessOf(long serviceId) {
