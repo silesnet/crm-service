@@ -297,9 +297,19 @@ public class DbiCrmRepository implements CrmRepository
       @Override
       public Map<String, Object> withHandle(Handle handle) throws Exception
       {
-        Map<String, Object> service = handle
-            .createQuery("SELECT s.*, c.status AS actual_status, false AS is_draft, true AS has_customer\n" +
-                             "FROM services AS s LEFT JOIN service_connections AS c ON s.id=c.service_id  WHERE s.id=:id")
+        Map<String, Object> service = handle.createQuery(
+            "SELECT\n" +
+                "s.*,\n" +
+                "c.status AS actual_status,\n" +
+                "a.label AS address_label,\n" +
+                "p.gps_cord,\n" +
+                "false AS is_draft,\n" +
+                "true AS has_customer\n" +
+             "FROM services AS s\n" +
+                "LEFT JOIN service_connections AS c ON s.id=c.service_id\n" +
+                "LEFT JOIN addresses AS a USING (address_id)\n" +
+                "LEFT JOIN places AS p ON s.place_id = p.place_id\n" +
+              "WHERE s.id=:id")
             .bind("id", serviceId)
             .first();
         if (service == null)
