@@ -415,6 +415,7 @@ public class DbiCrmRepository implements CrmRepository
                 "       , s.download\n" +
                 "       , s.upload\n" +
                 "       , s.price\n" +
+                "       , ad.label AS address_label\n" +
                 "       , s.info AS service_info\n" +
                 "       , false AS is_draft\n" +
                 "FROM services AS s\n" +
@@ -422,6 +423,7 @@ public class DbiCrmRepository implements CrmRepository
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
                 "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
                 "  LEFT JOIN dhcp_wireless AS d ON s.id = d.service_id\n" +
+                "  LEFT JOIN addresses AS ad USING (address_id)\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   " + isActiveRestriction + "\n" +
                 "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
@@ -449,6 +451,7 @@ public class DbiCrmRepository implements CrmRepository
                 "     , d.service_download\n" +
                 "     , d.service_upload\n" +
                 "     , d.service_price\n" +
+                "     , '' AS address_label\n" +
                 "     , '' AS service_info\n" +
                 "     , true AS is_draft\n" +
                 "FROM service_drafts AS d\n" +
