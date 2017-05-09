@@ -3,6 +3,7 @@ package net.snet.crm.service.utils;
 import com.google.common.base.*;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
@@ -17,12 +18,14 @@ import org.skife.jdbi.v2.util.LongMapper;
 import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.*;
+import static net.snet.crm.domain.shared.data.Data.EMPTY;
 
 public class Databases {
   private static String DRAFTS_TABLE = "drafts2";
@@ -103,7 +106,7 @@ public class Databases {
         "SELECT * FROM " + recordId.table() + " WHERE " + recordId.column() + "=:id;")
         .bind("id", recordId.value())
         .first();
-    return record != null ? MapData.of(record) : Data.EMPTY;
+    return record != null ? MapData.of(record) : EMPTY;
   }
 
   public static Data findRecord(final RecordId recordId, DBI dbi) {
@@ -179,6 +182,14 @@ public class Databases {
         .first();
     checkNotNull(record, "can't get record '%s' from '%s' table", id, table);
     return record;
+  }
+
+  public static List<Data> findRecords(
+      final String query,
+      final Data bindings,
+      final Handle handle)
+  {
+    return new ArrayList<>();
   }
 
   public static List<Map<String, Object>> findRecords(

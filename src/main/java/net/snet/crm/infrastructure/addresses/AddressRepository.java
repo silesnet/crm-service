@@ -7,4 +7,6 @@ import java.util.List;
 public interface AddressRepository
 {
   List<Data> findByQuery(String query);
+  Data findById(long addressId);
+  Data findByFk(String addressFk);
 }

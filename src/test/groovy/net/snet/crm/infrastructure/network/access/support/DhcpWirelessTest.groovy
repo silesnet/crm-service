@@ -3,6 +3,7 @@ package net.snet.crm.infrastructure.network.access.support
 import net.snet.crm.domain.shared.data.Data
 import net.snet.crm.domain.shared.data.MapData
 import spock.lang.Specification
+import spock.lang.Unroll
 
 class DhcpWirelessTest extends Specification {
   def "should instantiate from data"() {
@@ -13,6 +14,7 @@ class DhcpWirelessTest extends Specification {
 
   def "should implement equals"() {
     expect:
+    println "$left $right"
     left.equals(right) == result
     where:
     left | right | result
@@ -20,8 +22,8 @@ class DhcpWirelessTest extends Specification {
     dhcpWireless([:]) | DhcpWireless.NULL | true
     DhcpWireless.of(null) | DhcpWireless.NULL | true
     DhcpWireless.NULL | null | false
-    dhcpWireless([a: 1]) | dhcpWireless([a:1]) | true
-    dhcpWireless([a: 1]) | dhcpWireless([a:2]) | false
+    dhcpWireless([ip: 1]) | dhcpWireless([ip:1]) | true
+    dhcpWireless([ip: 1]) | dhcpWireless([ip:2]) | false
   }
 
   DhcpWireless dhcpWireless(map) {

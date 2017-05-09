@@ -39,4 +39,16 @@ public class RemoteAddressRepository implements AddressRepository
       return Lists.newArrayList();
     }
   }
+
+  @Override
+  public Data findById(long addressId)
+  {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public Data findByFk(String addressFk)
+  {
+    throw new UnsupportedOperationException();
+  }
 }

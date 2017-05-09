@@ -307,7 +307,7 @@ public class DbiCrmRepository implements CrmRepository
                 "true AS has_customer\n" +
              "FROM services AS s\n" +
                 "LEFT JOIN service_connections AS c ON s.id=c.service_id\n" +
-                "LEFT JOIN addresses AS a USING (address_id)\n" +
+                "LEFT JOIN addresses AS a ON s.address_id=a.address_id\n" +
                 "LEFT JOIN places AS p ON s.place_id = p.place_id\n" +
               "WHERE s.id=:id")
             .bind("id", serviceId)
@@ -423,7 +423,7 @@ public class DbiCrmRepository implements CrmRepository
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
                 "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
                 "  LEFT JOIN dhcp_wireless AS d ON s.id = d.service_id\n" +
-                "  LEFT JOIN addresses AS ad USING (address_id)\n" +
+                "  LEFT JOIN addresses AS ad ON s.address_id=ad.address_id\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   " + isActiveRestriction + "\n" +
                 "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
