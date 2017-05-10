@@ -15,6 +15,8 @@ import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
+import net.snet.crm.infrastructure.addresses.AddressRepository;
+import net.snet.crm.infrastructure.addresses.PlaceRepository;
 import net.snet.crm.infrastructure.network.access.*;
 import net.snet.crm.infrastructure.network.access.action.NoAction;
 import org.skife.jdbi.v2.*;
@@ -48,6 +50,8 @@ public class DraftResource2
   private UriInfo uriInfo;
   private DraftRepository draftRepository;
   private AgreementRepository agreementRepository;
+  private final AddressRepository addresses;
+  private final PlaceRepository places;
 
   public DraftResource2(
       DraftRepository draftRepository,
@@ -55,11 +59,15 @@ public class DraftResource2
       AgreementRepository agreementRepository,
       NetworkRepository networkRepository,
       NetworkService networkService,
+      AddressRepository addresses,
+      PlaceRepository places,
       DBI dbi)
   {
     this.draftRepository = draftRepository;
     this.crmRepository = crmRepository;
     this.agreementRepository = agreementRepository;
+    this.addresses = addresses;
+    this.places = places;
     this.dbi = dbi;
     this.stateMachine = new StateMachine();
     this.actionFactory = new ActionFactory(networkRepository, networkService);
@@ -253,12 +261,24 @@ public class DraftResource2
   @Path("/{draftId}")
   public Response importServiceDraft(@PathParam("draftId") final long draftId) {
     logger.debug("import service draft '{}'", draftId);
-    final Draft serviceDraft = new Draft(draftRepository.get(draftId));
+    final Map<String, Object> record = draftRepository.get(draftId);
+    resolveAddressAndPlace(record, addresses, places);
+    final Draft serviceDraft = new Draft(record);
     final Optional<Draft> customerDraft = customerDraftOf(serviceDraft.links());
     final Optional<Draft> agreementDraft = agreementDraftOf(serviceDraft.links());
     agreementRepository.addService(customerDraft, agreementDraft, serviceDraft);
     logger.info("service draft '{}' was imported", draftId);
     return Response.created(uriInfo.getRequestUri()).entity(ImmutableMap.of()).build();
+  }
+
+  private void resolveAddressAndPlace(Map<String, Object> record, AddressRepository addresses, PlaceRepository places)
+  {
+    System.out.println(record);
+    final Data data = MapData.of(record);
+    final String addressId = data.optStringOf("data.address_id");
+    final String addressFk = data.optStringOf("data.address_fk");
+    record.put("address_id", null);
+    record.put("place_id", null);
   }
 
   private long serviceId(Data draft) {

@@ -9,6 +9,13 @@ import static net.snet.crm.service.utils.Entities.*
 
 class EntitiesTest extends Specification {
 
+  def 'should return optional long'() {
+    def value = valueOf('a', [b: 10])
+    expect:
+      value.asLongOr(10) == 10 as Long
+      value.asLongOr(null) == null
+  }
+
   def 'should return numeric string property value'() {
     def value = valueOf('prop', [prop: '100'])
     expect:

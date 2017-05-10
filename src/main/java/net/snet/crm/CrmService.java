@@ -21,22 +21,15 @@ import net.snet.crm.domain.shared.event.EventLog;
 import net.snet.crm.infrastructure.addresses.DbiAddressRepository;
 import net.snet.crm.infrastructure.addresses.DbiPlaceRepository;
 import net.snet.crm.infrastructure.addresses.PlaceRepository;
-import net.snet.crm.infrastructure.addresses.RemoteAddressRepository;
 import net.snet.crm.infrastructure.command.DefaultTaskFactory;
 import net.snet.crm.infrastructure.command.TaskFactory;
 import net.snet.crm.infrastructure.messaging.SmtpMessagingService;
 import net.snet.crm.infrastructure.network.DefaultNetworkService;
-import net.snet.crm.infrastructure.persistence.jdbi.DbiAgreementRepository;
-import net.snet.crm.infrastructure.persistence.jdbi.DbiCommandQueue;
-import net.snet.crm.infrastructure.persistence.jdbi.DbiEventLog;
-import net.snet.crm.infrastructure.persistence.jdbi.DbiNetworkRepository;
+import net.snet.crm.infrastructure.persistence.jdbi.*;
 import net.snet.crm.infrastructure.system.FileSystemCommandFactory;
 import net.snet.crm.infrastructure.system.SystemCommandFactory;
 import net.snet.crm.service.CommandBroker;
 import net.snet.crm.service.DefaultUserService;
-import net.snet.crm.infrastructure.persistence.jdbi.DbiCrmRepository;
-import net.snet.crm.infrastructure.persistence.jdbi.DbiDraftRepository;
-import net.snet.crm.infrastructure.persistence.jdbi.DbiTodoRepository;
 import net.snet.crm.service.resources.*;
 import net.snet.crm.service.resources.modules.DataModule;
 import net.snet.crm.service.resources.modules.EventModule;
@@ -140,6 +133,8 @@ public class CrmService extends Application<CrmConfiguration> {
         agreementRepository,
         networkRepository,
         networkService,
+        addressRepository,
+        placeRepository,
         dbi));
     jersey.register(new MessagingResource(messagingService));
     jersey.register(new EventResource(eventLog));

@@ -165,7 +165,7 @@ public class Entities {
 
 
     public Long asLongOr(final Long fallBack) {
-      return isNullOrEmpty() ? fallBack : asLong();
+      return isNullOrEmpty() ? fallBack : (Long) asLong();
     }
 
 

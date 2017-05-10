@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.domain.shared.Entity;
-import net.snet.crm.service.utils.Entities;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -31,6 +30,8 @@ public class Service implements Entity<Service, ServiceId> {
           .put("connectionDownload", "download")
           .put("connectionUpload", "upload")
           .put("data", "data")
+          .put("addressId", "address_id")
+          .put("placeId", "place_id")
           .build();
 
   private static final Map<String, Object> RECORD_DEFAULTS =
@@ -52,7 +53,7 @@ public class Service implements Entity<Service, ServiceId> {
 
   public Service(Draft draft) {
     checkArgument(Draft.Entity.SERVICES.equals(draft.entity()),
-        "expected SERVICES draft, but got %s", draft.entity());
+                  "expected SERVICES draft, but got %s", draft.entity());
     this.id = new ServiceId(draft.entityId());
     this.props = propsFromDraft(draft);
     this.record = recordFromProps();
@@ -77,7 +78,8 @@ public class Service implements Entity<Service, ServiceId> {
     return record;
   }
 
-  private Map<String, Object> propsFromDraft(final Draft draft) {
+  private Map<String, Object> propsFromDraft( final Draft draft)
+  {
     final Map<String, Object> props = Maps.newLinkedHashMap();
     props.put("id", draft.entityId());
     for (Map.Entry<String, String> link : draft.links().entrySet()) {
@@ -101,6 +103,8 @@ public class Service implements Entity<Service, ServiceId> {
     props.put("data", mapToJson(ImmutableMap.<String, Object>builder()
         .put("devices", devices(data))
         .build()));
+    props.put("addressId", data.get("address_id").asStringOr(null));
+    props.put("placeId", data.get("place_id").asLongOr(null));
     return Collections.unmodifiableMap(props);
   }
 
