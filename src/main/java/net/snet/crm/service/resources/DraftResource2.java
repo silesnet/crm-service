@@ -273,12 +273,30 @@ public class DraftResource2
 
   private void resolveAddressAndPlace(Map<String, Object> record, AddressRepository addresses, PlaceRepository places)
   {
-    System.out.println(record);
-    final Data data = MapData.of(record);
-    final String addressId = data.optStringOf("data.address_id");
-    final String addressFk = data.optStringOf("data.address_fk");
-    record.put("address_id", null);
-    record.put("place_id", null);
+    final Data data = MapData.of(record).dataOf("data");
+    final Map<String, Object> result = data.asModifiableContent();
+
+    final String addressFk = data.optStringOf("address_id");
+    final Data address = addressFk.isEmpty() ? MapData.EMPTY : addresses.findByFk(addressFk);
+    if (!address.isEmpty()) {
+      result.put("address_id", address.longOf("address_id"));
+    }
+    final String addressCord = data.optStringOf("address_place");
+    final String placeCord = data.stringOf("place");
+    if (placeCord.equals(addressCord))
+    {
+      result.put("place_id", address.longOf("place_id"));
+    }
+    else {
+      final long placeId = places.add(
+          MapData.of(
+              ImmutableMap.<String, Object>of(
+                  "gps_cord", placeCord.replaceAll(",", "")
+              )
+          )
+      );
+      result.put("place_id", placeId);
+    }
   }
 
   private long serviceId(Data draft) {

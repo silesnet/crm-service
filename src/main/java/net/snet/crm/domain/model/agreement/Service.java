@@ -103,7 +103,7 @@ public class Service implements Entity<Service, ServiceId> {
     props.put("data", mapToJson(ImmutableMap.<String, Object>builder()
         .put("devices", devices(data))
         .build()));
-    props.put("addressId", data.get("address_id").asStringOr(null));
+    props.put("addressId", data.get("address_id").asLongOr(null));
     props.put("placeId", data.get("place_id").asLongOr(null));
     return Collections.unmodifiableMap(props);
   }

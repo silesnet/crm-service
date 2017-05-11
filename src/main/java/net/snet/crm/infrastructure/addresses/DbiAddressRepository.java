@@ -9,6 +9,8 @@ import org.skife.jdbi.v2.tweak.HandleCallback;
 
 import java.util.List;
 
+import static net.snet.crm.service.utils.Databases.findRecord;
+
 public class DbiAddressRepository implements AddressRepository
 {
   private final DBI dbi;
@@ -42,12 +44,12 @@ public class DbiAddressRepository implements AddressRepository
   @Override
   public Data findById(long addressId)
   {
-    return null;
+    return findRecord(Databases.recordIdOf("addresses", "address_id", addressId), dbi);
   }
 
   @Override
   public Data findByFk(String addressFk)
   {
-    return null;
+    return findRecord(Databases.recordIdOf("addresses", "address_fk", addressFk), dbi);
   }
 }

@@ -36,6 +36,10 @@ public class Databases {
   private static Function<Object, Object> valueToSqlType = valueToSqlType();
   private static Predicate<String> notId = notId();
 
+  public static RecordId recordIdOf(String table, String column, Object value) {
+    return new RecordId(table, column, value);
+  }
+
   public static void insertRecordWithoutKey(String table, Data record, Handle handle)
   {
     insertRecordWithoutKey(table, record.asMap(), handle);
