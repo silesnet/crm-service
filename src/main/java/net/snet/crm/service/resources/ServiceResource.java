@@ -98,11 +98,17 @@ public class ServiceResource
       @PathParam("serviceId") long serviceId,
       Data body)
   {
-//    final Value serviceUpdate = valueMapOf(body).get("services");
     checkState(body.hasData("services"), "no service update body sent");
     final Data data = body.dataOf("services");
-    final Map<String, Object> update = data.asModifiableContent();
     logger.debug("updating service: '{}'", data);
+    resolveAddressUpdateInPlace(data);
+    crmRepository.updateService(serviceId, data);
+    return Response.ok(ImmutableMap.of()).build();
+  }
+
+  private void resolveAddressUpdateInPlace(Data data)
+  {
+    final Map<String, Object> update = data.asModifiableContent();
     final String place = data.optStringOf("place");
     update.remove("place");
     final String addressPlace = data.optStringOf("address_place");
@@ -130,8 +136,6 @@ public class ServiceResource
           MapData.of(ImmutableMap.<String, Object>of("gps_cord", place)));
       update.put("place_id", placeId);
     }
-    crmRepository.updateService(serviceId, data);
-    return Response.ok(ImmutableMap.of()).build();
   }
 
   @GET
