@@ -302,6 +302,7 @@ public class DbiCrmRepository implements CrmRepository
                 "s.*,\n" +
                 "c.status AS actual_status,\n" +
                 "a.label AS address_label,\n" +
+                "a.address_fk AS address_fk,\n" +
                 "pp.gps_cord AS address_place,\n" +
                 "p.gps_cord AS place,\n" +
                 "false AS is_draft,\n" +

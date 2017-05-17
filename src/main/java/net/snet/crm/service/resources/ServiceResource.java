@@ -107,10 +107,12 @@ public class ServiceResource
     update.remove("place");
     final String addressPlace = data.optStringOf("address_place");
     update.remove("address_place");
-    if (data.hasValue("address_id")) {
-      final Data address = addresses.findByFk(data.stringOf("address_id"));
+    final String addressFk = data.optStringOf("address_fk");
+    update.remove("address_fk");
+    if (!addressFk.isEmpty()) {
+      final Data address = addresses.findByFk(addressFk);
       if (address.isEmpty()) {
-        update.remove("address_id");
+        update.put("address_id", null);
       }
       else {
         update.put("address_id", address.longOf("address_id"));
@@ -119,6 +121,9 @@ public class ServiceResource
       {
         update.put("place_id", address.longOf("place_id"));
       }
+    }
+    else {
+      update.put("address_id", null);
     }
     if (!place.isEmpty() && !place.equals(addressPlace)) {
       final long placeId = places.add(
