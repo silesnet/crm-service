@@ -122,7 +122,7 @@ public class CrmService extends Application<CrmConfiguration> {
 
     final JerseyEnvironment jersey = environment.jersey();
     jersey.register(new CustomerResource(dbi, crmRepository));
-    jersey.register(new ServiceResource(crmRepository, networkRepository, todoRepository));
+    jersey.register(new ServiceResource(crmRepository, networkRepository, todoRepository, addressRepository, placeRepository));
     jersey.register(new NetworkResource(dbi, networkService));
     jersey.register(new UserResource(dbi, crmRepository,
         new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository)));

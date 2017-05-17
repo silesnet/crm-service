@@ -302,13 +302,15 @@ public class DbiCrmRepository implements CrmRepository
                 "s.*,\n" +
                 "c.status AS actual_status,\n" +
                 "a.label AS address_label,\n" +
-                "p.gps_cord,\n" +
+                "pp.gps_cord AS address_place,\n" +
+                "p.gps_cord AS place,\n" +
                 "false AS is_draft,\n" +
                 "true AS has_customer\n" +
              "FROM services AS s\n" +
                 "LEFT JOIN service_connections AS c ON s.id=c.service_id\n" +
                 "LEFT JOIN addresses AS a ON s.address_id=a.address_id\n" +
                 "LEFT JOIN places AS p ON s.place_id = p.place_id\n" +
+                "LEFT JOIN places AS pp ON a.place_id = pp.place_id\n" +
               "WHERE s.id=:id")
             .bind("id", serviceId)
             .first();

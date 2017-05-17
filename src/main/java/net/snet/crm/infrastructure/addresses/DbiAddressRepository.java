@@ -4,8 +4,6 @@ import com.sun.jersey.api.client.Client;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.service.utils.Databases;
 import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.tweak.HandleCallback;
 
 import java.util.List;
 
@@ -25,19 +23,19 @@ public class DbiAddressRepository implements AddressRepository
   public List<Data> findByQuery(final String query)
   {
     return remoteAddressRepository.findByQuery(query);
+//    final String sql = "SELECT a.* FROM addresses AS a INNER JOIN places AS p USING(place_id), address_query(:query) AS query WHERE query @@ a.lexems";
 //    return dbi.withHandle(new HandleCallback<List<Data>>()
 //    {
 //      @Override
 //      public List<Data> withHandle(Handle handle) throws Exception
 //      {
 //        return Databases.findRecords(
-//            query,
-//            Data.EMPTY,
+//            sql,
+//            MapData.of(ImmutableMap.<String, Object>of("query", query)),
 //            handle
 //        );
 //      }
 //    });
-
 
   }
 

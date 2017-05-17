@@ -10,7 +10,9 @@ import net.snet.crm.domain.model.agreement.CrmRepository;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.todo.TodoRepository;
 import net.snet.crm.domain.shared.data.Data;
-import net.snet.crm.service.utils.Entities.Value;
+import net.snet.crm.domain.shared.data.MapData;
+import net.snet.crm.infrastructure.addresses.AddressRepository;
+import net.snet.crm.infrastructure.addresses.PlaceRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +26,6 @@ import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static net.snet.crm.service.utils.Entities.valueMapOf;
 
 @Path("/services")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -35,15 +36,24 @@ public class ServiceResource
   private final CrmRepository crmRepository;
   private final NetworkRepository networkRepository;
   private final TodoRepository todoRepository;
+  private final AddressRepository addresses;
+  private final PlaceRepository places;
   private
   @Context
   UriInfo uriInfo;
 
-  public ServiceResource(CrmRepository crmRepository, NetworkRepository networkRepository, TodoRepository todoRepository)
+  public ServiceResource(
+      CrmRepository crmRepository,
+      NetworkRepository networkRepository,
+      TodoRepository todoRepository,
+      AddressRepository addresses,
+      PlaceRepository places)
   {
     this.crmRepository = crmRepository;
     this.networkRepository = networkRepository;
     this.todoRepository = todoRepository;
+    this.addresses = addresses;
+    this.places = places;
   }
 
   @GET
@@ -90,7 +100,32 @@ public class ServiceResource
   {
 //    final Value serviceUpdate = valueMapOf(body).get("services");
     checkState(body.hasData("services"), "no service update body sent");
-    crmRepository.updateService(serviceId, body.dataOf("services"));
+    final Data data = body.dataOf("services");
+    final Map<String, Object> update = data.asModifiableContent();
+    logger.debug("updating service: '{}'", data);
+    final String place = data.optStringOf("place");
+    update.remove("place");
+    final String addressPlace = data.optStringOf("address_place");
+    update.remove("address_place");
+    if (data.hasValue("address_id")) {
+      final Data address = addresses.findByFk(data.stringOf("address_id"));
+      if (address.isEmpty()) {
+        update.remove("address_id");
+      }
+      else {
+        update.put("address_id", address.longOf("address_id"));
+      }
+      if (place.equals(addressPlace) && address.hasValue("place_id"))
+      {
+        update.put("place_id", address.longOf("place_id"));
+      }
+    }
+    if (!place.isEmpty() && !place.equals(addressPlace)) {
+      final long placeId = places.add(
+          MapData.of(ImmutableMap.<String, Object>of("gps_cord", place)));
+      update.put("place_id", placeId);
+    }
+    crmRepository.updateService(serviceId, data);
     return Response.ok(ImmutableMap.of()).build();
   }
 
