@@ -182,6 +182,15 @@ public class DbiAgreementRepository implements AgreementRepository {
     final long historyId = insertCustomerAuditOf(draft, handle);
     record.put("history_id", historyId);
     insertRecordWithoutKey(CUSTOMERS_TABLE, record, handle);
+    final int updated = handle.createStatement(
+        "UPDATE customers SET lexems=to_tsvector(:name) WHERE id=:customerId;"
+        )
+        .bind("name", record.get("name"))
+        .bind("customerId", record.get("id"))
+        .execute();
+    if (updated != 1) {
+      throw new IllegalStateException("unable to parse customer name to lexems");
+    }
   }
 
   private long insertCustomerAuditOf(final Draft draft, final Handle handle) {

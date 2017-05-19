@@ -426,10 +426,11 @@ public class DbiCrmRepository implements CrmRepository
                 "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
                 "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
                 "  LEFT JOIN dhcp_wireless AS d ON s.id = d.service_id\n" +
-                "  LEFT JOIN addresses AS ad ON s.address_id=ad.address_id\n" +
+                "  LEFT JOIN addresses AS ad ON s.address_id=ad.address_id,\n" +
+                "  prefix_query(:rawQuery) AS cquery\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   " + isActiveRestriction + "\n" +
-                "AND   (lower(translate(c.name, :fromChars, :toChars)) ~* :query\n" +
+                "AND (c.lexems @@ cquery \n" +
                 "  OR s.id\\:\\:text ~ :query\n" +
                 "  OR lower(translate(p.interface, '-', '')) ~* :query\n" +
                 "  OR lower(translate(d.interface, '-', '')) ~* :query\n" +
@@ -467,6 +468,7 @@ public class DbiCrmRepository implements CrmRepository
                 "ORDER BY customer_name, service_id \n" +
                 "LIMIT 25")
                      .bind("query", query)
+                     .bind("rawQuery", rawQuery)
                      .bind("fromChars", TRANSLATE_FROM_CHARS)
                      .bind("toChars", TRANSLATE_TO_CHARS)
                      .list();
