@@ -18,7 +18,8 @@ public class RuntimeExceptionMapper implements ExceptionMapper<RuntimeException>
     final int status = (exception instanceof WebApplicationException) ?
         ((WebApplicationException) exception).getResponse().getStatus() :
         500;
-    final Map<String, String> error = ImmutableMap.of("detail", exception.getMessage());
+    final String message = exception.getMessage() != null ? exception.getMessage() : "";
+    final Map<String, String> error = ImmutableMap.of("detail", message);
     log.error("exception", exception);
     return Response
         .status(status)

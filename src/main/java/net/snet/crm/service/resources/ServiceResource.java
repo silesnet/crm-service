@@ -119,6 +119,10 @@ public class ServiceResource
       update.put("place_id", placeId);
     }
     else {
+      if (!data.hasValue("address_place_id"))
+      {
+        throw new RuntimeException("GPS coordinates are missing");
+      }
       update.put("place_id", data.longOf("address_place_id"));
     }
     update.remove("address_place_id");
