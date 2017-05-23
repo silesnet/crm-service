@@ -109,33 +109,21 @@ public class ServiceResource
   private void resolveAddressUpdateInPlace(Data data)
   {
     final Map<String, Object> update = data.asModifiableContent();
-    final String place = data.optStringOf("place");
-    update.remove("place");
+    final Long addressId = data.hasValue("address_id") ? data.longOf("address_id") : null;
+    update.put("address_id", addressId);
     final String addressPlace = data.optStringOf("address_place");
-    update.remove("address_place");
-    final String addressFk = data.optStringOf("address_fk");
-    update.remove("address_fk");
-    if (!addressFk.isEmpty()) {
-      final Data address = addresses.findByFk(addressFk);
-      if (address.isEmpty()) {
-        update.put("address_id", null);
-      }
-      else {
-        update.put("address_id", address.longOf("address_id"));
-      }
-      if (place.equals(addressPlace) && address.hasValue("place_id"))
-      {
-        update.put("place_id", address.longOf("place_id"));
-      }
-    }
-    else {
-      update.put("address_id", null);
-    }
+    final String place = data.optStringOf("place");
     if (!place.isEmpty() && !place.equals(addressPlace)) {
       final long placeId = places.add(
           MapData.of(ImmutableMap.<String, Object>of("gps_cord", place)));
       update.put("place_id", placeId);
     }
+    else {
+      update.put("place_id", data.longOf("address_place_id"));
+    }
+    update.remove("address_place_id");
+    update.remove("address_place");
+    update.remove("place");
   }
 
   @GET

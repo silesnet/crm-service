@@ -193,7 +193,19 @@ public class Databases {
       final Data bindings,
       final Handle handle)
   {
-    return new ArrayList<>();
+    final List<Map<String, Object>> list = handle
+        .createQuery(query)
+        .bindFromMap(bindings.asMap())
+        .list();
+    final List<Data> result = new ArrayList<>();
+    if (list != null)
+    {
+      for (Map<String, Object> address : list)
+      {
+        result.add(MapData.of(address));
+      }
+    }
+    return result;
   }
 
   public static List<Map<String, Object>> findRecords(

@@ -283,7 +283,7 @@ public class DraftResource2
     }
     final String addressCord = data.optStringOf("address_place");
     final String placeCord = data.stringOf("place");
-    if (placeCord.equals(addressCord))
+    if (!placeCord.isEmpty() && placeCord.equals(addressCord))
     {
       result.put("place_id", address.longOf("place_id"));
     }

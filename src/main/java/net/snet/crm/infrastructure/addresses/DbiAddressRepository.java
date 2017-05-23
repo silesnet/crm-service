@@ -1,9 +1,13 @@
 package net.snet.crm.infrastructure.addresses;
 
+import com.google.common.collect.ImmutableMap;
 import com.sun.jersey.api.client.Client;
 import net.snet.crm.domain.shared.data.Data;
+import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.service.utils.Databases;
 import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.tweak.HandleCallback;
 
 import java.util.List;
 
@@ -22,20 +26,29 @@ public class DbiAddressRepository implements AddressRepository
   @Override
   public List<Data> findByQuery(final String query)
   {
-    return remoteAddressRepository.findByQuery(query);
-//    final String sql = "SELECT a.* FROM addresses AS a INNER JOIN places AS p USING(place_id), address_query(:query) AS query WHERE query @@ a.lexems";
-//    return dbi.withHandle(new HandleCallback<List<Data>>()
-//    {
-//      @Override
-//      public List<Data> withHandle(Handle handle) throws Exception
-//      {
-//        return Databases.findRecords(
-//            sql,
-//            MapData.of(ImmutableMap.<String, Object>of("query", query)),
-//            handle
-//        );
-//      }
-//    });
+    final String sql =
+        "SELECT" +
+            " a.address_id" +
+            ", a.address_fk" +
+            ", a.label" +
+            ", a.place_id" +
+            ", p.gps_cord" +
+            " FROM addresses AS a" +
+            " LEFT JOIN places AS p USING(place_id)," +
+            " address_query(:query) AS query" +
+            " WHERE a.lexems @@ query";
+    return dbi.withHandle(new HandleCallback<List<Data>>()
+    {
+      @Override
+      public List<Data> withHandle(Handle handle) throws Exception
+      {
+        return Databases.findRecords(
+            sql,
+            MapData.of(ImmutableMap.<String, Object>of("query", query)),
+            handle
+        );
+      }
+    });
 
   }
 
