@@ -5,8 +5,10 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
-import java.io.File;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Scanner;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -26,6 +28,8 @@ public class FileSystemCommandFactory implements SystemCommandFactory {
     final List<String> command = Lists.asList(script.getAbsolutePath(), args);
     return new SystemCommand() {
 
+      public String output = "";
+
       @Override
       public String name() {
         return name;
@@ -36,15 +40,24 @@ public class FileSystemCommandFactory implements SystemCommandFactory {
         try {
           Process process = new ProcessBuilder(command)
               .redirectErrorStream(true)
-              .redirectOutput(ProcessBuilder.Redirect.INHERIT)
               .start();
-            int error = process.waitFor();
-            if (error != 0) {
-              throw new RuntimeException("error code: " + error);
-            }
+          int error = process.waitFor();
+          if (error != 0) {
+            throw new RuntimeException("error code: " + error);
+          }
+          final Scanner scanner = new Scanner(process.getInputStream(), StandardCharsets.UTF_8.name());
+          final String output = scanner.useDelimiter("\\A").next();
+          scanner.close();
+          this.output = output;
         } catch (Exception e) {
           throw new RuntimeException("can't run '" + Joiner.on(" ").join(command) + "'", e);
         }
+      }
+
+      @Override
+      public String output()
+      {
+        return output;
       }
     };
   }

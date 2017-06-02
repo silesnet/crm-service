@@ -1,5 +1,7 @@
 package net.snet.crm.domain.model.network;
 
+import net.snet.crm.domain.shared.data.Data;
+
 public interface NetworkService {
   void enableSwitchPort(String switchName, int port);
 
@@ -14,4 +16,6 @@ public interface NetworkService {
   void enableService(long serviceId);
 
   void disableService(long serviceId);
+
+  Data fetchDhcpWirelessConnection(String master, String mac);
 }

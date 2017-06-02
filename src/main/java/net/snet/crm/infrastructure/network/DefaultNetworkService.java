@@ -1,5 +1,6 @@
 package net.snet.crm.infrastructure.network;
 
+import com.google.common.collect.Maps;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkService;
 import net.snet.crm.domain.shared.data.Data;
@@ -10,9 +11,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static net.snet.crm.infrastructure.system.SystemCommandRunner.executeSystemCommand;
+import static net.snet.crm.infrastructure.system.SystemCommandRunner.executeSystemCommandWithResult;
 
 public class DefaultNetworkService implements NetworkService {
 
@@ -24,6 +29,42 @@ public class DefaultNetworkService implements NetworkService {
   public DefaultNetworkService(SystemCommandFactory commandFactory, NetworkRepository networkRepository) {
     this.commandFactory = commandFactory;
     this.networkRepository = networkRepository;
+  }
+
+  @Override
+  public Data fetchDhcpWirelessConnection(String master, String mac)
+  {
+    logger.debug("fetching DHCP wireless connection info for '{}', '{}'", master, mac);
+    final String output = executeSystemCommandWithResult(commandFactory.systemCommand(
+        "fetchDhcpWirelessConnection",
+        "-m", master,
+        "-a", mac));
+    return parseDhcpWirelessConnection(output);
+  }
+
+  private Data parseDhcpWirelessConnection(String connection) {
+    final Map<String, Object> result = Maps.newHashMap();
+    final String[] lines = connection.split("\\r?\\n");
+    final Pattern pattern = Pattern.compile("^\\s*([\\w\\-]+): (.*)$");
+    for (String line : lines)
+    {
+      final Matcher matcher = pattern.matcher(line);
+      if (matcher.matches())
+      {
+        final String key = matcher.group(1);
+        final String value = matcher.group(2);
+        switch (key)
+        {
+          case "active-address": result.put("address", value); break;
+          case "active-server": result.put("server", value); break;
+          case "host-name": result.put("host", value); break;
+          case "status": result.put("status", value); break;
+          case "last-seen": result.put("lastSeen", value); break;
+        }
+      }
+    }
+
+    return MapData.of(result);
   }
 
   @Override

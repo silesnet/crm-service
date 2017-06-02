@@ -2,6 +2,7 @@ package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkRepository.Country;
@@ -51,6 +52,25 @@ public class NetworkResource
   {
     networkService.kickPppoeUser(master, login);
     return Response.ok(ImmutableMap.of()).build();
+  }
+
+  @GET
+  @Path("dhcp-wireless/{serviceId}/connection")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response dhcpWirelessLastIpOf(@PathParam("serviceId") long serviceId) {
+    final Map<String, Object> result;
+    final Data dhcpWireless = networkRepository.findServiceDhcpWireless(serviceId);
+    if (dhcpWireless.hasValue("master") && dhcpWireless.hasValue("mac.value"))
+    {
+      final String master = dhcpWireless.stringOf("master");
+      final String mac = dhcpWireless.stringOf("mac.value").toUpperCase();
+      final Data connection = networkService.fetchDhcpWirelessConnection(master, mac);
+      result = connection.asMap();
+    }
+    else {
+      result = ImmutableMap.of();
+    }
+    return Response.ok(ImmutableMap.of("connection", result)).build();
   }
 
   @GET

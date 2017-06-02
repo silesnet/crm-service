@@ -34,4 +34,30 @@ public class SystemCommandRunner {
           "execution of system command '" + command.name() + "' failed", e);
     }
   }
+
+  public static String executeSystemCommandWithResult(final SystemCommand command) {
+    final Runnable task = new Runnable() {
+      @Override
+      public void run() {
+        try {
+          log.debug("executing system command '{}'...", command.name());
+          command.run();
+          log.info("system command '{}' completed", command.name());
+        } catch (Exception e) {
+          log.error("failed executing '{}'", command.name(), e);
+        }
+      }
+    };
+    final Future<?> future = executor.submit(task);
+    try {
+      future.get();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(
+          "system command '" + command.name() + "' has been interrupted", e);
+    } catch (ExecutionException e) {
+      throw new RuntimeException(
+          "execution of system command '" + command.name() + "' failed", e);
+    }
+    return command.output();
+  }
 }

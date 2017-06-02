@@ -15,6 +15,15 @@ class FileSystemCommandFactoryTest extends Specification {
       factory().systemCommand('sendEmail', '-a', 'address', '-s', 'subject', '-m', 'message').run()
   }
 
+  def "should capture commands output"() {
+    given:
+    def command = factory().systemCommand('fetchDhcpWirelessConnection', '-m', 'master', '-a', 'MAC')
+    when:
+    command.run()
+    then:
+    !command.output().isEmpty()
+  }
+
   FileSystemCommandFactory factory() {
     new FileSystemCommandFactory(new File('src/test/resources/commands'))
   }
