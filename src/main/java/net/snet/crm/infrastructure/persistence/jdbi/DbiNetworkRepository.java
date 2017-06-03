@@ -46,15 +46,28 @@ public class DbiNetworkRepository implements NetworkRepository
       @Override
       public List<Map<String, Object>> withHandle(Handle handle) throws Exception {
         return handle.createQuery(
-            "SELECT s.*\n" +
-                "       , p.*\n" +
-                "       , d.*\n" +
-                "FROM services AS s\n" +
-                "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
-                "  LEFT JOIN dhcp AS d ON s.id = d.service_id\n" +
-                "WHERE p.service_id IS NOT NULL\n" +
-                "AND   d.service_id IS NOT NULL")
-                     .list();
+            "WITH service_authentications AS\n" +
+                "(\n" +
+                "  SELECT s.id\n" +
+                "         , p.service_id\n" +
+                "         , d.service_id\n" +
+                "         , w.service_id\n" +
+                "         , (SELECT count(*)\n" +
+                "            FROM (\n" +
+                "                 VALUES (p.service_id), (d.service_id), (w.service_id)) AS v (col)\n" +
+                "            WHERE v.col IS NOT NULL) AS \"count\"\n" +
+                "  FROM services AS s\n" +
+                "    LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
+                "    LEFT JOIN dhcp AS d ON s.id = d.service_id\n" +
+                "    LEFT JOIN dhcp_wireless w ON s.id = w.service_id\n" +
+                ")\n" +
+                "SELECT s.id\n" +
+                "       , s.name\n" +
+                "       , a.count\n" +
+                "FROM services s\n" +
+                "  LEFT JOIN service_authentications a ON s.id = a.id\n" +
+                "WHERE a.count > 1;"
+        ).list();
       }
     });
   }
