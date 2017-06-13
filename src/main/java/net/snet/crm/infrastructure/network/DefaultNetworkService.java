@@ -80,7 +80,13 @@ public class DefaultNetworkService implements NetworkService {
     if (hasDhcp) {
       enableSwitchPort(dhcp.stringOf("switch"), dhcp.intOf("port"));
     }
-    if (!hasPppoe && !hasDhcp) {
+    final Data dhcpWireless = networkRepository.findServiceDhcpWireless(serviceId);
+    final boolean hasDhcpWireless = !dhcpWireless.isEmpty();
+    if (hasDhcpWireless) {
+      // TODO implement enabling of DHCP wireless
+      logger.debug("enabling DHCP wireless: '{}'", dhcpWireless);
+    }
+    if (!hasPppoe && !hasDhcp && !hasDhcpWireless) {
       executeSystemCommand(commandFactory.systemCommand(
           "sendEmail",
           "-a", "podpora@silesnet.cz",
@@ -103,7 +109,13 @@ public class DefaultNetworkService implements NetworkService {
     if (hasDhcp) {
       disableSwitchPort(dhcp.stringOf("switch"), dhcp.intOf("port"));
     }
-    if (!hasPppoe && !hasDhcp) {
+    final Data dhcpWireless = networkRepository.findServiceDhcpWireless(serviceId);
+    final boolean hasDhcpWireless = !dhcpWireless.isEmpty();
+    if (hasDhcpWireless) {
+      // TODO implement disabling of DHCP wireless
+      logger.debug("disabling DHCP wireless: '{}'", dhcpWireless);
+    }
+    if (!hasPppoe && !hasDhcp && !hasDhcpWireless) {
       executeSystemCommand(commandFactory.systemCommand(
           "sendEmail",
           "-a", "podpora@silesnet.cz",
