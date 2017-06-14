@@ -18,4 +18,8 @@ public interface NetworkService {
   void disableService(long serviceId);
 
   Data fetchDhcpWirelessConnection(String master, String mac);
+
+  void enableDhcpWirelessAddress(String master, String address);
+
+  void disableDhcpWirelessAddress(String master, String address);
 }

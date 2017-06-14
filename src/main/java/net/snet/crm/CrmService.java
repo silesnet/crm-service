@@ -115,7 +115,9 @@ public class CrmService extends Application<CrmConfiguration> {
 
     final SystemCommandFactory systemCommandFactory = new FileSystemCommandFactory(configuration.getSystemCommandHome());
 
-    final NetworkService networkService = new DefaultNetworkService(systemCommandFactory, networkRepository);
+    final NetworkService networkService = new DefaultNetworkService(
+        systemCommandFactory,
+        networkRepository);
     final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessaging());
     final DbiAddressRepository addressRepository = new DbiAddressRepository(dbi, httpClient, configuration.getAddressServiceUri());
     final PlaceRepository placeRepository = new DbiPlaceRepository(dbi);

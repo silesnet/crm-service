@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,9 +25,33 @@ public class DefaultNetworkService implements NetworkService {
   private final SystemCommandFactory commandFactory;
   private final NetworkRepository networkRepository;
 
-  public DefaultNetworkService(SystemCommandFactory commandFactory, NetworkRepository networkRepository) {
+  public DefaultNetworkService(
+      SystemCommandFactory commandFactory,
+      NetworkRepository networkRepository) {
     this.commandFactory = commandFactory;
     this.networkRepository = networkRepository;
+  }
+
+  @Override
+  public void enableDhcpWirelessAddress(String master, String address)
+  {
+    logger.debug("enabling DHCP wireless address for '{}', '{}'", master, address);
+    executeSystemCommand(commandFactory.systemCommand(
+        "enableDhcpWirelessAddress",
+        "-m", master,
+        "-a", address)
+    );
+  }
+
+  @Override
+  public void disableDhcpWirelessAddress(String master, String address)
+  {
+    logger.debug("disabling DHCP wireless address for '{}', '{}'", master, address);
+    executeSystemCommand(commandFactory.systemCommand(
+        "disableDhcpWirelessAddress",
+        "-m", master,
+        "-a", address)
+    );
   }
 
   @Override
@@ -83,8 +106,11 @@ public class DefaultNetworkService implements NetworkService {
     final Data dhcpWireless = networkRepository.findServiceDhcpWireless(serviceId);
     final boolean hasDhcpWireless = !dhcpWireless.isEmpty();
     if (hasDhcpWireless) {
-      // TODO implement enabling of DHCP wireless
-      logger.debug("enabling DHCP wireless: '{}'", dhcpWireless);
+      final String master = dhcpWireless.stringOf("master");
+      final String mac = dhcpWireless.stringOf("mac.value");
+      final Data connection = fetchDhcpWirelessConnection(master, mac);
+      final String address = connection.stringOf("address");
+      enableDhcpWirelessAddress(master, address);
     }
     if (!hasPppoe && !hasDhcp && !hasDhcpWireless) {
       executeSystemCommand(commandFactory.systemCommand(
@@ -112,8 +138,11 @@ public class DefaultNetworkService implements NetworkService {
     final Data dhcpWireless = networkRepository.findServiceDhcpWireless(serviceId);
     final boolean hasDhcpWireless = !dhcpWireless.isEmpty();
     if (hasDhcpWireless) {
-      // TODO implement disabling of DHCP wireless
-      logger.debug("disabling DHCP wireless: '{}'", dhcpWireless);
+      final String master = dhcpWireless.stringOf("master");
+      final String mac = dhcpWireless.stringOf("mac.value");
+      final Data connection = fetchDhcpWirelessConnection(master, mac);
+      final String address = connection.stringOf("address");
+      disableDhcpWirelessAddress(master, address);
     }
     if (!hasPppoe && !hasDhcp && !hasDhcpWireless) {
       executeSystemCommand(commandFactory.systemCommand(
