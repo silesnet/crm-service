@@ -11,6 +11,8 @@ import net.snet.crm.domain.model.agreement.Service;
 import net.snet.crm.domain.model.draft.Draft;
 import net.snet.crm.domain.model.draft.DraftId;
 import net.snet.crm.domain.shared.Id;
+import net.snet.crm.domain.shared.data.Data;
+import net.snet.crm.domain.shared.data.MapData;
 import org.joda.time.DateTime;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
@@ -68,6 +70,7 @@ public class DbiAgreementRepository implements AgreementRepository {
           updateDraftStatusTo(IMPORTED, agreementDraft.id(), handle);
         }
         insertServiceOf(serviceDraft, handle);
+        updateDhcpPlace(serviceDraft, handle);
         updateDraftStatusTo(IMPORTED, serviceDraft.id(), handle);
         updateCustomerStatusOf(
             customerDraftOptional,
@@ -78,6 +81,17 @@ public class DbiAgreementRepository implements AgreementRepository {
         return null;
       }
     });
+  }
+
+  private void updateDhcpPlace(Draft service, Handle handle) {
+    final Data data = MapData.of(service.data());
+    if (data.optIntOf("auth_type") == 1 && !"wireless".equals(data.optStringOf("product_channel"))) {
+      final Data update = MapData.of(ImmutableMap.<String, Object>of(
+          "address_id", data.optIntOf("address_id"),
+          "site", data.optStringOf("location_flat"))
+      );
+      updateRecord(new RecordId("dhcp", "service_id", service.entityId()), update, handle);
+    }
   }
 
   private void updateCustomerStatusOf(
