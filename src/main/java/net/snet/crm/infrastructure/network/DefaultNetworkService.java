@@ -87,7 +87,7 @@ public class DefaultNetworkService implements NetworkService {
         }
       }
     }
-
+    logger.debug("DHCP Wireless info: '{}'", result);
     return MapData.of(result);
   }
 
@@ -110,6 +110,7 @@ public class DefaultNetworkService implements NetworkService {
       final String master = dhcpWireless.stringOf("master");
       final String mac = dhcpWireless.stringOf("mac.value");
       final Data connection = fetchDhcpWirelessConnection(master, mac);
+      logger.debug("DHCP connection '{}'", connection);
       final String address = connection.stringOf("address");
       enableDhcpWirelessAddress(master, address);
     }
