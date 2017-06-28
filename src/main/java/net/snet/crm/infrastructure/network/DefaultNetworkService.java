@@ -62,6 +62,7 @@ public class DefaultNetworkService implements NetworkService {
         "fetchDhcpWirelessConnection",
         "-m", master,
         "-a", mac));
+    logger.debug("DHCP wireless output: '{}'", output);
     return parseDhcpWirelessConnection(output);
   }
 
