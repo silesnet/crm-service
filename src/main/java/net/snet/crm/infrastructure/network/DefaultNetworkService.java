@@ -57,12 +57,12 @@ public class DefaultNetworkService implements NetworkService {
   @Override
   public Data fetchDhcpWirelessConnection(String master, String mac)
   {
+    mac = mac.toUpperCase();
     logger.debug("fetching DHCP wireless connection info for '{}', '{}'", master, mac);
     final String output = executeSystemCommandWithResult(commandFactory.systemCommand(
         "fetchDhcpWirelessConnection",
         "-m", master,
         "-a", mac));
-    logger.debug("DHCP wireless output: '{}'", output);
     return parseDhcpWirelessConnection(output);
   }
 
@@ -77,7 +77,6 @@ public class DefaultNetworkService implements NetworkService {
       {
         final String key = matcher.group(1);
         final String value = matcher.group(2);
-        logger.debug("parsing key/value of '{}/{}'", key, value);
         switch (key)
         {
           case "active-address": result.put("address", value); break;
@@ -88,7 +87,6 @@ public class DefaultNetworkService implements NetworkService {
         }
       }
     }
-    logger.debug("DHCP Wireless info: '{}'", result);
     return MapData.of(result);
   }
 
