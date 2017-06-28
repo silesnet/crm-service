@@ -76,6 +76,7 @@ public class DefaultNetworkService implements NetworkService {
       {
         final String key = matcher.group(1);
         final String value = matcher.group(2);
+        logger.debug("parsing key/value of '{}/{}'", key, value);
         switch (key)
         {
           case "active-address": result.put("address", value); break;
