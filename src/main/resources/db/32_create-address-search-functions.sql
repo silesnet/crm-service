@@ -13,8 +13,9 @@ BEGIN
 END;
 $$ LANGUAGE PLPGSQL;
 
+-- use '$1' instead of 'query' for older version of pgSQL
 CREATE OR REPLACE FUNCTION address_query(query TEXT) RETURNS TSQUERY AS $$
-  SELECT to_tsquery(string_agg(
+  SELECT to_tsquery('simple', string_agg(
     CASE
       WHEN t.alias = 'asciiword' OR t.alias = 'numword' THEN p.token || ':*'
       WHEN t.alias = 'blank' THEN ' & '
@@ -22,20 +23,21 @@ CREATE OR REPLACE FUNCTION address_query(query TEXT) RETURNS TSQUERY AS $$
     END,''))
   FROM
     ts_parse ('default', normalize_text(query)) p
-    , ts_token_type ('default') t
+    , ts_token_type('default') t
   WHERE
     p.tokid = t.tokid;
 $$ LANGUAGE SQL;
 
+-- use '$1' instead of 'query' for older version of pgSQL
 CREATE OR REPLACE FUNCTION prefix_query(query TEXT) RETURNS TSQUERY AS $$
-  SELECT to_tsquery(string_agg(
+  SELECT to_tsquery('simple', string_agg(
     CASE
       WHEN t.alias != 'blank' THEN p.token || ':*'
       ELSE ' & '
     END,''))
   FROM
     ts_parse ('default', normalize_text(query)) p
-    , ts_token_type ('default') t
+    , ts_token_type('default') t
   WHERE
     p.tokid = t.tokid;
 $$ LANGUAGE SQL;
