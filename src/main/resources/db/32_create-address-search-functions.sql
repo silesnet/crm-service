@@ -1,6 +1,15 @@
 CREATE OR REPLACE FUNCTION normalize_text(term TEXT) RETURNS TEXT AS $$
 BEGIN
-  RETURN lower(translate(trim(regexp_replace(term, '\s+', ' ', 'g')), 'ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź/.,;:-&+?', 'aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz         '));
+  RETURN
+    lower(
+      trim(
+        regexp_replace(
+          translate(
+            term,
+            'ÁĄÄČĆĎÉĚĘËÍŁŇŃÓÖŘŠŚŤÚŮÜÝŽŻŹáąäčćďéěęëíłňńóöřšśťúůüýžżź/.,;:-&+?',
+            'aaaccdeeeeilnnoorsstuuuyzzzaaaccdeeeeilnnoorsstuuuyzzz         '
+          ),
+          '\s+', ' ', 'g')));
 END;
 $$ LANGUAGE PLPGSQL;
 
