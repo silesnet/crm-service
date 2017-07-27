@@ -69,7 +69,7 @@ public class UserResource {
 		if ((session.isPresent() && "test".equals(session.get()))
 				|| (key.isPresent() && "test".equals(key.get()))) {
 			Map<String, Object> user = Maps.newHashMap();
-			user.put("id", 35);
+			user.put("id", 21);
 			user.put("user", "test");
 			user.put("name", "Test");
 			user.put("full_name", "Test Anonymous");
