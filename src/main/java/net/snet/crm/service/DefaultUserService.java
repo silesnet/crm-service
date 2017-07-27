@@ -38,7 +38,6 @@ public class DefaultUserService implements UserService
 			Map rawUser = new ObjectMapper().readValue(response, Map.class);
 			Map<String, Object> user = crmRepository.findUserByLogin(rawUser.get("user").toString());
 			user.put("user", user.get("login"));
-			user.remove("id");
 			user.remove("login");
 			return user;
 		} catch (Exception e) {
