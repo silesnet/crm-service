@@ -392,7 +392,8 @@ public class DbiCrmRepository implements CrmRepository
       final Boolean isActive
   )
   {
-    final String query = Utils.replaceChars(rawQuery, TRANSLATE_FROM_CHARS, TRANSLATE_TO_CHARS);
+    final String query = Utils.replaceChars(
+        rawQuery.toLowerCase(), TRANSLATE_FROM_CHARS, TRANSLATE_TO_CHARS);
     if (query.isEmpty())
     {
       return Lists.newArrayList();
