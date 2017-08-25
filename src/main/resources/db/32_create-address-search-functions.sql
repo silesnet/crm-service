@@ -32,8 +32,9 @@ $$ LANGUAGE SQL;
 CREATE OR REPLACE FUNCTION prefix_query(query TEXT) RETURNS TSQUERY AS $$
   SELECT to_tsquery('simple', string_agg(
     CASE
-      WHEN t.alias != 'blank' THEN p.token || ':*'
-      ELSE ' & '
+      WHEN t.alias = 'asciiword' OR t.alias = 'numword' OR t.alias = 'uint' THEN  p.token || ':*'
+      WHEN t.alias = 'blank' THEN ' & '
+      ELSE p.token
     END,''))
   FROM
     ts_parse ('default', normalize_text(query)) p
