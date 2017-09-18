@@ -7,7 +7,7 @@ CREATE OR REPLACE VIEW customer_connection_status
 )
 AS 
 SELECT s.customer_id
---       , ARRAY_AGG(c.status)
+       , JSON_OBJECT(ARRAY_AGG(s.id::TEXT), ARRAY_AGG(c.status))
        , CASE
          WHEN REPLACE(STRING_AGG(c.status,''),'ACTIVE','') = '' THEN 'ALL_ACTIVE'
          WHEN REPLACE(STRING_AGG(c.status,''),'ACTIVE','') != STRING_AGG(c.status,'') THEN 'SOME_ACTIVE'
