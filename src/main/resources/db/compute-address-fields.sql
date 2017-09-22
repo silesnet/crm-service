@@ -1,6 +1,6 @@
 UPDATE municipalities SET
   label = name || ', ' || country,
-  lexems = to_tsvector(normalize_text(name || ', ' || country));
+  lexems = to_tsvector('simple', normalize_text(name || ', ' || country));
  
 ALTER TABLE municipalities
   ALTER COLUMN label SET NOT NULL,
@@ -15,7 +15,7 @@ UPDATE districts d SET
       ELSE m.name || ' - ' || d.name || ', ' || m.country
     END
    ),
-  lexems = to_tsvector(normalize_text(
+  lexems = to_tsvector('simple', normalize_text(
     CASE
       WHEN d.name = m.name THEN m.label
       ELSE m.name || ' - ' || d.name || ', ' || m.country
@@ -38,7 +38,7 @@ UPDATE streets s SET
       ELSE s.name || ', ' || m.label
     END
    ),
-  lexems = to_tsvector(normalize_text(
+  lexems = to_tsvector('simple', normalize_text(
     CASE
       WHEN s.name = m.name THEN m.label
       ELSE s.name || ', ' || m.label
@@ -89,7 +89,7 @@ UPDATE addresses a SET
     || ' ' ||
     m.label
   ),
-  lexems = to_tsvector(normalize_text(
+  lexems = to_tsvector('simple', normalize_text(
     CASE
       WHEN s.street_id IS NOT NULL THEN
         s.name
