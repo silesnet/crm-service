@@ -21,8 +21,6 @@ BEGIN
        || CASE WHEN p.interface IS NOT NULL THEN to_tsvector(p.interface) ELSE '' END
        || CASE WHEN d.interface IS NOT NULL THEN to_tsvector(d.interface) ELSE '' END
        || CASE WHEN p.location IS NOT NULL THEN to_tsvector(p.location) ELSE '' END
-       || CASE WHEN p.mac IS NOT NULL THEN to_tsvector(p.mac::text) ELSE '' END
-       || CASE WHEN d.mac IS NOT NULL THEN to_tsvector(d.mac::text) ELSE '' END
        || CASE WHEN c.phone IS NOT NULL THEN to_tsvector(TRANSLATE(c.phone, ' ', '')) ELSE '' END
        AS lexems
     FROM services AS ss
@@ -103,3 +101,6 @@ DROP TRIGGER IF EXISTS calculate_service_lexems_from_address_trg ON addresses;
 
 CREATE TRIGGER calculate_service_lexems_from_address_trg AFTER INSERT OR UPDATE
   ON addresses FOR EACH ROW EXECUTE PROCEDURE calculate_service_lexems_from_address();
+
+-- update service lexems by hand, may take long time ()
+-- SELECT calculate_service_lexems(id) FROM services;
