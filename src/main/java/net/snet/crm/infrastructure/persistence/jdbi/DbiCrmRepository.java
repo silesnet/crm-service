@@ -429,21 +429,13 @@ public class DbiCrmRepository implements CrmRepository
                 "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
                 "  LEFT JOIN dhcp_wireless AS d ON s.id = d.service_id\n" +
                 "  LEFT JOIN addresses AS ad ON s.address_id=ad.address_id,\n" +
-                "  prefix_query(:rawQuery) AS cquery,\n" +
                 "  address_query(:rawQuery) AS aquery,\n" +
-                "  normalize_text(:rawQuery) AS query\n" +
+                "  translate(lower(:rawQuery), '-:', '') AS mquery\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   " + isActiveRestriction + "\n" +
-                "AND (c.lexems @@ cquery \n" +
-                "  OR s.id\\:\\:text ~ query\n" +
-                "  OR lower(translate(p.interface, '-', '')) ~* query\n" +
-                "  OR lower(translate(d.interface, '-', '')) ~* query\n" +
-                "  OR lower(translate(p.location, '-', '')) ~* query\n" +
-                "  OR lower(translate(p.mac\\:\\:text, '\\:', '')) ~* query\n" +
-                "  OR lower(translate(d.mac\\:\\:text, '\\:', '')) ~* query\n" +
-                "  OR translate(phone, ' ', '') ~* query\n" +
-                "  OR (a.id % 100000)\\:\\:text ~ query\n" +
-                "  OR ad.lexems @@ aquery" +
+                "AND (s.lexems @@ aquery\n" +
+                "  OR lower(translate(p.mac\\:\\:text, '\\:', '')) ~* mquery\n" +
+                "  OR lower(translate(d.mac\\:\\:text, '\\:', '')) ~* mquery\n" +
                 ")\n" +
                 "\n" +
                 "UNION\n" +

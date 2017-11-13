@@ -102,5 +102,5 @@ DROP TRIGGER IF EXISTS calculate_service_lexems_from_address_trg ON addresses;
 CREATE TRIGGER calculate_service_lexems_from_address_trg AFTER INSERT OR UPDATE
   ON addresses FOR EACH ROW EXECUTE PROCEDURE calculate_service_lexems_from_address();
 
--- update service lexems by hand, may take long time ()
--- SELECT calculate_service_lexems(id) FROM services;
+-- update service lexems by hand, may take long time (40s on restarted pg server)
+-- SELECT calculate_service_lexems(id) FROM services order by id;
