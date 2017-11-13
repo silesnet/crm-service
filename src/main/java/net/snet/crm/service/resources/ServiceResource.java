@@ -38,9 +38,6 @@ public class ServiceResource
   private final TodoRepository todoRepository;
   private final AddressRepository addresses;
   private final PlaceRepository places;
-  private
-  @Context
-  UriInfo uriInfo;
 
   public ServiceResource(
       CrmRepository crmRepository,
@@ -161,6 +158,7 @@ public class ServiceResource
   {
     final Boolean isActive = resolveIsActive(isActiveValue);
     List<Map<String, Object>> services = crmRepository.findService(query.or(""), country.or(""), isActive);
+    logger.debug(uriInfo.getRequestUri().getQuery());
     return Response.ok(ImmutableMap.of(
         "services", services,
         "query", uriInfo.getRequestUri().getQuery()
@@ -188,7 +186,10 @@ public class ServiceResource
   @POST
   @Path("/{serviceId}/connections")
   @Timed(name = "post-request")
-  public Response insertConnection(@PathParam("serviceId") long serviceId, Optional<Map<String, Object>> connectionData)
+  public Response insertConnection(
+      @PathParam("serviceId") long serviceId,
+      Optional<Map<String, Object>> connectionData,
+      @Context UriInfo uriInfo)
   {
     logger.debug("inserting new connection for service id '{}'", serviceId);
     Map<String, Object> service = crmRepository.findServiceById(serviceId);
