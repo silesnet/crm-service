@@ -82,7 +82,7 @@ $$;
 
 DROP TRIGGER IF EXISTS calculate_service_lexems_from_dhcp_wireless_trg ON dhcp_wireless;
 
-CREATE TRIGGER calculate_service_lexems_from_pppoe_trg AFTER INSERT OR UPDATE
+CREATE TRIGGER calculate_service_lexems_from_dhcp_wireless_trg AFTER INSERT OR UPDATE
   ON dhcp_wireless FOR EACH ROW EXECUTE PROCEDURE calculate_service_lexems_from_dhcp_wireless();
 
 
