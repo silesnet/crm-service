@@ -15,13 +15,13 @@ BEGIN
     SELECT
        ss.id
        , to_tsvector(ss.id::text)
-       || c.lexems
-       || ad.lexems
-       || to_tsvector((a.id % 100000)::text)
-       || CASE WHEN p.interface IS NOT NULL THEN to_tsvector(p.interface) ELSE '' END
-       || CASE WHEN d.interface IS NOT NULL THEN to_tsvector(d.interface) ELSE '' END
-       || CASE WHEN p.location IS NOT NULL THEN to_tsvector(p.location) ELSE '' END
-       || CASE WHEN c.phone IS NOT NULL THEN to_tsvector(TRANSLATE(c.phone, ' ', '')) ELSE '' END
+         || CASE WHEN c.lexems IS NOT NULL THEN c.lexems ELSE '' END
+         || CASE WHEN ad.lexems IS NOT NULL THEN ad.lexems ELSE '' END
+         || to_tsvector((a.id % 100000)::text)
+         || CASE WHEN p.interface IS NOT NULL THEN to_tsvector(p.interface) ELSE '' END
+         || CASE WHEN d.interface IS NOT NULL THEN to_tsvector(d.interface) ELSE '' END
+         || CASE WHEN p.location IS NOT NULL THEN to_tsvector(p.location) ELSE '' END
+         || CASE WHEN c.phone IS NOT NULL THEN to_tsvector(TRANSLATE(c.phone, ' ', '')) ELSE '' END
        AS lexems
     FROM services AS ss
       INNER JOIN customers AS c ON ss.customer_id = c.id
@@ -33,6 +33,22 @@ BEGIN
   WHERE service_lexems.id=s.id AND s.id = service_id;
 END;
 $$;
+
+CREATE OR REPLACE FUNCTION calculate_service_lexems_from_service()
+RETURNS TRIGGER
+VOLATILE
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  EXECUTE 'SELECT calculate_service_lexems(s.id) FROM services s WHERE s.id = $1' USING NEW.id;
+  RETURN NEW;
+END
+$$;
+
+DROP TRIGGER IF EXISTS calculate_service_lexems_from_service_trg ON customers;
+
+CREATE TRIGGER calculate_service_lexems_from_service_trg AFTER INSERT OR UPDATE
+  ON customers FOR EACH ROW EXECUTE PROCEDURE calculate_service_lexems_from_service();
 
 
 CREATE OR REPLACE FUNCTION calculate_service_lexems_from_customer()
