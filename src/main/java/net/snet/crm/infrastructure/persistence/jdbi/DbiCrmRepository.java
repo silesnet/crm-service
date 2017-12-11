@@ -408,8 +408,8 @@ public class DbiCrmRepository implements CrmRepository
       {
         return handle.createQuery(
             "SELECT\n" +
-                "       a.id AS agreement_id\n" +
-                "       , a.id % 100000 AS agreement\n" +
+                "       (s.id / 100) AS agreement_id\n" +
+                "       , (s.id / 100) % 100000 AS agreement\n" +
                 "       , c.id AS customer_id\n" +
                 "       , c.name AS customer_name\n" +
                 "       , c.street\n" +
@@ -420,22 +420,18 @@ public class DbiCrmRepository implements CrmRepository
                 "       , s.download\n" +
                 "       , s.upload\n" +
                 "       , s.price\n" +
-                "       , ad.label AS address_label\n" +
+                "       , a.label AS address_label\n" +
                 "       , s.info AS service_info\n" +
                 "       , false AS is_draft\n" +
                 "FROM services AS s\n" +
                 "  INNER JOIN customers AS c ON s.customer_id = c.id\n" +
-                "  INNER JOIN agreements AS a ON s.id/100 = a.id\n" +
-                "  LEFT JOIN pppoe AS p ON s.id = p.service_id\n" +
-                "  LEFT JOIN dhcp_wireless AS d ON s.id = d.service_id\n" +
-                "  LEFT JOIN addresses AS ad ON s.address_id=ad.address_id,\n" +
+                "  LEFT JOIN addresses AS a ON s.address_id = a.address_id,\n" +
                 "  address_query(:rawQuery) AS aquery,\n" +
-                "  translate(lower(:rawQuery), '-:', '') AS mquery\n" +
+                "  to_tsquery(alphanumeric(:rawQuery) || ':*') AS oneword\n" +
                 "WHERE " + countryRestriction + "\n" +
                 "AND   " + isActiveRestriction + "\n" +
                 "AND (s.lexems @@ aquery\n" +
-                "  OR lower(translate(p.mac\\:\\:text, '\\:', '')) ~* mquery\n" +
-                "  OR lower(translate(d.mac\\:\\:text, '\\:', '')) ~* mquery\n" +
+                "  OR s.lexems @@ oneword\n" +
                 ")\n" +
                 "\n" +
                 "UNION\n" +
