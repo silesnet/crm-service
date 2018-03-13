@@ -106,7 +106,7 @@ public class Service implements Entity<Service, ServiceId> {
         .build()));
     props.put("addressId", data.get("address_id").asLongOr(null));
     props.put("placeId", data.get("place_id").asLongOr(null));
-    props.put("location", data.get("location").asStringValueOr(""));
+    props.put("location", data.get("location_flat").asStringValueOr(""));
     return Collections.unmodifiableMap(props);
   }
 
