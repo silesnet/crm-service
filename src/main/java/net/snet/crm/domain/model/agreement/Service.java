@@ -32,6 +32,7 @@ public class Service implements Entity<Service, ServiceId> {
           .put("data", "data")
           .put("addressId", "address_id")
           .put("placeId", "place_id")
+          .put("location", "location")
           .build();
 
   private static final Map<String, Object> RECORD_DEFAULTS =
@@ -105,6 +106,7 @@ public class Service implements Entity<Service, ServiceId> {
         .build()));
     props.put("addressId", data.get("address_id").asLongOr(null));
     props.put("placeId", data.get("place_id").asLongOr(null));
+    props.put("location", data.get("location").asStringValueOr(""));
     return Collections.unmodifiableMap(props);
   }
 
