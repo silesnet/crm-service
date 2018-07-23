@@ -66,6 +66,11 @@ public class DbiDraftRepository implements DraftRepository
     final String entityType = valueOf("entity_type", record, String.class);
     final String entitySpate = valueOf("entity_spate", record, String.class);
     logger.debug("entity type.spate: {}.{}", entityType, entitySpate);
+    final String entityName = valueOf("entity_name", record, String.class);
+    if (entityName != null && entityName.length() > 50)
+    {
+      record.put("entity_name", entityName.substring(0, 50));
+    }
     if (record.containsKey("data")) {
       record.put("data", toJson(record.get("data")));
     }
