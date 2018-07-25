@@ -1,51 +1,55 @@
 package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterators;
-import net.snet.crm.service.bo.Product;
-import net.snet.crm.service.dao.ProductDAO;
+import com.google.common.collect.ImmutableMap;
 import org.skife.jdbi.v2.DBI;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.tweak.HandleCallback;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import java.util.*;
+import javax.ws.rs.core.Response;
+import java.util.List;
+import java.util.Map;
 
 @Path("/products")
 public class ProductResource {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProductResource.class);
-
-  private ProductDAO productDAO;
+  private final DBI dbi;
 
   public ProductResource(DBI dbi) {
-    this.productDAO = dbi.onDemand(ProductDAO.class);
+    this.dbi = dbi;
   }
 
   @GET
   @Produces({"application/json; charset=UTF-8"})
   @Timed(name = "get-requests")
-  public Map<String, Object> getAllProducts(@QueryParam("country") final Optional<String> country) {
-    final HashMap<String, Object> productsMap = new HashMap<String, Object>();
-    Iterator<Product> productIterator = productDAO.allProducts();
-    List<Product> products = new ArrayList<Product>();
-    if (country.isPresent()) {
-      Iterators.addAll(products, Iterators.filter(productIterator, new Predicate<Product>() {
-        @Override
-        public boolean apply(Product product) {
-          return country.get().equals(product.getCountry());
-        }
-      }));
-    } else {
-      Iterators.addAll(products, productIterator);
-    }
-    productsMap.put("products", products);
-    return productsMap;
+  public Response getAllProducts(@QueryParam("country") final String country) {
+    return Response.ok(
+      ImmutableMap.of(
+        "products", fetchProductsByCountry(country)
+      )
+    ).build();
   }
+
+  private List<Map<String, Object>> fetchProductsByCountry(final String country)
+  {
+    return dbi.withHandle(new HandleCallback<List<Map<String, Object>>>()
+    {
+      @Override
+      public List<Map<String, Object>> withHandle(Handle handle) throws Exception
+      {
+        return handle.createQuery(
+          "SELECT id, name, price, channel, can_change_price FROM products WHERE country=:country " +
+            "AND now() BETWEEN active_from AND active_to ORDER BY position"
+         )
+        .bind("country", country)
+        .list();
+      }
+    });
+  }
+
 }
 
