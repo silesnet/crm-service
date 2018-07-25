@@ -27,20 +27,17 @@ public class Service implements Entity<Service, ServiceId> {
           .put("periodEnd", "period_to")
           .put("productName", "name")
           .put("chargingAmount", "price")
-          .put("connectionDownload", "download")
-          .put("connectionUpload", "upload")
           .put("data", "data")
           .put("addressId", "address_id")
           .put("placeId", "place_id")
           .put("location", "location")
+          .put("productId", "product_id")
           .build();
 
   private static final Map<String, Object> RECORD_DEFAULTS =
       ImmutableMap.<String, Object>builder()
           .put("additionalname", "")
           .put("frequency", 40)
-          .put("bps", "M")
-          .put("is_aggregated", false)
           .put("info", "")
           .build();
 
@@ -107,6 +104,7 @@ public class Service implements Entity<Service, ServiceId> {
     props.put("addressId", data.get("address_id").asLongOr(null));
     props.put("placeId", data.get("place_id").asLongOr(null));
     props.put("location", data.get("location_flat").asStringValueOr(""));
+    props.put("productId", data.get("product").asInteger());
     return Collections.unmodifiableMap(props);
   }
 

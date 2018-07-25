@@ -417,8 +417,6 @@ public class DbiCrmRepository implements CrmRepository
                 "       , c.info as customer_info\n" +
                 "       , s.id AS service_id\n" +
                 "       , s.name AS service_name\n" +
-                "       , s.download\n" +
-                "       , s.upload\n" +
                 "       , s.price\n" +
                 "       , a.label AS address_label\n" +
                 "       , s.info AS service_info\n" +
@@ -446,8 +444,6 @@ public class DbiCrmRepository implements CrmRepository
                 "     , d.customer_info\n" +
                 "     , d.service_id\n" +
                 "     , d.service_name\n" +
-                "     , d.service_download\n" +
-                "     , d.service_upload\n" +
                 "     , d.service_price\n" +
                 "     , '' AS address_label\n" +
                 "     , '' AS service_info\n" +
