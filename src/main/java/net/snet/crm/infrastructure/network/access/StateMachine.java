@@ -13,7 +13,16 @@ public class StateMachine
 
   public Transitions transitionOf(States state, Events event) {
     log.debug("resolving transition for '{}.{}'", state, event);
-    if (None == state) {
+    if (NoneCreated == state) {
+      switch (event) {
+        case Created: return NULL;
+        case PppoeConfigured: return NoneToPppoe;
+        case DhcpConfigured: return NoneToDhcp;
+        case DhcpWirelessConfigured: return NoneToDhcpWireless;
+        case StaticConfigured: return NULL;
+        case Deleted: return NULL;
+      }
+    } else if (None == state) {
       switch (event) {
         case Created: return NULL;
         case PppoeConfigured: return NoneToPppoe;

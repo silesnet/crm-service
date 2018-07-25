@@ -27,6 +27,9 @@ public class Access
 
   private States resolveState() {
     if (draft.optStringOf("data.product_name", "").length() == 0) {
+      return NoneCreated;
+    }
+    if ("none".equals(draft.optStringOf("data.product_channel", ""))) {
       return None;
     }
     if (draft.optIntOf("data.config", -1) == 2) {
@@ -46,7 +49,7 @@ public class Access
 
   private Events resolveEvent() {
     switch (state) {
-      case None:
+      case NoneCreated:
         return Created;
       case Pppoe:
         return PppoeConfigured;
@@ -56,6 +59,8 @@ public class Access
         return DhcpWirelessConfigured;
       case Static:
         return StaticConfigured;
+      case None:
+        return Deleted;
     }
     return Deleted;
   }
