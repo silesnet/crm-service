@@ -32,6 +32,7 @@ public class Service implements Entity<Service, ServiceId> {
           .put("placeId", "place_id")
           .put("location", "location")
           .put("productId", "product_id")
+          .put("additionalName", "additionalname")
           .build();
 
   private static final Map<String, Object> RECORD_DEFAULTS =
@@ -105,6 +106,7 @@ public class Service implements Entity<Service, ServiceId> {
     props.put("placeId", data.get("place_id").asLongOr(null));
     props.put("location", data.get("location_flat").asStringValueOr(""));
     props.put("productId", data.get("product").asInteger());
+    props.put("additionalName", data.get("additional_name").asStringValueOr(""));
     return Collections.unmodifiableMap(props);
   }
 
@@ -131,8 +133,8 @@ public class Service implements Entity<Service, ServiceId> {
 
   private Map<String, Object> recordFromProps() {
     final Map<String, Object> record = Maps.newLinkedHashMap();
-    record.putAll(recordOf(props, PROP_NAMES));
     record.putAll(RECORD_DEFAULTS);
+    record.putAll(recordOf(props, PROP_NAMES));
     return Collections.unmodifiableMap(record);
   }
 
