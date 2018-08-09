@@ -97,8 +97,6 @@ public class Service implements Entity<Service, ServiceId> {
     props.put("periodEnd", null);
     props.put("productName", data.get("product_name").toString());
     props.put("chargingAmount", data.get("price").asIntegerOr(0));
-    props.put("connectionDownload", data.get("downlink").asIntegerOr(null));
-    props.put("connectionUpload", data.get("uplink").asIntegerOr(null));
     props.put("data", mapToJson(ImmutableMap.<String, Object>builder()
         .put("devices", devices(data))
         .build()));
