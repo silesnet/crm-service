@@ -1,16 +1,15 @@
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'shadow'
 apply plugin: 'idea'
+apply plugin: "com.github.johnrengelman.shadow"
 
 version = '0.1.0'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
-tasks.withType(Compile) {
-	options.encoding = 'UTF-8'
-}
+compileJava.options.encoding = "UTF-8"
+compileTestJava.options.encoding = "UTF-8"
 
 mainClassName = 'net.snet.crm.CrmService'
 
@@ -43,10 +42,6 @@ repositories {
   mavenCentral()
 }
 
-task wrapper(type: Wrapper) {
-  gradleVersion = '1.9'
-}
-
 run {
   args 'server', './src/dist/config/' + serviceConfig
 }
@@ -54,21 +49,21 @@ run {
 buildscript {
   repositories { jcenter() }
   dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:0.8'
+    classpath "com.github.jengelman.gradle.plugins:shadow:5.1.0"
   }
 }
 
-import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-
-shadow {
-  artifactAttached false
-  transformer(ServiceFileTransformer)
+shadowJar {
+  mergeServiceFiles()
   exclude 'META-INF/*.DSA'
   exclude 'META-INF/*.RSA'
-}
-
-jar {
+  classifier = null
   manifest {
     attributes 'Main-Class': mainClassName
   }
+}
+
+wrapper {
+    gradleVersion = '5.6.2'
+    distributionType = 'ALL'
 }
