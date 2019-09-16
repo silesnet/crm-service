@@ -6,7 +6,7 @@ database:
   driverClass: org.postgresql.Driver
   user: sisa
   password: sisa
-  url: jdbc:postgresql://localhost/crm-service
+  url: jdbc:postgresql://localhost/sis
 
 systemCommandHome: src/test/resources/commands
 
