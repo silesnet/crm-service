@@ -1,10 +1,9 @@
 package net.snet.crm.service.resources
 
 import ch.qos.logback.classic.Level
-import io.dropwizard.logging.LoggingFactory
+import io.dropwizard.logging.BootstrapLogging
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.crm.domain.shared.event.EventConstrain
-import net.snet.crm.domain.shared.event.EventId
 import net.snet.crm.domain.shared.event.EventLog
 import org.junit.ClassRule
 import spock.lang.Shared
@@ -22,7 +21,7 @@ class EventResourceTest extends Specification {
   ResourceTestRule testRule = ResourceTestRule.builder().addResource(eventResource).build()
 
   def setupSpec() {
-    LoggingFactory.bootstrap(Level.INFO)
+    BootstrapLogging.bootstrap(Level.INFO)
   }
 
   def "should parse query params for entity request"() {
@@ -30,11 +29,12 @@ class EventResourceTest extends Specification {
       def eventLog = Mock(EventLog)
       eventResource.eventLog = eventLog
     when:
-      testRule.client().resource('/events')
+      testRule.client().target('/events')
           .queryParam('pastEventId', '10')
           .queryParam('event', 'disconnected')
           .queryParam('entity', 'services')
           .queryParam('entityId', '103')
+          .request()
           .accept(MediaType.APPLICATION_JSON_TYPE)
           .get(Map.class)
     then:

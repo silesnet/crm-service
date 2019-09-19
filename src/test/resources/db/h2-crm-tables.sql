@@ -74,7 +74,10 @@ CREATE TABLE services (
     status TEXT NOT NULL DEFAULT 'ACTIVE',
     data TEXT NOT NULL DEFAULT '{}',
     address_id INTEGER,
-    place_id INTEGER
+    place_id INTEGER,
+    location VARCHAR(32),
+    dph boolean,
+    product_id integer
 );
 
 CREATE TABLE services_info (

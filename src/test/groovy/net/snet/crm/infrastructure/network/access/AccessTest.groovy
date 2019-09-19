@@ -12,7 +12,7 @@ class AccessTest extends Specification {
     def access = new Access(MapData.of(data))
     expect:
     access.state() == None
-    access.event() == Created
+    access.event() == Deleted
   }
 
   def "should return Pppoe state and event"() {
