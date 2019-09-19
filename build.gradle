@@ -54,11 +54,10 @@ buildscript {
 }
 
 shadowJar {
+  mergeServiceFiles()
   exclude 'META-INF/*.DSA'
   exclude 'META-INF/*.RSA'
-}
-
-jar {
+  classifier = null
   manifest {
     attributes 'Main-Class': mainClassName
   }
