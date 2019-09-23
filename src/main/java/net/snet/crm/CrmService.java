@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
-import com.sun.jersey.api.client.Client;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.client.JerseyClientBuilder;
@@ -35,11 +34,14 @@ import net.snet.crm.service.resources.modules.DataModule;
 import net.snet.crm.service.resources.modules.EventModule;
 import net.snet.crm.service.utils.JsonUtil;
 import net.snet.crm.service.utils.RuntimeExceptionMapper;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.config.Registry;
+import org.apache.http.config.RegistryBuilder;
+import org.apache.http.conn.socket.ConnectionSocketFactory;
+import org.apache.http.conn.socket.PlainConnectionSocketFactory;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
@@ -47,13 +49,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
+import javax.ws.rs.client.Client;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.EnumSet;
 
 public class CrmService extends Application<CrmConfiguration> {
@@ -101,7 +102,7 @@ public class CrmService extends Application<CrmConfiguration> {
     final Client httpClient =
         new JerseyClientBuilder(environment)
             .using(configuration.getHttpClientConfiguration())
-            .using(schemeRegistry())
+            .using(connectionRegistry())
             .using(environment)
             .build("crm-service-http-client");
 
@@ -150,23 +151,18 @@ public class CrmService extends Application<CrmConfiguration> {
     environment.lifecycle().manage(commandBroker);
   }
 
-  private SchemeRegistry schemeRegistry() throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
-    SSLSocketFactory socketFactory = new SSLSocketFactory(trustStrategy(), SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-    SchemeRegistry schemeRegistry = new SchemeRegistry();
-    schemeRegistry.register(new Scheme("http", 80, PlainSocketFactory.getSocketFactory()));
-    schemeRegistry.register(new Scheme("https", 443, socketFactory));
-    schemeRegistry.register(new Scheme("https", 8443, socketFactory));
-    return schemeRegistry;
+  private Registry<ConnectionSocketFactory> connectionRegistry() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+    final SSLConnectionSocketFactory sslConnectionSocketFactory = new SSLConnectionSocketFactory(
+        new SSLContextBuilder().loadTrustMaterial(null, trustStrategy()).build(),
+        NoopHostnameVerifier.INSTANCE
+    );
+    return RegistryBuilder.<ConnectionSocketFactory>create()
+        .register("http", PlainConnectionSocketFactory.getSocketFactory())
+        .register("https", sslConnectionSocketFactory)
+        .build();
   }
 
   private TrustStrategy trustStrategy() {
-    return new TrustStrategy() {
-      @Override
-      public boolean isTrusted(X509Certificate[] chain, String authType) throws CertificateException {
-        return true;
-      }
-    };
+    return (chain, authType) -> true;
   }
-
-
 }

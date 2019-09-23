@@ -1,7 +1,6 @@
 package net.snet.crm.infrastructure.addresses;
 
 import com.google.common.collect.ImmutableMap;
-import com.sun.jersey.api.client.Client;
 import net.snet.crm.domain.shared.data.Data;
 import net.snet.crm.domain.shared.data.MapData;
 import net.snet.crm.service.utils.Databases;
@@ -9,6 +8,7 @@ import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.tweak.HandleCallback;
 
+import javax.ws.rs.client.Client;
 import java.util.List;
 
 import static net.snet.crm.service.utils.Databases.findRecord;

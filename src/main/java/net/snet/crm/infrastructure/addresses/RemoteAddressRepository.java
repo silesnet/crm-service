@@ -2,11 +2,11 @@ package net.snet.crm.infrastructure.addresses;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import com.sun.jersey.api.client.Client;
 import net.snet.crm.domain.shared.data.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.List;
@@ -31,7 +31,7 @@ public class RemoteAddressRepository implements AddressRepository
     LOG.debug(queryUri.toString());
     try
     {
-      final String response = http.resource(queryUri).get(String.class);
+      final String response = http.target(queryUri).request().get(String.class);
       List addresses = new ObjectMapper().readValue(response, List.class);
       return addresses;
     } catch (Exception e)

@@ -2,11 +2,11 @@ package net.snet.crm.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
-import com.sun.jersey.api.client.Client;
 import net.snet.crm.domain.model.agreement.CrmRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.core.UriBuilder;
 import java.net.URI;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class DefaultUserService implements UserService
 	public Map<String, Object> authenticateUserBySessionId(String sessionId) {
 		final URI authUri = UriBuilder.fromUri(serviceUri).matrixParam("jsessionid", sessionId).build();
 		try {
-			final String response = httpClient.resource(authUri).get(String.class);
+			final String response = httpClient.target(authUri).request().get(String.class);
 			logger.debug("user service response '{}'", response);
 			Map rawUser = new ObjectMapper().readValue(response, Map.class);
 			Map<String, Object> user = crmRepository.findUserByLogin(rawUser.get("user").toString());

@@ -73,7 +73,7 @@ public class CustomerResource {
 		if (queryName.isPresent()) {
 			String query = queryName.get().toLowerCase();
 			logger.debug("querying customers for named query '{}'", query);
-			Iterator<Map<String, Object>> customers = Iterators.emptyIterator();
+			Iterator<Map<String, Object>> customers = Collections.emptyIterator();
 			Matcher ledgerMatcher = LEDGER_IMPORT.matcher(query);
 			if (ledgerMatcher.matches()) {
 				String ledgerCountry = ledgerMatcher.group(1);
