@@ -1,11 +1,13 @@
 package net.snet.crm.service.resources
 
-import com.sun.jersey.api.client.ClientResponse
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.crm.domain.model.agreement.CrmRepository
 import org.junit.ClassRule
 import spock.lang.Shared
 import spock.lang.Specification
+
+import javax.ws.rs.client.Entity
+import javax.ws.rs.core.MediaType
 
 
 class ServiceResourceTest extends Specification {
@@ -33,17 +35,18 @@ class ServiceResourceTest extends Specification {
       def query = 'cus'
       def country = 'cz'
     when:
-      def response = resources.client().resource('/services')
-            .queryParam('q', query)
-            .queryParam('country', 'cz')
-            .type('application/json')
-            .get(ClientResponse.class)
-      def services = response.getEntity(Map.class).services
+      def response = resources.client().target('/services')
+              .queryParam('q', query)
+              .queryParam('country', 'cz')
+              .request()
+              .accept('application/json')
+              .get()
+      def services = response.readEntity(Map.class).services
     then:
       1 * crmRepository.findService(query, country, null) >> [[id: 1, name: 'LAN1'], [id: 2, name: 'LAN2']]
     and:
       response.status == 200
-      response.type.toString().startsWith('application/json')
+      response.mediaType.toString().startsWith('application/json')
     and:
       services.size() == 2
     and:
@@ -57,9 +60,11 @@ class ServiceResourceTest extends Specification {
     given: 'new connection'
       def connectionData = [auth_type: 'PPPoE', auth_name: 'user', auth_value: 'password']
     when: 'inserting new connection'
-      def response = resources.client().resource('/services/100123401/connections').type('application/json')
-          .post(ClientResponse.class, [connections: connectionData])
-      def connection = response.getEntity(Map.class).connections
+      def response = resources.client().target('/services/100123401/connections')
+              .request()
+              .accept('application/json')
+              .post(Entity.entity([connections: connectionData], MediaType.APPLICATION_JSON))
+      def connection = response.readEntity(Map.class).connections
     then:
       1 * crmRepository.findServiceById(100123401) >> [id: 100123401]
       1 * crmRepository.insertConnection(100123401) >> [service_id: 100123401]
@@ -67,7 +72,7 @@ class ServiceResourceTest extends Specification {
     and: 'response has correct headers'
       response.status == 201
       response.location.toString() ==~ /.*\/connections\/\d+$/
-      response.type.toString().startsWith('application/json')
+      response.mediaType.toString().startsWith('application/json')
     and: 'connection is returned'
       connection.service_id == 100123401
       connection.auth_type == 'PPPoE'

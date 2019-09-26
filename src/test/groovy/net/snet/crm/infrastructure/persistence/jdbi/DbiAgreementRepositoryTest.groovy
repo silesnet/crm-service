@@ -26,10 +26,10 @@ class DbiAgreementRepositoryTest extends Specification {
   def 'should add service'() {
     given:
       def service = new Service(new Draft(ServiceTest.draftMap(ServiceTest.draftJson())))
-    when:
+      when:
       def added = repo.addService(service)
     then:
-      def row = handle.select('SELECT * FROM services WHERE id=:?', added.id().value()).first()
+      def row = handle.createQuery('SELECT * FROM services WHERE id=:id').bind('id', added.id().value()).asList().first()
       with(row) {
         id == service.id().value()
         period_from.time == service.props().periodStart.millis

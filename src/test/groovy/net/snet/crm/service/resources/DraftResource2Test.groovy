@@ -1,17 +1,17 @@
 package net.snet.crm.service.resources
 import ch.qos.logback.classic.Level
-import com.sun.jersey.api.client.ClientResponse
-import com.sun.jersey.api.client.PartialRequestBuilder
-import io.dropwizard.logging.LoggingFactory
+import io.dropwizard.logging.BootstrapLogging
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.crm.domain.model.network.NetworkRepository
 import net.snet.crm.domain.model.network.NetworkService
 import net.snet.crm.domain.model.draft.DraftRepository
+import org.glassfish.jersey.client.ClientResponse
 import org.junit.ClassRule
 import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 
+import javax.ws.rs.client.Entity
 import javax.ws.rs.core.MediaType
 
 class DraftResource2Test extends Specification {
@@ -28,7 +28,7 @@ class DraftResource2Test extends Specification {
   ResourceTestRule testRule = ResourceTestRule.builder().addResource(draftResource).build()
 
   def setupSpec() {
-    LoggingFactory.bootstrap(Level.DEBUG)
+    BootstrapLogging.bootstrap(Level.DEBUG)
   }
 
   @Ignore
@@ -88,7 +88,7 @@ class DraftResource2Test extends Specification {
         status == 201
         location.path.endsWith("${DRAFTS}/${CUSTOMER_DRAFT_ID}")
       }
-      res.getEntity(Map.class).drafts == createdCustomerDraft()
+      res.readEntity(Map.class).drafts == createdCustomerDraft()
   }
 
   String postCustomerDraft() {
@@ -138,13 +138,12 @@ class DraftResource2Test extends Specification {
     draftResource.networkService = service
   }
 
-  ClientResponse post(String path, String json) {
-    reqTo(path, json).post(ClientResponse.class)
+  def post(String path, String json) {
+    reqTo(path, json).post(Entity.entity(json, MediaType.APPLICATION_JSON))
   }
 
-  PartialRequestBuilder reqTo(String path, String jsonData) {
-    testRule.client().resource(path)
-        .entity(jsonData, MediaType.APPLICATION_JSON_TYPE)
+  def reqTo(String path, String jsonData) {
+    testRule.client().target(path).request()
         .accept(MediaType.APPLICATION_JSON_TYPE)
   }
 }

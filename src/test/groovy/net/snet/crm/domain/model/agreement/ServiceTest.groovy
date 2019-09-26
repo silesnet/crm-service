@@ -19,8 +19,6 @@ class ServiceTest extends Specification {
         stamp(periodEdn) == null
         productName == 'LanAccess'
         chargingAmount == 436
-        connectionDownload == 10
-        connectionUpload == 5
         data =~ /"devices"/
       }
   }
@@ -37,12 +35,9 @@ class ServiceTest extends Specification {
         name == 'LanAccess'
         price == 436
         frequency == 40
-        download == 10
-        upload == 5
         !is_aggregated
         info == ''
         additionalname == ''
-        bps == 'M'
         data =~ /"devices"/
       }
   }
