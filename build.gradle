@@ -60,6 +60,11 @@ buildscript {
   }
 }
 
+lombok{
+  config['lombok.anyConstructor.addConstructorProperties'] = 'true'
+  config['lombok.log.fieldName'] = 'LOGGER'
+}
+
 shadowJar {
   mergeServiceFiles()
   exclude 'META-INF/*.DSA'
