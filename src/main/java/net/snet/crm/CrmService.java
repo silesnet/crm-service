@@ -124,6 +124,7 @@ public class CrmService extends Application<CrmConfiguration> {
     final PlaceRepository placeRepository = new DbiPlaceRepository(dbi);
 
     final JerseyEnvironment jersey = environment.jersey();
+    jersey.register(new AuthResource(dbi));
     jersey.register(new CustomerResource(dbi, crmRepository));
     jersey.register(new ServiceResource(crmRepository, networkRepository, todoRepository, addressRepository, placeRepository));
     jersey.register(new NetworkResource(dbi, networkService));
