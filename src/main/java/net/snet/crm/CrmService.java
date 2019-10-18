@@ -95,9 +95,12 @@ public class CrmService extends Application<CrmConfiguration> {
     }
     JsonUtil.configure(mapper);
 
-    FilterRegistration.Dynamic filters = environment.servlets().addFilter("CORS", new CrossOriginFilter());
-    filters.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
-    filters.setInitParameter("allowedMethods", "GET,PUT,POST,DELETE");
+    FilterRegistration.Dynamic filter = environment.servlets().addFilter("CORS", CrossOriginFilter.class);
+    filter.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
+    filter.setInitParameter(CrossOriginFilter.ALLOWED_HEADERS_PARAM, "X-Requested-With,Content-Type,Accept,Origin,Authorization");
+    filter.setInitParameter(CrossOriginFilter.ALLOWED_METHODS_PARAM, "OPTIONS,GET,PUT,POST,DELETE,HEAD,PATCH");
+    filter.setInitParameter(CrossOriginFilter.ALLOW_CREDENTIALS_PARAM, "true");
+    filter.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST), true, "/*");
 
     final Client httpClient =
         new JerseyClientBuilder(environment)
