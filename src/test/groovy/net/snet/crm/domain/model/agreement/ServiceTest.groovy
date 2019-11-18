@@ -20,6 +20,7 @@ class ServiceTest extends Specification {
         productName == 'LanAccess'
         chargingAmount == 436
         data =~ /"devices"/
+        location == '7'
       }
   }
 
@@ -76,6 +77,7 @@ class ServiceTest extends Specification {
             "location_street" : "Školní 1073",
             "location_descriptive_number" : "",
             "location_orientation_number" : "",
+            "location_flat" : "7",
             "location_town" : "Mirošov 1",
             "location_postal_code" : "33843",
             "location_country" : "10",
