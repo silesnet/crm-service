@@ -419,6 +419,7 @@ public class DbiCrmRepository implements CrmRepository
                 "       , s.name AS service_name\n" +
                 "       , s.price\n" +
                 "       , a.label AS address_label\n" +
+                "       , s.location AS location\n" +
                 "       , s.info AS service_info\n" +
                 "       , false AS is_draft\n" +
                 "FROM services AS s\n" +
@@ -446,6 +447,7 @@ public class DbiCrmRepository implements CrmRepository
                 "     , d.service_name\n" +
                 "     , d.service_price\n" +
                 "     , '' AS address_label\n" +
+                "     , '' AS location\n" +
                 "     , '' AS service_info\n" +
                 "     , true AS is_draft\n" +
                 "FROM service_drafts AS d\n" +
