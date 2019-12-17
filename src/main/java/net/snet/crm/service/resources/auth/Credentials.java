@@ -1,8 +1,8 @@
 package net.snet.crm.service.resources.auth;
 
-import lombok.Data;
+import lombok.Value;
 
-@Data
+@Value
 public class Credentials
 {
     private final String sessionId;
