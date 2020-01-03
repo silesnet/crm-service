@@ -30,6 +30,7 @@ import net.snet.crm.infrastructure.system.SystemCommandFactory;
 import net.snet.crm.service.CommandBroker;
 import net.snet.crm.service.DefaultUserService;
 import net.snet.crm.service.resources.*;
+import net.snet.crm.service.resources.auth.AuthResource;
 import net.snet.crm.service.resources.modules.DataModule;
 import net.snet.crm.service.resources.modules.EventModule;
 import net.snet.crm.service.utils.JsonUtil;
