@@ -4,5 +4,5 @@ import lombok.Value;
 
 @Value
 public class AccessToken {
-  private final String value;
+  private final String accessToken;
 }
