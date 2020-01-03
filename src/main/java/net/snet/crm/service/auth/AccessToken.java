@@ -1,4 +1,4 @@
-package net.snet.crm.service.resources.auth;
+package net.snet.crm.service.auth;
 
 import lombok.Value;
 

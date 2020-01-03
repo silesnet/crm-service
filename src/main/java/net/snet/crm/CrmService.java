@@ -20,6 +20,8 @@ import net.snet.crm.domain.shared.event.EventLog;
 import net.snet.crm.infrastructure.addresses.DbiAddressRepository;
 import net.snet.crm.infrastructure.addresses.DbiPlaceRepository;
 import net.snet.crm.infrastructure.addresses.PlaceRepository;
+import net.snet.crm.infrastructure.auth.DefaultAuthenticationService;
+import net.snet.crm.infrastructure.auth.HttpUserService;
 import net.snet.crm.infrastructure.command.DefaultTaskFactory;
 import net.snet.crm.infrastructure.command.TaskFactory;
 import net.snet.crm.infrastructure.messaging.SmtpMessagingService;
@@ -29,8 +31,9 @@ import net.snet.crm.infrastructure.system.FileSystemCommandFactory;
 import net.snet.crm.infrastructure.system.SystemCommandFactory;
 import net.snet.crm.service.CommandBroker;
 import net.snet.crm.service.DefaultUserService;
+import net.snet.crm.service.UserService;
 import net.snet.crm.service.resources.*;
-import net.snet.crm.service.resources.auth.AuthResource;
+import net.snet.crm.service.resources.auth.AuthenticationResource;
 import net.snet.crm.service.resources.modules.DataModule;
 import net.snet.crm.service.resources.modules.EventModule;
 import net.snet.crm.service.utils.JsonUtil;
@@ -126,14 +129,14 @@ public class CrmService extends Application<CrmConfiguration> {
     final SmtpMessagingService messagingService = new SmtpMessagingService(configuration.getSmsMessaging());
     final DbiAddressRepository addressRepository = new DbiAddressRepository(dbi, httpClient, configuration.getAddressServiceUri());
     final PlaceRepository placeRepository = new DbiPlaceRepository(dbi);
+    final UserService userService = new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository);
 
     final JerseyEnvironment jersey = environment.jersey();
-    jersey.register(new AuthResource(dbi));
+    jersey.register(new AuthenticationResource(new DefaultAuthenticationService(new HttpUserService(httpClient, configuration.getUserServiceUri()))));
     jersey.register(new CustomerResource(dbi, crmRepository));
     jersey.register(new ServiceResource(crmRepository, networkRepository, todoRepository, addressRepository, placeRepository));
     jersey.register(new NetworkResource(dbi, networkService));
-    jersey.register(new UserResource(dbi, crmRepository,
-        new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository)));
+    jersey.register(new UserResource(dbi, crmRepository, userService));
     jersey.register(new ProductResource(dbi));
     jersey.register(new DraftResource2(
         draftRepository,

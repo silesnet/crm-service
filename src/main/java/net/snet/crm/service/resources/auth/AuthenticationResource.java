@@ -1,9 +1,9 @@
 package net.snet.crm.service.resources.auth;
 
-import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
-import net.snet.crm.service.resources.auth.Credentials;
-import org.skife.jdbi.v2.DBI;
+import net.snet.crm.service.auth.AccessToken;
+import net.snet.crm.service.auth.SessionId;
+import net.snet.crm.service.auth.AuthenticationService;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -14,18 +14,23 @@ import javax.ws.rs.core.Response;
 @Path("/api")
 @Produces({"application/json; charset=UTF-8"})
 @Slf4j
-public class AuthResource {
-  private final DBI dbi;
+public class AuthenticationResource {
+  private final AuthenticationService authenticationService;
 
-  public AuthResource(final DBI dbi) {
-    this.dbi = dbi;
+  public AuthenticationResource(AuthenticationService authenticationService) {
+    this.authenticationService = authenticationService;
   }
 
   @POST
   @Path("/auth/token")
   public Response authenticationToken(final Credentials credentials) {
     LOGGER.info("Authenticating by '{}'", credentials);
-    return Response.ok().entity(new AccessToken("123456789")).build();
+    try {
+      final AccessToken accessToken = authenticationService.authenticate(new SessionId(credentials.getSessionId()));
+      return Response.ok().entity(accessToken).build();
+    } catch (Exception exception) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
   }
 
   @GET
@@ -35,4 +40,5 @@ public class AuthResource {
     UserSession userSession = new UserSession("ikaleta", "Ivo Kaleta", "CZ", new String[]{"ROLE_USER"});
     return Response.ok().entity(userSession).build();
   }
+
 }
