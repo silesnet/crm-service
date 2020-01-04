@@ -23,11 +23,10 @@ public class HttpUserService implements UserService {
 
   @Override
   public AuthenticatedUser authenticate(SessionId sessionId) {
-    final URI authUri = UriBuilder.fromUri(serviceUri).matrixParam("jsessionid", sessionId).build();
+    final URI authUri = UriBuilder.fromUri(serviceUri).matrixParam("jsessionid", sessionId.getValue()).build();
     LOGGER.debug("authentication URI '{}'", authUri);
     try {
       final String response = httpClient.target(authUri).request().get(String.class);
-      LOGGER.debug("user service response '{}'", response);
       Map principal = mapper.readValue(response, Map.class);
       return authenticatedUser(principal);
     } catch (Exception e) {
