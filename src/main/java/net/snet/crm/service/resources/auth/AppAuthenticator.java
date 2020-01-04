@@ -19,10 +19,8 @@ public class AppAuthenticator implements Authenticator<String, AuthenticatedUser
 
   @Override
   public Optional<AuthenticatedUser> authenticate(String credentials) throws AuthenticationException {
-    LOGGER.debug("Authenticating by '{}'", credentials);
     try {
       AuthenticatedUser user = authenticationService.authenticate(new AccessToken(credentials));
-      LOGGER.debug("Authenticated user '{}'", user);
       return Optional.of(user);
     } catch (Exception exception) {
       return Optional.empty();

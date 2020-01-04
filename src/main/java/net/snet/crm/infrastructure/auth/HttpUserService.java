@@ -30,7 +30,6 @@ public class HttpUserService implements UserService {
       Map principal = mapper.readValue(response, Map.class);
       return authenticatedUser(principal);
     } catch (Exception e) {
-      LOGGER.error(e.getMessage());
       throw new AuthenticationException(e);
     }
   }

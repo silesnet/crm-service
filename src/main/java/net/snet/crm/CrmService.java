@@ -151,6 +151,7 @@ public class CrmService extends Application<CrmConfiguration> {
           .buildAuthFilter()
     ));
     jersey.register(RolesAllowedDynamicFeature.class);
+    jersey.register(new AuthValueFactoryProvider.Binder<>(AuthenticatedUser.class));
     jersey.register(new AuthenticationResource(authenticationService, crmRepository));
 
     jersey.register(new CustomerResource(dbi, crmRepository));

@@ -10,8 +10,6 @@ import net.snet.crm.service.auth.SessionId;
 import net.snet.crm.service.auth.AuthenticationService;
 
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.util.Map;
 
@@ -30,10 +28,8 @@ public class AuthenticationResource {
   @POST
   @Path("/auth/token")
   public Response authenticationToken(final Credentials credentials) {
-    LOGGER.info("Authenticating by '{}'", credentials);
     try {
       final AccessToken accessToken = authenticationService.authenticate(new SessionId(credentials.getSessionId()));
-      LOGGER.debug("Authenticated with token '{}'", accessToken.getAccessToken());
       return Response.ok().entity(accessToken).build();
     } catch (Exception exception) {
       throw new NotAuthorizedException("authentication failed");
@@ -43,7 +39,6 @@ public class AuthenticationResource {
   @GET
   @Path("/users/session")
   public Response userSession(@Auth final AuthenticatedUser user) {
-    LOGGER.debug("User session for '{}'", user);
     Map<String, Object> userInfo = crmRepository.findUserByLogin(user.getLogin());
     UserSession userSession = new UserSession(
         userInfo.get("login").toString(),
