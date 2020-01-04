@@ -33,6 +33,7 @@ public class AuthenticationResource {
     LOGGER.info("Authenticating by '{}'", credentials);
     try {
       final AccessToken accessToken = authenticationService.authenticate(new SessionId(credentials.getSessionId()));
+      LOGGER.debug("Authenticated with token '{}'", accessToken.getAccessToken());
       return Response.ok().entity(accessToken).build();
     } catch (Exception exception) {
       throw new NotAuthorizedException("authentication failed");
