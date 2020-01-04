@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.google.common.cache.CacheBuilder;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.auth.*;
+import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
@@ -32,7 +35,11 @@ import net.snet.crm.infrastructure.system.SystemCommandFactory;
 import net.snet.crm.service.CommandBroker;
 import net.snet.crm.service.DefaultUserService;
 import net.snet.crm.service.UserService;
+import net.snet.crm.service.auth.AuthenticatedUser;
+import net.snet.crm.service.auth.AuthenticationService;
 import net.snet.crm.service.resources.*;
+import net.snet.crm.service.resources.auth.AppAuthenticator;
+import net.snet.crm.service.resources.auth.AppAuthorizer;
 import net.snet.crm.service.resources.auth.AuthenticationResource;
 import net.snet.crm.service.resources.modules.DataModule;
 import net.snet.crm.service.resources.modules.EventModule;
@@ -47,6 +54,7 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,6 +68,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 
 public class CrmService extends Application<CrmConfiguration> {
   private static final Logger LOG = LoggerFactory.getLogger(CrmService.class);
@@ -132,9 +141,18 @@ public class CrmService extends Application<CrmConfiguration> {
     final UserService userService = new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository);
 
     final JerseyEnvironment jersey = environment.jersey();
-    jersey.register(new AuthenticationResource(
-        new DefaultAuthenticationService(new HttpUserService(httpClient, configuration.getUserServiceUri())),
-        crmRepository));
+
+    final AuthenticationService authenticationService = new DefaultAuthenticationService(new HttpUserService(httpClient, configuration.getUserServiceUri()));
+    jersey.register(new AuthDynamicFeature(
+        new OAuthCredentialAuthFilter.Builder<AuthenticatedUser>()
+          .setAuthenticator(authenticator(environment, authenticationService))
+          .setAuthorizer(authorizer(environment))
+          .setPrefix("Bearer")
+          .buildAuthFilter()
+    ));
+    jersey.register(RolesAllowedDynamicFeature.class);
+    jersey.register(new AuthenticationResource(authenticationService, crmRepository));
+
     jersey.register(new CustomerResource(dbi, crmRepository));
     jersey.register(new ServiceResource(crmRepository, networkRepository, todoRepository, addressRepository, placeRepository));
     jersey.register(new NetworkResource(dbi, networkService));
@@ -159,6 +177,27 @@ public class CrmService extends Application<CrmConfiguration> {
     final TaskFactory taskFactory = new DefaultTaskFactory(dbi, networkService, eventLog);
     final CommandBroker commandBroker = new CommandBroker(commandQueue, taskFactory);
     environment.lifecycle().manage(commandBroker);
+  }
+
+  private Authorizer<AuthenticatedUser> authorizer(Environment environment) {
+    return new CachingAuthorizer<>(
+          environment.metrics(),
+          new AppAuthorizer(),
+          CacheBuilder.newBuilder()
+            .maximumSize(20)
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+      );
+  }
+
+  private Authenticator<String, AuthenticatedUser> authenticator(Environment environment, AuthenticationService authenticationService) {
+    final AppAuthenticator authenticator = new AppAuthenticator(authenticationService);
+    return new CachingAuthenticator<>(
+        environment.metrics(),
+        authenticator,
+        CacheBuilder.newBuilder()
+          .maximumSize(20)
+          .expireAfterAccess(10, TimeUnit.MINUTES)
+    );
   }
 
   private Registry<ConnectionSocketFactory> connectionRegistry() throws NoSuchAlgorithmException, KeyStoreException, KeyManagementException {

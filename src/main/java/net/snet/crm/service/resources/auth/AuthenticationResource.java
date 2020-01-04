@@ -1,5 +1,6 @@
 package net.snet.crm.service.resources.auth;
 
+import io.dropwizard.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
 import net.snet.crm.domain.model.agreement.CrmRepository;
 import net.snet.crm.infrastructure.persistence.jdbi.DbiCrmRepository;
@@ -43,22 +44,15 @@ public class AuthenticationResource {
 
   @GET
   @Path("/users/session")
-  public Response userSession(@Context final HttpHeaders headers) {
-    try {
-      final AccessToken accessToken = new AccessToken(headers.getHeaderString("authorization").split(" ")[1]);
-      LOGGER.info("Getting user session by access token '{}'", accessToken);
-      AuthenticatedUser authenticatedUser = authenticationService.authenticate(accessToken);
-      Map<String, Object> userInfo = crmRepository.findUserByLogin(authenticatedUser.getLogin());
-      UserSession userSession = new UserSession(
-          userInfo.get("login").toString(),
-          userInfo.get("full_name").toString(),
-          userInfo.get("operation_country").toString(),
-          userInfo.get("roles").toString().split(",\\s*")
-      );
-      return Response.ok().entity(userSession).build();
-    } catch (Exception exception) {
-      return Response.status(Response.Status.FORBIDDEN).build();
-    }
+  public Response userSession(@Auth final AuthenticatedUser user) {
+    Map<String, Object> userInfo = crmRepository.findUserByLogin(user.getLogin());
+    UserSession userSession = new UserSession(
+        userInfo.get("login").toString(),
+        userInfo.get("full_name").toString(),
+        userInfo.get("operation_country").toString(),
+        userInfo.get("roles").toString().split(",\\s*")
+    );
+    return Response.ok().entity(userSession).build();
   }
 
 }
