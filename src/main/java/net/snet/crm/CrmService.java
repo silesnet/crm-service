@@ -132,7 +132,9 @@ public class CrmService extends Application<CrmConfiguration> {
     final UserService userService = new DefaultUserService(httpClient, configuration.getUserServiceUri(), crmRepository);
 
     final JerseyEnvironment jersey = environment.jersey();
-    jersey.register(new AuthenticationResource(new DefaultAuthenticationService(new HttpUserService(httpClient, configuration.getUserServiceUri()))));
+    jersey.register(new AuthenticationResource(
+        new DefaultAuthenticationService(new HttpUserService(httpClient, configuration.getUserServiceUri())),
+        crmRepository));
     jersey.register(new CustomerResource(dbi, crmRepository));
     jersey.register(new ServiceResource(crmRepository, networkRepository, todoRepository, addressRepository, placeRepository));
     jersey.register(new NetworkResource(dbi, networkService));
