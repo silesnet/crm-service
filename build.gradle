@@ -19,6 +19,7 @@ mainClassName = 'net.snet.crm.CrmService'
 project.ext {
   dropwizardVersion = '1.3.14'
   jooqVersion = '3.12.3'
+  dropwizardJooqVersion = '1.3.5-1'
   lombokVersion = '1.18.10'
   jpaVersion = '2.2.0'
   serviceConfig = 'crm-service-dev.yml'
@@ -31,6 +32,7 @@ dependencies {
   compile "io.dropwizard:dropwizard-jdbi:$dropwizardVersion"
   compile "io.dropwizard:dropwizard-migrations:$dropwizardVersion"
   compile "io.dropwizard:dropwizard-assets:$dropwizardVersion"
+  compile "com.bendb.dropwizard:dropwizard-jooq:$dropwizardJooqVersion"
   compile "org.projectlombok:lombok:$lombokVersion"
   compile "org.jooq:jooq:$jooqVersion"
   compile "org.eclipse.persistence:javax.persistence:$jpaVersion"

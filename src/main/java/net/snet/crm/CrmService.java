@@ -1,5 +1,7 @@
 package net.snet.crm;
 
+import com.bendb.dropwizard.jooq.JooqBundle;
+import com.bendb.dropwizard.jooq.JooqFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
@@ -11,6 +13,7 @@ import io.dropwizard.auth.*;
 import io.dropwizard.auth.oauth.OAuthCredentialAuthFilter;
 import io.dropwizard.client.JerseyClientBuilder;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.db.PooledDataSourceFactory;
 import io.dropwizard.jdbi.DBIFactory;
 import io.dropwizard.jersey.setup.JerseyEnvironment;
 import io.dropwizard.migrations.MigrationsBundle;
@@ -55,6 +58,8 @@ import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.skife.jdbi.v2.DBI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +77,8 @@ import java.util.concurrent.TimeUnit;
 
 public class CrmService extends Application<CrmConfiguration> {
   private static final Logger LOG = LoggerFactory.getLogger(CrmService.class);
+
+  private JooqBundle<CrmConfiguration> jooqBundle;
 
   public static void main(String[] args) throws Exception {
     new CrmService().run(args);
@@ -95,11 +102,24 @@ public class CrmService extends Application<CrmConfiguration> {
       }
     });
     bootstrap.addBundle(new AssetsBundle("/favicon.ico"));
+    jooqBundle = new JooqBundle<CrmConfiguration>() {
+      @Override
+      public PooledDataSourceFactory getDataSourceFactory(CrmConfiguration configuration) {
+        return configuration.getDataSourceFactory();
+      }
+      @Override
+      public JooqFactory getJooqFactory(CrmConfiguration configuration) {
+        return configuration.getJooq();
+      }
+    };
+    bootstrap.addBundle(jooqBundle);
   }
 
   @Override
   public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, URISyntaxException {
     LOG.info("Starting CRM service...");
+    DSLContext dslContext = DSL.using(jooqBundle.getConfiguration());
+    LOG.debug("DSL context: '{}'", dslContext);
     final DBIFactory dbiFactory = new DBIFactory();
     final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
     final ObjectMapper mapper = environment.getObjectMapper();

@@ -1,7 +1,7 @@
 package net.snet.crm;
 
+import com.bendb.dropwizard.jooq.JooqFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 import io.dropwizard.Configuration;
@@ -14,7 +14,6 @@ import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Arrays;
 
 import static java.lang.System.getProperty;
 import static java.lang.System.getenv;
@@ -30,6 +29,11 @@ public class CrmConfiguration extends Configuration {
 	@NotNull
 	@JsonProperty
 	private DataSourceFactory database = new DataSourceFactory();
+
+	@Valid
+	@NotNull
+	@JsonProperty
+	private JooqFactory jooq = new JooqFactory();
 
 	@Valid
 	@JsonProperty
@@ -62,6 +66,10 @@ public class CrmConfiguration extends Configuration {
 
 	public DataSourceFactory getDataSourceFactory() {
 		return database;
+	}
+
+	public JooqFactory getJooq() {
+		return jooq;
 	}
 
 	public JerseyClientConfiguration getHttpClientConfiguration() {
