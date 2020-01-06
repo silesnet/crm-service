@@ -8,6 +8,11 @@ database:
   password: sisa
   url: jdbc:postgresql://localhost/sis
 
+jooq:
+  logExecutedSql: true
+  renderSchema: false
+  renderNameStyle: LOWER
+
 systemCommandHome: src/test/resources/commands
 
 version: 14.4.1-326+388872d
