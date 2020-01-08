@@ -21,8 +21,10 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.snet.crm.domain.model.agreement.AgreementRepository;
 import net.snet.crm.domain.model.network.NetworkService;
+import net.snet.crm.domain.shared.auth.UserRepository;
 import net.snet.crm.domain.shared.command.CommandQueue;
 import net.snet.crm.domain.shared.event.EventLog;
+import net.snet.crm.infra.data.JooqUserRepository;
 import net.snet.crm.infrastructure.addresses.DbiAddressRepository;
 import net.snet.crm.infrastructure.addresses.DbiPlaceRepository;
 import net.snet.crm.infrastructure.addresses.PlaceRepository;
@@ -119,7 +121,7 @@ public class CrmService extends Application<CrmConfiguration> {
   public void run(CrmConfiguration configuration, Environment environment) throws ClassNotFoundException, UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException, URISyntaxException {
     LOG.info("Starting CRM service...");
     DSLContext dslContext = DSL.using(jooqBundle.getConfiguration());
-    LOG.debug("DSL context: '{}'", dslContext);
+    final UserRepository userRepository = new JooqUserRepository(dslContext);
     final DBIFactory dbiFactory = new DBIFactory();
     final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
     final ObjectMapper mapper = environment.getObjectMapper();
@@ -172,7 +174,7 @@ public class CrmService extends Application<CrmConfiguration> {
     ));
     jersey.register(RolesAllowedDynamicFeature.class);
     jersey.register(new AuthValueFactoryProvider.Binder<>(AuthenticatedUser.class));
-    jersey.register(new AuthenticationResource(authenticationService, crmRepository));
+    jersey.register(new AuthenticationResource(authenticationService, userRepository));
 
     jersey.register(new CustomerResource(dbi, crmRepository));
     jersey.register(new ServiceResource(crmRepository, networkRepository, todoRepository, addressRepository, placeRepository));
