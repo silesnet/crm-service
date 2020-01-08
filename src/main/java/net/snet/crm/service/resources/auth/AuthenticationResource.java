@@ -9,6 +9,7 @@ import net.snet.crm.service.auth.AuthenticatedUser;
 import net.snet.crm.service.auth.SessionId;
 import net.snet.crm.service.auth.AuthenticationService;
 
+import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class AuthenticationResource {
 
   @GET
   @Path("/users/session")
+  @PermitAll
   public Response userSession(@Auth final AuthenticatedUser user) {
     Map<String, Object> userInfo = crmRepository.findUserByLogin(user.getLogin());
     UserSession userSession = new UserSession(
