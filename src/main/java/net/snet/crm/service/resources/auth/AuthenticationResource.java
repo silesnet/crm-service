@@ -2,17 +2,15 @@ package net.snet.crm.service.resources.auth;
 
 import io.dropwizard.auth.Auth;
 import lombok.extern.slf4j.Slf4j;
-import net.snet.crm.domain.shared.auth.User;
 import net.snet.crm.domain.shared.auth.UserRepository;
 import net.snet.crm.service.auth.AccessToken;
 import net.snet.crm.service.auth.AuthenticatedUser;
-import net.snet.crm.service.auth.SessionId;
 import net.snet.crm.service.auth.AuthenticationService;
+import net.snet.crm.service.auth.SessionId;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.Optional;
 
 @Path("/api")
 @Produces({"application/json; charset=UTF-8"})
@@ -41,9 +39,11 @@ public class AuthenticationResource {
   @Path("/users/session")
   @PermitAll
   public Response userSession(@Auth final AuthenticatedUser principal) {
-    final Optional<User> user = userRepository.fetchByLogin(principal.getLogin());
-    user.orElseThrow(() -> new RuntimeException("user not found: '" + principal.getLogin() + "'"));
-    return Response.ok().entity(user.map(UserSession::new)).build();
+    return Response.ok().entity(
+        userRepository.fetchByLogin(principal.getLogin())
+            .map(UserSession::new)
+            .orElseThrow(() -> new RuntimeException("user not found: '" + principal.getLogin() + "'"))
+    ).build();
   }
 
 }
