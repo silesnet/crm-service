@@ -7,6 +7,7 @@ package net.snet.crm.infra.db.jooq;
 import javax.annotation.Generated;
 
 import net.snet.crm.infra.db.jooq.tables.Customers;
+import net.snet.crm.infra.db.jooq.tables.NetworkNodesView;
 import net.snet.crm.infra.db.jooq.tables.Services;
 import net.snet.crm.infra.db.jooq.tables.Users;
 
@@ -28,6 +29,11 @@ public class Tables {
      * The table <code>public.customers</code>.
      */
     public static final Customers CUSTOMERS = Customers.CUSTOMERS;
+
+    /**
+     * The table <code>public.network_nodes_view</code>.
+     */
+    public static final NetworkNodesView NETWORK_NODES_VIEW = NetworkNodesView.NETWORK_NODES_VIEW;
 
     /**
      * The table <code>public.services</code>.
