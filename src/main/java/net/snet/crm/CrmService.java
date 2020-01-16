@@ -50,6 +50,8 @@ import net.snet.crm.service.resources.modules.DataModule;
 import net.snet.crm.service.resources.modules.EventModule;
 import net.snet.crm.service.utils.JsonUtil;
 import net.snet.crm.service.utils.RuntimeExceptionMapper;
+import net.snet.network.NetworkComponent;
+import net.snet.network.NetworkComponentImpl;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -122,6 +124,7 @@ public class CrmService extends Application<CrmConfiguration> {
     LOG.info("Starting CRM service...");
     DSLContext dslContext = DSL.using(jooqBundle.getConfiguration());
     final UserRepository userRepository = new JooqUserRepository(dslContext);
+    final NetworkComponent networkComponent = new NetworkComponentImpl(dslContext);
     final DBIFactory dbiFactory = new DBIFactory();
     final DBI dbi = dbiFactory.build(environment, configuration.getDataSourceFactory(), "postgresql");
     final ObjectMapper mapper = environment.getObjectMapper();
@@ -195,6 +198,7 @@ public class CrmService extends Application<CrmConfiguration> {
     jersey.register(new AdminResource(configuration.getVersion()));
     jersey.register(new AddressResource(addressRepository));
     jersey.register(new PlaceResource(placeRepository));
+    jersey.register(new net.snet.api.NetworkResource(networkComponent));
     jersey.register(new RuntimeExceptionMapper());
 
     final TaskFactory taskFactory = new DefaultTaskFactory(dbi, networkService, eventLog);
