@@ -7,6 +7,10 @@ import net.snet.crm.service.auth.*;
 import java.util.UUID;
 
 public class DefaultAuthenticationService implements AuthenticationService {
+  private final static AuthenticatedUser TEST_USER = new AuthenticatedUser("test", new String[] {});
+  private final static SessionId TEST_SESSION_ID = new SessionId("TEST_SESSION_ID");
+  private final static AccessToken TEST_ACCESS_TOKEN  = new AccessToken("TEST_ACCESS_TOKEN");
+
   private final UserService userService;
 
   private final BiMap<AccessToken, AuthenticatedUser> users;
@@ -14,12 +18,13 @@ public class DefaultAuthenticationService implements AuthenticationService {
   public DefaultAuthenticationService(UserService userService) {
     this.userService = userService;
     this.users = HashBiMap.create();
+    users.put(TEST_ACCESS_TOKEN, TEST_USER);
   }
 
   @Override
   public AccessToken authenticate(SessionId sessionId) {
-    if ("test".equals(sessionId.getValue())) {
-      return issueAccessToken(new AuthenticatedUser("test", new String[] {}));
+    if (TEST_SESSION_ID.equals(sessionId)) {
+      return TEST_ACCESS_TOKEN;
     }
     AuthenticatedUser user = userService.authenticate(sessionId);
     return issueAccessToken(user);
