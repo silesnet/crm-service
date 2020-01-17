@@ -9,9 +9,11 @@ database:
   url: jdbc:postgresql://localhost/sis
 
 jooq:
-  logExecutedSql: true
+  executeLogging: true
   renderSchema: false
-  renderNameStyle: LOWER
+  renderNameStyle: QUOTED
+  renderFormatted: true
+  paramType: NAMED
 
 systemCommandHome: src/test/resources/commands
 
@@ -23,6 +25,7 @@ logging:
   level: WARN
   loggers:
     "net.snet": DEBUG
+    "org.jooq": DEBUG
   appenders:
     - type: console
       logFormat: "%d{yyyyMMdd HH:mm:ss.SSS} %5p %m%n"
