@@ -3,6 +3,7 @@ package net.snet.network;
 import lombok.extern.slf4j.Slf4j;
 import net.snet.crm.infra.db.jooq.tables.pojos.NetworkNodesView;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 
 import java.util.stream.Collectors;
 
@@ -20,7 +21,14 @@ class JooqNetworkRepository implements NetworkRepository {
   public Iterable<Node> findNodes(NodeQuery query) {
     LOGGER.debug("find nodes by '{}'", query);
     return db.select().from(NETWORK_NODES_VIEW)
-        .limit(10)
+        .where(DSL.condition("to_tsvector('english', {0}) @@ to_tsquery('english', {1})",
+            DSL.concat(NETWORK_NODES_VIEW.NAME,
+                DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.MASTER, ""),
+                DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.VENDOR, ""),
+                DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.LINKTO, ""),
+                DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.AREA, "")),
+            DSL.val(query.getValue() + ":*")))
+        .limit(100)
         .fetchInto(NetworkNodesView.class)
         .stream()
         .map(node -> new Node(
@@ -30,4 +38,5 @@ class JooqNetworkRepository implements NetworkRepository {
         ))
         .collect(Collectors.toList());
   }
+
 }
