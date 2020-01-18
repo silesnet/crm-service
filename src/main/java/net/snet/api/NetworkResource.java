@@ -1,5 +1,6 @@
 package net.snet.api;
 
+import com.google.common.collect.*;
 import io.dropwizard.auth.Auth;
 import net.snet.crm.service.auth.AuthenticatedUser;
 import net.snet.network.NetworkComponent;
@@ -12,6 +13,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Path("/api/networks")
 @PermitAll
@@ -28,6 +32,31 @@ public class NetworkResource {
   public Response findNodes(@QueryParam("q") String query, @Auth AuthenticatedUser principal) {
     final NodeQuery nodeQuery = new NodeQuery(query);
     final Iterable<Node> nodes = networkComponent.findNodes(nodeQuery);
-    return Response.ok().entity(nodes).build();
+    return Response.ok().entity(
+        ImmutableMap.of("data", mapIterable(nodes, this::toJsonApi))
+    ).build();
+  }
+
+  private <T, R> Iterable<R> mapIterable(Iterable<T> iterable, Function<T, R> fn) {
+    return Lists.newArrayList(iterable).stream()
+        .map(fn)
+        .collect(Collectors.toList());
+  }
+
+  private Map<String, Object> toJsonApi(Node node) {
+    LinkedHashMap<Object, Object> attributes = Maps.newLinkedHashMap();
+    attributes.put("name", node.getName());
+    attributes.put("master", node.getMaster());
+    attributes.put("area", node.getArea());
+    attributes.put("vendor", node.getVendor());
+    attributes.put("model", node.getModel());
+    attributes.put("linkTo", node.getLinkTo());
+    attributes.put("rstpNumRing", node.getRstpNumRing());
+    attributes.put("backupPath", node.getBackupPath());
+    return ImmutableMap.of(
+        "type", "nodes",
+        "id", node.getId(),
+        "attributes", attributes
+    );
   }
 }
