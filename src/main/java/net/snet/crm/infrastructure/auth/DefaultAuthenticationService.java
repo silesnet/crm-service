@@ -32,7 +32,9 @@ public class DefaultAuthenticationService implements AuthenticationService {
       return sessions.get(sessionId);
     }
     AuthenticatedUser user = userService.authenticate(sessionId);
-    return issueAccessToken(user);
+    AccessToken accessToken = issueAccessToken(user);
+    sessions.put(sessionId, accessToken);
+    return accessToken;
   }
 
   @Override
