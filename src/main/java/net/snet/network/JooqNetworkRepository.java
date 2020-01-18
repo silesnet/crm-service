@@ -32,9 +32,15 @@ class JooqNetworkRepository implements NetworkRepository {
         .fetchInto(NetworkNodesView.class)
         .stream()
         .map(node -> new Node(
+            node.getId(),
             node.getName(),
             node.getMaster(),
-            node.getArea()
+            node.getArea(),
+            node.getVendor(),
+            node.getModel(),
+            node.getLinkto(),
+            node.getRstpnumring(),
+            node.getBackuppath()
         ))
         .collect(Collectors.toList());
   }
