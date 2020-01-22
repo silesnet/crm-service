@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Path("/api/networks")
 @PermitAll
-@Produces({"application/json; charset=UTF-8"})
+@Produces({"application/vnd.api+json"})
 public class NetworkResource {
   private final NetworkComponent networkComponent;
 
