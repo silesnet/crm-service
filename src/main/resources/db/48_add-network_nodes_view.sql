@@ -5,8 +5,8 @@ select id,
        area,
        vendor,
        model,
-       linkto        as "linkTo",
-       rstp_num_ring as "rstpNumRing",
+       linkto        as link_to,
+       rstp_num_ring,
        'backup/' || id ||
        (case
             when vendor = 'Huawei' then '-current.cfg'
@@ -17,5 +17,5 @@ select id,
             when vendor = 'Siklu' then '-startup-configuration.txt'
             when vendor = 'Ubiquiti' then '-backup.cfg'
             when vendor = 'Mikrotik' then '.backup'
-           end)      as "backupPath"
+           end)      as backup_path
 from network;

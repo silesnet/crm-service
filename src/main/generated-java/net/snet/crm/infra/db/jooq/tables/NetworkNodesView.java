@@ -34,7 +34,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class NetworkNodesView extends TableImpl<NetworkNodesViewRecord> {
 
-    private static final long serialVersionUID = -16898906;
+    private static final long serialVersionUID = -1597109496;
 
     /**
      * The reference instance of <code>public.network_nodes_view</code>
@@ -80,19 +80,19 @@ public class NetworkNodesView extends TableImpl<NetworkNodesViewRecord> {
     public final TableField<NetworkNodesViewRecord, String> MODEL = createField(DSL.name("model"), org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>public.network_nodes_view.linkTo</code>.
+     * The column <code>public.network_nodes_view.link_to</code>.
      */
-    public final TableField<NetworkNodesViewRecord, String> LINKTO = createField(DSL.name("linkTo"), org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
+    public final TableField<NetworkNodesViewRecord, String> LINK_TO = createField(DSL.name("link_to"), org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
-     * The column <code>public.network_nodes_view.rstpNumRing</code>.
+     * The column <code>public.network_nodes_view.rstp_num_ring</code>.
      */
-    public final TableField<NetworkNodesViewRecord, Integer> RSTPNUMRING = createField(DSL.name("rstpNumRing"), org.jooq.impl.SQLDataType.INTEGER, this, "");
+    public final TableField<NetworkNodesViewRecord, Integer> RSTP_NUM_RING = createField(DSL.name("rstp_num_ring"), org.jooq.impl.SQLDataType.INTEGER, this, "");
 
     /**
-     * The column <code>public.network_nodes_view.backupPath</code>.
+     * The column <code>public.network_nodes_view.backup_path</code>.
      */
-    public final TableField<NetworkNodesViewRecord, String> BACKUPPATH = createField(DSL.name("backupPath"), org.jooq.impl.SQLDataType.CLOB, this, "");
+    public final TableField<NetworkNodesViewRecord, String> BACKUP_PATH = createField(DSL.name("backup_path"), org.jooq.impl.SQLDataType.CLOB, this, "");
 
     /**
      * Create a <code>public.network_nodes_view</code> table reference

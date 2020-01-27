@@ -33,7 +33,7 @@ import org.jooq.impl.TableRecordImpl;
 @Table(name = "network_nodes_view", schema = "public")
 public class NetworkNodesViewRecord extends TableRecordImpl<NetworkNodesViewRecord> implements Record9<Integer, String, String, String, String, String, String, Integer, String> {
 
-    private static final long serialVersionUID = 1121856982;
+    private static final long serialVersionUID = -805974578;
 
     /**
      * Setter for <code>public.network_nodes_view.id</code>.
@@ -137,51 +137,51 @@ public class NetworkNodesViewRecord extends TableRecordImpl<NetworkNodesViewReco
     }
 
     /**
-     * Setter for <code>public.network_nodes_view.linkTo</code>.
+     * Setter for <code>public.network_nodes_view.link_to</code>.
      */
-    public NetworkNodesViewRecord setLinkto(String value) {
+    public NetworkNodesViewRecord setLinkTo(String value) {
         set(6, value);
         return this;
     }
 
     /**
-     * Getter for <code>public.network_nodes_view.linkTo</code>.
+     * Getter for <code>public.network_nodes_view.link_to</code>.
      */
-    @Column(name = "linkTo", length = 50)
+    @Column(name = "link_to", length = 50)
     @Size(max = 50)
-    public String getLinkto() {
+    public String getLinkTo() {
         return (String) get(6);
     }
 
     /**
-     * Setter for <code>public.network_nodes_view.rstpNumRing</code>.
+     * Setter for <code>public.network_nodes_view.rstp_num_ring</code>.
      */
-    public NetworkNodesViewRecord setRstpnumring(Integer value) {
+    public NetworkNodesViewRecord setRstpNumRing(Integer value) {
         set(7, value);
         return this;
     }
 
     /**
-     * Getter for <code>public.network_nodes_view.rstpNumRing</code>.
+     * Getter for <code>public.network_nodes_view.rstp_num_ring</code>.
      */
-    @Column(name = "rstpNumRing", precision = 32)
-    public Integer getRstpnumring() {
+    @Column(name = "rstp_num_ring", precision = 32)
+    public Integer getRstpNumRing() {
         return (Integer) get(7);
     }
 
     /**
-     * Setter for <code>public.network_nodes_view.backupPath</code>.
+     * Setter for <code>public.network_nodes_view.backup_path</code>.
      */
-    public NetworkNodesViewRecord setBackuppath(String value) {
+    public NetworkNodesViewRecord setBackupPath(String value) {
         set(8, value);
         return this;
     }
 
     /**
-     * Getter for <code>public.network_nodes_view.backupPath</code>.
+     * Getter for <code>public.network_nodes_view.backup_path</code>.
      */
-    @Column(name = "backupPath")
-    public String getBackuppath() {
+    @Column(name = "backup_path")
+    public String getBackupPath() {
         return (String) get(8);
     }
 
@@ -231,17 +231,17 @@ public class NetworkNodesViewRecord extends TableRecordImpl<NetworkNodesViewReco
 
     @Override
     public Field<String> field7() {
-        return NetworkNodesView.NETWORK_NODES_VIEW.LINKTO;
+        return NetworkNodesView.NETWORK_NODES_VIEW.LINK_TO;
     }
 
     @Override
     public Field<Integer> field8() {
-        return NetworkNodesView.NETWORK_NODES_VIEW.RSTPNUMRING;
+        return NetworkNodesView.NETWORK_NODES_VIEW.RSTP_NUM_RING;
     }
 
     @Override
     public Field<String> field9() {
-        return NetworkNodesView.NETWORK_NODES_VIEW.BACKUPPATH;
+        return NetworkNodesView.NETWORK_NODES_VIEW.BACKUP_PATH;
     }
 
     @Override
@@ -276,17 +276,17 @@ public class NetworkNodesViewRecord extends TableRecordImpl<NetworkNodesViewReco
 
     @Override
     public String component7() {
-        return getLinkto();
+        return getLinkTo();
     }
 
     @Override
     public Integer component8() {
-        return getRstpnumring();
+        return getRstpNumRing();
     }
 
     @Override
     public String component9() {
-        return getBackuppath();
+        return getBackupPath();
     }
 
     @Override
@@ -321,17 +321,17 @@ public class NetworkNodesViewRecord extends TableRecordImpl<NetworkNodesViewReco
 
     @Override
     public String value7() {
-        return getLinkto();
+        return getLinkTo();
     }
 
     @Override
     public Integer value8() {
-        return getRstpnumring();
+        return getRstpNumRing();
     }
 
     @Override
     public String value9() {
-        return getBackuppath();
+        return getBackupPath();
     }
 
     @Override
@@ -372,19 +372,19 @@ public class NetworkNodesViewRecord extends TableRecordImpl<NetworkNodesViewReco
 
     @Override
     public NetworkNodesViewRecord value7(String value) {
-        setLinkto(value);
+        setLinkTo(value);
         return this;
     }
 
     @Override
     public NetworkNodesViewRecord value8(Integer value) {
-        setRstpnumring(value);
+        setRstpNumRing(value);
         return this;
     }
 
     @Override
     public NetworkNodesViewRecord value9(String value) {
-        setBackuppath(value);
+        setBackupPath(value);
         return this;
     }
 
@@ -416,7 +416,7 @@ public class NetworkNodesViewRecord extends TableRecordImpl<NetworkNodesViewReco
     /**
      * Create a detached, initialised NetworkNodesViewRecord
      */
-    public NetworkNodesViewRecord(Integer id, String name, String master, String area, String vendor, String model, String linkto, Integer rstpnumring, String backuppath) {
+    public NetworkNodesViewRecord(Integer id, String name, String master, String area, String vendor, String model, String linkTo, Integer rstpNumRing, String backupPath) {
         super(NetworkNodesView.NETWORK_NODES_VIEW);
 
         set(0, id);
@@ -425,8 +425,8 @@ public class NetworkNodesViewRecord extends TableRecordImpl<NetworkNodesViewReco
         set(3, area);
         set(4, vendor);
         set(5, model);
-        set(6, linkto);
-        set(7, rstpnumring);
-        set(8, backuppath);
+        set(6, linkTo);
+        set(7, rstpNumRing);
+        set(8, backupPath);
     }
 }

@@ -25,7 +25,7 @@ class JooqNetworkRepository implements NetworkRepository {
             DSL.concat(NETWORK_NODES_VIEW.NAME,
                 DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.MASTER, ""),
                 DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.VENDOR, ""),
-                DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.LINKTO, ""),
+                DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.LINK_TO, ""),
                 DSL.val(" "), DSL.coalesce(NETWORK_NODES_VIEW.AREA, "")),
             DSL.val(query.getValue() + ":*")))
         .limit(100)
@@ -38,9 +38,9 @@ class JooqNetworkRepository implements NetworkRepository {
             node.getArea(),
             node.getVendor(),
             node.getModel(),
-            node.getLinkto(),
-            node.getRstpnumring(),
-            node.getBackuppath()
+            node.getLinkTo(),
+            node.getRstpNumRing(),
+            node.getBackupPath()
         ))
         .collect(Collectors.toList());
   }

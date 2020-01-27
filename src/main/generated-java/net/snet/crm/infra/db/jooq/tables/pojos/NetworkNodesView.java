@@ -28,7 +28,7 @@ import javax.validation.constraints.Size;
 @Table(name = "network_nodes_view", schema = "public")
 public class NetworkNodesView implements Serializable {
 
-    private static final long serialVersionUID = -43159989;
+    private static final long serialVersionUID = 1000349593;
 
     private final Integer id;
     private final String  name;
@@ -36,9 +36,9 @@ public class NetworkNodesView implements Serializable {
     private final String  area;
     private final String  vendor;
     private final String  model;
-    private final String  linkto;
-    private final Integer rstpnumring;
-    private final String  backuppath;
+    private final String  linkTo;
+    private final Integer rstpNumRing;
+    private final String  backupPath;
 
     public NetworkNodesView(NetworkNodesView value) {
         this.id = value.id;
@@ -47,9 +47,9 @@ public class NetworkNodesView implements Serializable {
         this.area = value.area;
         this.vendor = value.vendor;
         this.model = value.model;
-        this.linkto = value.linkto;
-        this.rstpnumring = value.rstpnumring;
-        this.backuppath = value.backuppath;
+        this.linkTo = value.linkTo;
+        this.rstpNumRing = value.rstpNumRing;
+        this.backupPath = value.backupPath;
     }
 
     public NetworkNodesView(
@@ -59,9 +59,9 @@ public class NetworkNodesView implements Serializable {
         String  area,
         String  vendor,
         String  model,
-        String  linkto,
-        Integer rstpnumring,
-        String  backuppath
+        String  linkTo,
+        Integer rstpNumRing,
+        String  backupPath
     ) {
         this.id = id;
         this.name = name;
@@ -69,9 +69,9 @@ public class NetworkNodesView implements Serializable {
         this.area = area;
         this.vendor = vendor;
         this.model = model;
-        this.linkto = linkto;
-        this.rstpnumring = rstpnumring;
-        this.backuppath = backuppath;
+        this.linkTo = linkTo;
+        this.rstpNumRing = rstpNumRing;
+        this.backupPath = backupPath;
     }
 
     @Column(name = "id", precision = 32)
@@ -109,20 +109,20 @@ public class NetworkNodesView implements Serializable {
         return this.model;
     }
 
-    @Column(name = "linkTo", length = 50)
+    @Column(name = "link_to", length = 50)
     @Size(max = 50)
-    public String getLinkto() {
-        return this.linkto;
+    public String getLinkTo() {
+        return this.linkTo;
     }
 
-    @Column(name = "rstpNumRing", precision = 32)
-    public Integer getRstpnumring() {
-        return this.rstpnumring;
+    @Column(name = "rstp_num_ring", precision = 32)
+    public Integer getRstpNumRing() {
+        return this.rstpNumRing;
     }
 
-    @Column(name = "backupPath")
-    public String getBackuppath() {
-        return this.backuppath;
+    @Column(name = "backup_path")
+    public String getBackupPath() {
+        return this.backupPath;
     }
 
     @Override
@@ -135,9 +135,9 @@ public class NetworkNodesView implements Serializable {
         sb.append(", ").append(area);
         sb.append(", ").append(vendor);
         sb.append(", ").append(model);
-        sb.append(", ").append(linkto);
-        sb.append(", ").append(rstpnumring);
-        sb.append(", ").append(backuppath);
+        sb.append(", ").append(linkTo);
+        sb.append(", ").append(rstpNumRing);
+        sb.append(", ").append(backupPath);
 
         sb.append(")");
         return sb.toString();
