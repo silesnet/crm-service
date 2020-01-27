@@ -50,9 +50,9 @@ public class NetworkResource {
     attributes.put("area", node.getArea());
     attributes.put("vendor", node.getVendor());
     attributes.put("model", node.getModel());
-    attributes.put("linkTo", node.getLinkTo());
-    attributes.put("rstpNumRing", node.getRstpNumRing());
-    attributes.put("backupPath", node.getBackupPath());
+    attributes.put("link-to", node.getLinkTo());
+    attributes.put("rstp-num-ring", node.getRstpNumRing());
+    attributes.put("backup-path", node.getBackupPath());
     return ImmutableMap.of(
         "type", "nodes",
         "id", node.getId(),
