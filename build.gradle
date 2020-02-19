@@ -58,7 +58,7 @@ jooq {
   version = project.ext.jooqVersion
   edition = 'OSS'
   generateSchemaSourceOnCompilation = false
-  crm(sourceSets.main) {
+  command(sourceSets.main) {
     jdbc {
       driver = 'org.postgresql.Driver'
       url = System.getenv('JOOQ_URL')
@@ -85,7 +85,35 @@ jooq {
         daos = true
       }
       target {
-        packageName = 'net.snet.crm.infra.db.jooq'
+        packageName = 'net.snet.crm.infra.db.command'
+        directory = 'src/main/generated-java'
+      }
+    }
+  }
+  query(sourceSets.main) {
+    jdbc {
+      driver = 'org.postgresql.Driver'
+      url = System.getenv('JOOQ_URL')
+      user = System.getenv('JOOQ_USER')
+      password = System.getenv('JOOQ_PASSWORD')
+    }
+    generator {
+      name = 'org.jooq.codegen.DefaultGenerator'
+      database {
+        name = 'org.jooq.meta.postgres.PostgresDatabase'
+        inputSchema = 'query'
+        includes = 'nodes'
+        excludes = ''
+      }
+      generate {
+        relations = true
+        records = false
+        deprecated = false
+        pojos = true
+        immutablePojos = true
+      }
+      target {
+        packageName = 'net.snet.crm.infra.db.query'
         directory = 'src/main/generated-java'
       }
     }

@@ -1,13 +1,13 @@
 package net.snet.network;
 
 import lombok.extern.slf4j.Slf4j;
-import net.snet.crm.infra.db.jooq.tables.pojos.NetworkNodesView;
+import net.snet.crm.infra.db.command.tables.pojos.NetworkNodesView;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.util.stream.Collectors;
 
-import static net.snet.crm.infra.db.jooq.tables.NetworkNodesView.NETWORK_NODES_VIEW;
+import static net.snet.crm.infra.db.command.tables.NetworkNodesView.NETWORK_NODES_VIEW;
 
 @Slf4j
 class JooqNetworkRepository implements NetworkRepository {
