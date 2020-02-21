@@ -3,14 +3,11 @@ package net.snet.network;
 import lombok.Value;
 
 @Value
-public class Node {
-  private final Integer id;
+public class NodeFilter {
   private final String name;
   private final String master;
   private final String area;
-  private final String vendor;
-  private final String model;
   private final String linkTo;
+  private final String vendor;
   private final String country;
-  private final Integer frequency;
 }

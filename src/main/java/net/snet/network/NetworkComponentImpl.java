@@ -1,5 +1,6 @@
 package net.snet.network;
 
+import com.google.common.collect.Iterables;
 import org.jooq.DSLContext;
 
 public class NetworkComponentImpl implements NetworkComponent {
@@ -12,5 +13,10 @@ public class NetworkComponentImpl implements NetworkComponent {
   @Override
   public Iterable<Node> findNodes(NodeQuery query) {
     return networkRepository.findNodes(query);
+  }
+
+  @Override
+  public Iterable<Node> findNodes(NodeFilter filter) {
+    return Iterables.cycle();
   }
 }
