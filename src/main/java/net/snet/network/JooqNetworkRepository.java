@@ -69,7 +69,6 @@ class JooqNetworkRepository implements NetworkRepository {
         .orElse(DSL.condition(false));
     return db.select().from(NODES)
         .where(condition)
-        .limit(100)
         .fetchInto(Nodes.class)
         .stream()
         .map(MAPPER)
@@ -80,7 +79,7 @@ class JooqNetworkRepository implements NetworkRepository {
     if (prefix == null || prefix.trim().isEmpty()) {
       return Optional.empty();
     }
-    return Optional.of(field.likeIgnoreCase(prefix + "%"));
+    return Optional.of(field.likeIgnoreCase(prefix.replaceAll("\\*", "%")));
   }
 
 }
