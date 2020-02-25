@@ -28,6 +28,12 @@ public class NetworkResource {
   }
 
   @GET
+  @Path("/nodes2")
+  public Response findNodes2() {
+    return Response.ok("OK").build();
+  }
+
+  @GET
   @Path("/nodes")
   public Response findNodes(@QueryParam("q") String query, @Auth AuthenticatedUser principal) {
     final NodeQuery nodeQuery = new NodeQuery(query);
