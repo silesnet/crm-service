@@ -1,10 +1,13 @@
 package net.snet.api;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.dropwizard.auth.Auth;
 import net.snet.crm.service.auth.AuthenticatedUser;
 import net.snet.network.NetworkComponent;
 import net.snet.network.Node;
+import net.snet.network.NodeFilter;
 import net.snet.network.NodeQuery;
 
 import javax.annotation.security.PermitAll;
@@ -13,7 +16,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -29,8 +34,26 @@ public class NetworkResource {
 
   @GET
   @Path("/nodes2")
-  public Response findNodes2() {
-    return Response.ok("OK").build();
+  public Response findNodes2(
+      @QueryParam("name") Optional<String> name,
+      @QueryParam("master") Optional<String> master,
+      @QueryParam("area") Optional<String> area,
+      @QueryParam("linkTo") Optional<String> linkTo,
+      @QueryParam("vendor") Optional<String> vendor,
+      @QueryParam("country") Optional<String> country,
+      @Auth AuthenticatedUser principal) {
+    final NodeFilter.NodeFilterBuilder builder = NodeFilter.builder();
+    name.ifPresent(builder::name);
+    master.ifPresent(builder::master);
+    area.ifPresent(builder::area);
+    linkTo.ifPresent(builder::linkTo);
+    vendor.ifPresent(builder::vendor);
+    country.ifPresent(builder::country);
+    final NodeFilter nodeFilter = builder.build();
+    final Iterable<Node> nodes = networkComponent.findNodes(nodeFilter);
+    return Response.ok().entity(
+        ImmutableMap.of("data", mapIterable(nodes, this::toJsonApi))
+    ).build();
   }
 
   @GET

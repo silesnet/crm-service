@@ -18,7 +18,14 @@ class NetworkResourceTest extends Specification {
     .build()
 
   def 'should create nodes filter'() {
-    def response = RULE.target("/api/networks/nodes2").request().get()
+    def response = RULE.target("/api/networks/nodes2")
+        .queryParam("name", "node-name")
+        .queryParam("master", "master-name")
+        .queryParam("area", "area-name")
+        .queryParam("linkTo", "linTo-name")
+        .queryParam("vendor", "vendor-name")
+        .queryParam("country", "country-name")
+        .request().get()
 
     println response
     expect:
