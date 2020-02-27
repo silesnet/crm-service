@@ -33,14 +33,15 @@ public class NetworkResource {
   }
 
   @GET
-  @Path("/nodes2")
-  public Response findNodes2(
+  @Path("/nodes")
+  public Response findNodes(
       @QueryParam("name") Optional<String> name,
       @QueryParam("master") Optional<String> master,
       @QueryParam("area") Optional<String> area,
       @QueryParam("linkTo") Optional<String> linkTo,
       @QueryParam("vendor") Optional<String> vendor,
       @QueryParam("country") Optional<String> country,
+      @QueryParam("q") Optional<String> query,
       @Auth AuthenticatedUser principal) {
     final NodeFilter.NodeFilterBuilder builder = NodeFilter.builder();
     name.ifPresent(builder::name);
@@ -50,17 +51,9 @@ public class NetworkResource {
     vendor.ifPresent(builder::vendor);
     country.ifPresent(builder::country);
     final NodeFilter nodeFilter = builder.build();
-    final Iterable<Node> nodes = networkComponent.findNodes(nodeFilter);
-    return Response.ok().entity(
-        ImmutableMap.of("data", mapIterable(nodes, this::toJsonApi))
-    ).build();
-  }
-
-  @GET
-  @Path("/nodes")
-  public Response findNodes(@QueryParam("q") String query, @Auth AuthenticatedUser principal) {
-    final NodeQuery nodeQuery = new NodeQuery(query);
-    final Iterable<Node> nodes = networkComponent.findNodes(nodeQuery);
+    final Iterable<Node> nodes = query.isPresent()
+        ? networkComponent.findNodes(new NodeQuery(query.get()))
+        : networkComponent.findNodes(nodeFilter);
     return Response.ok().entity(
         ImmutableMap.of("data", mapIterable(nodes, this::toJsonApi))
     ).build();
