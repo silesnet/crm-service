@@ -7,6 +7,7 @@ package net.snet.crm.infra.db.query;
 import javax.annotation.Generated;
 
 import net.snet.crm.infra.db.query.tables.Nodes;
+import net.snet.crm.infra.db.query.tables.NodesDetail;
 
 
 /**
@@ -26,4 +27,9 @@ public class Tables {
      * The table <code>query.nodes</code>.
      */
     public static final Nodes NODES = Nodes.NODES;
+
+    /**
+     * The table <code>query.nodes_detail</code>.
+     */
+    public static final NodesDetail NODES_DETAIL = NodesDetail.NODES_DETAIL;
 }

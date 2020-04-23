@@ -11,6 +11,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import net.snet.crm.infra.db.query.tables.Nodes;
+import net.snet.crm.infra.db.query.tables.NodesDetail;
 
 import org.jooq.Catalog;
 import org.jooq.Table;
@@ -30,7 +31,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Query extends SchemaImpl {
 
-    private static final long serialVersionUID = -437292815;
+    private static final long serialVersionUID = 9074104;
 
     /**
      * The reference instance of <code>query</code>
@@ -41,6 +42,11 @@ public class Query extends SchemaImpl {
      * The table <code>query.nodes</code>.
      */
     public final Nodes NODES = net.snet.crm.infra.db.query.tables.Nodes.NODES;
+
+    /**
+     * The table <code>query.nodes_detail</code>.
+     */
+    public final NodesDetail NODES_DETAIL = net.snet.crm.infra.db.query.tables.NodesDetail.NODES_DETAIL;
 
     /**
      * No further instances allowed
@@ -64,6 +70,7 @@ public class Query extends SchemaImpl {
 
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
-            Nodes.NODES);
+            Nodes.NODES,
+            NodesDetail.NODES_DETAIL);
     }
 }

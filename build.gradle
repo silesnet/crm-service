@@ -102,7 +102,7 @@ jooq {
       database {
         name = 'org.jooq.meta.postgres.PostgresDatabase'
         inputSchema = 'query'
-        includes = 'nodes'
+        includes = 'nodes|nodes_detail'
         excludes = ''
       }
       generate {
