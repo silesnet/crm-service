@@ -4,6 +4,8 @@ import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.network.NetworkComponent
 import net.snet.network.Node
 import net.snet.network.NodeFilter
+import net.snet.network.NodeId
+import net.snet.network.NodeItem
 import net.snet.network.NodeQuery
 import org.junit.ClassRule
 import spock.lang.Shared
@@ -12,13 +14,18 @@ import spock.lang.Specification
 class NetworkResourceTest extends Specification {
   @Shared networkComponent = new NetworkComponent() {
     @Override
-    Iterable<Node> findNodes(NodeQuery query) {
+    Iterable<NodeItem> findNodes(NodeQuery query) {
       return []
     }
 
     @Override
-    Iterable<Node> findNodes(NodeFilter filter) {
+    Iterable<NodeItem> findNodes(NodeFilter filter) {
       return []
+    }
+
+    @Override
+    Optional<Node> fetchNode(NodeId nodeId) {
+      return Optional.empty()
     }
   }
 
@@ -30,7 +37,7 @@ class NetworkResourceTest extends Specification {
 
   def 'should search by node filter'() {
     when:
-    def response = RULE.target("/api/networks/nodes")
+    def response = RULE.target("/api/networks/node-items")
         .queryParam("name", "node-name")
         .queryParam("master", "master-name")
         .queryParam("area", "area-name")
@@ -44,10 +51,18 @@ class NetworkResourceTest extends Specification {
 
   def 'should search by query'() {
     when:
-    def response = RULE.target("/api/networks/nodes")
+    def response = RULE.target("/api/networks/node-items")
         .queryParam("q", "node-name")
         .request().get(String)
     then:
     response == '{"data":[]}'
+  }
+
+  def 'should return node detail'() {
+    when:
+    def response = RULE.target("/api/networks/nodes/node-id")
+        .request().get(String)
+    then:
+    response == '{"errors":[{"status":404}]}'
   }
 }

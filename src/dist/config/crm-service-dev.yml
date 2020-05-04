@@ -10,7 +10,7 @@ database:
 
 jooq:
   executeLogging: true
-  renderSchema: false
+  renderSchema: true
   renderNameStyle: QUOTED
   renderFormatted: true
   paramType: NAMED
