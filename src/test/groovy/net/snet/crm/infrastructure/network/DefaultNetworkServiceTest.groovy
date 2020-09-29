@@ -1,9 +1,11 @@
 package net.snet.crm.infrastructure.network
 
 import net.snet.crm.infrastructure.system.FileSystemCommandFactory
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 class DefaultNetworkServiceTest extends Specification {
+  @IgnoreIf({ os.linux })
   def "should fetch dhcp wireless connection info"() {
     given:
     def commands = new FileSystemCommandFactory(new File('src/test/resources/commands'))

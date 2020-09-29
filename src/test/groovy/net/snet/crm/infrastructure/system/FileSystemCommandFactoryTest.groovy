@@ -1,5 +1,6 @@
 package net.snet.crm.infrastructure.system
 
+import spock.lang.IgnoreIf
 import spock.lang.Specification
 
 class FileSystemCommandFactoryTest extends Specification {
@@ -8,6 +9,7 @@ class FileSystemCommandFactoryTest extends Specification {
       factory()
   }
 
+  @IgnoreIf({ os.linux })
   def "should instantiate system command from file name"() {
     expect:
       factory().systemCommand('kickPppoeUser', '-u', 'user', '-d', 'device').run()
@@ -15,6 +17,7 @@ class FileSystemCommandFactoryTest extends Specification {
       factory().systemCommand('sendEmail', '-a', 'address', '-s', 'subject', '-m', 'message').run()
   }
 
+  @IgnoreIf({ os.linux })
   def "should capture commands output"() {
     given:
     def command = factory().systemCommand('fetchDhcpWirelessConnection', '-m', 'master', '-a', 'MAC')
