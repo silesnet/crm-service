@@ -202,7 +202,7 @@ public class DefaultNetworkService implements NetworkService {
   public Data fetchDhcpServiceIpAddress(String serviceId) {
     logger.debug("fetching DHCP service ip address '{}'", serviceId);
     final String output = executeSystemCommandWithResult(commandFactory.systemCommand(
-        "fetchDhcpServiceIpAddress", serviceId));
+        "fetchDhcpLanConnection", serviceId));
     return parseDhcpServiceIpAddress(output);
   }
 
