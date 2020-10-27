@@ -22,4 +22,6 @@ public interface NetworkService {
   void enableDhcpWirelessAddress(String master, String address);
 
   void disableDhcpWirelessAddress(String master, String address);
+
+  Data fetchDhcpServiceIpAddress(String serviceId);
 }

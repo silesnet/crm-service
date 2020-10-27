@@ -198,4 +198,18 @@ public class DefaultNetworkService implements NetworkService {
     }
   }
 
+  @Override
+  public Data fetchDhcpServiceIpAddress(String serviceId) {
+    logger.debug("fetching DHCP service ip address '{}'", serviceId);
+    final String output = executeSystemCommandWithResult(commandFactory.systemCommand(
+        "fetchDhcpServiceIpAddress",
+        "-s", serviceId));
+    return parseDhcpServiceIpAddress(output);
+  }
+
+  private Data parseDhcpServiceIpAddress(String output) {
+    final Map<String, Object> result = Maps.newHashMap();
+    return MapData.of(result);
+  }
+
 }

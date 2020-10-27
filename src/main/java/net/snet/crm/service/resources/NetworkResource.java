@@ -2,7 +2,6 @@ package net.snet.crm.service.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
 import net.snet.crm.domain.model.network.NetworkRepository;
 import net.snet.crm.domain.model.network.NetworkRepository.Country;
@@ -79,6 +78,14 @@ public class NetworkResource
   public Response pppoeLastIpOf(@PathParam("login") String login) {
     return Response.ok(ImmutableMap.of("lastIp",
                                        networkRepository.findPppoeUserLastIp(login))).build();
+  }
+
+  @GET
+  @Path("dhcp/{serviceId}/ip-address")
+  @Produces({"application/json; charset=UTF-8"})
+  public Response dhcpServiceIpAddress(@PathParam("serviceId") String serviceId) {
+    return Response.ok(ImmutableMap.of("ipAddress",
+        networkService.fetchDhcpServiceIpAddress(serviceId))).build();
   }
 
   @PUT
