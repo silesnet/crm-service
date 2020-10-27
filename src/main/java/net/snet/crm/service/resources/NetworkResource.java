@@ -81,7 +81,7 @@ public class NetworkResource
   }
 
   @GET
-  @Path("dhcp/{serviceId}/ip-address")
+  @Path("dhcp/{serviceId}/connection")
   @Produces({"application/json; charset=UTF-8"})
   public Response dhcpServiceIpAddress(@PathParam("serviceId") String serviceId) {
     return Response.ok(ImmutableMap.of("dhcp",
