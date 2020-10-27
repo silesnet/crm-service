@@ -202,13 +202,19 @@ public class DefaultNetworkService implements NetworkService {
   public Data fetchDhcpServiceIpAddress(String serviceId) {
     logger.debug("fetching DHCP service ip address '{}'", serviceId);
     final String output = executeSystemCommandWithResult(commandFactory.systemCommand(
-        "fetchDhcpServiceIpAddress",
-        "-s", serviceId));
+        "fetchDhcpServiceIpAddress", serviceId));
     return parseDhcpServiceIpAddress(output);
   }
 
   private Data parseDhcpServiceIpAddress(String output) {
     final Map<String, Object> result = Maps.newHashMap();
+
+    final String[] pairs = output.split("\\s+");
+    for (String keyValue : pairs)
+    {
+      final String[] pair = keyValue.split(":");
+      result.put(pair[0], pair[1]);
+    }
     return MapData.of(result);
   }
 
