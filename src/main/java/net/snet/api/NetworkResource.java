@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.dropwizard.auth.Auth;
+import jersey.repackaged.com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import net.snet.crm.service.auth.AuthenticatedUser;
 import net.snet.network.*;
@@ -11,10 +12,7 @@ import net.snet.network.*;
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,6 +59,28 @@ public class NetworkResource {
   public Response fetchNode(@PathParam("nodeId") NodeId nodeId) {
     final Optional<Node> node = networkComponent.fetchNode(nodeId);
     return Response.ok().entity(node.isPresent() ? ImmutableMap.of("data", toJsonApi(node.get())) : notFound()).build();
+  }
+
+  @GET
+  @Path("/labels")
+  public Response fetchNodeLabels() {
+    final HashMap<String, List<String>> labels = new HashMap<>();
+    labels.put("masters", ImmutableList.of());
+    labels.put("links", ImmutableList.of());
+    labels.put("areas", ImmutableList.of());
+    labels.put("vendors", ImmutableList.of());
+    labels.put("models", ImmutableList.of());
+    labels.put("channelWidths", ImmutableList.of());
+    labels.put("norms", ImmutableList.of());
+    labels.put("frequencies", ImmutableList.of());
+    return Response.ok()
+        .entity(ImmutableMap.of("data",
+            ImmutableMap.of(
+                "type", "nodeLabels",
+                "id", "1",
+                "attributes", labels
+            ))
+        ).build();
   }
 
   private ImmutableMap<String, ArrayList<ImmutableMap<String, Integer>>> notFound() {
