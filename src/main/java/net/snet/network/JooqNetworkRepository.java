@@ -1,13 +1,17 @@
 package net.snet.network;
 
+import jersey.repackaged.com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
-import net.snet.crm.infra.db.query.tables.pojos.NodesDetail;
 import net.snet.crm.infra.db.query.tables.pojos.Nodes;
+import net.snet.crm.infra.db.query.tables.pojos.NodesDetail;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.impl.DSL;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -117,6 +121,24 @@ class JooqNetworkRepository implements NetworkRepository {
         .where(condition)
         .fetchOptionalInto(NodesDetail.class)
         .map(NODE_MAPPER);
+  }
+
+  @Override
+  public Map<String, Iterable<String>> fetchNodeOptions() {
+    final Map<String, Iterable<String>> options = new HashMap<>();
+    options.put("masters", fetchOptions(NODES_DETAIL.MASTER));
+    options.put("links", ImmutableList.of());
+    options.put("areas", ImmutableList.of());
+    options.put("vendors", ImmutableList.of());
+    options.put("models", ImmutableList.of());
+    options.put("channelWidths", ImmutableList.of());
+    options.put("norms", ImmutableList.of());
+    options.put("frequencies", ImmutableList.of());
+    return options;
+  }
+
+  private List<String> fetchOptions(Field field) {
+    return db.selectDistinct(field).from(NODES_DETAIL).orderBy(field).fetch(field);
   }
 
   private Optional<Condition> condition(final Field<?> field, final String prefix) {

@@ -64,21 +64,12 @@ public class NetworkResource {
   @GET
   @Path("nodes/options")
   public Response fetchNodeLabels() {
-    final HashMap<String, List<String>> labels = new HashMap<>();
-    labels.put("masters", ImmutableList.of());
-    labels.put("links", ImmutableList.of());
-    labels.put("areas", ImmutableList.of());
-    labels.put("vendors", ImmutableList.of());
-    labels.put("models", ImmutableList.of());
-    labels.put("channelWidths", ImmutableList.of());
-    labels.put("norms", ImmutableList.of());
-    labels.put("frequencies", ImmutableList.of());
     return Response.ok()
         .entity(ImmutableMap.of("data",
             ImmutableMap.of(
-                "type", "nodeLabels",
-                "id", "1",
-                "attributes", labels
+                "type", "options",
+                "id", "nodes.options",
+                "attributes", networkComponent.fetchNodeOptions()
             ))
         ).build();
   }

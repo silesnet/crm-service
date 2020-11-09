@@ -2,6 +2,7 @@ package net.snet.network;
 
 import org.jooq.DSLContext;
 
+import java.util.Map;
 import java.util.Optional;
 
 public class NetworkComponentImpl implements NetworkComponent {
@@ -24,5 +25,10 @@ public class NetworkComponentImpl implements NetworkComponent {
   @Override
   public Optional<Node> fetchNode(NodeId nodeId) {
     return networkRepository.fetchNode(nodeId);
+  }
+
+  @Override
+  public Map<String, Iterable<String>> fetchNodeOptions() {
+    return networkRepository.fetchNodeOptions();
   }
 }
