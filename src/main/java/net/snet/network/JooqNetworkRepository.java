@@ -127,13 +127,13 @@ class JooqNetworkRepository implements NetworkRepository {
   public Map<String, Iterable<String>> fetchNodeOptions() {
     final Map<String, Iterable<String>> options = new HashMap<>();
     options.put("masters", fetchOptions(NODES_DETAIL.MASTER));
-    options.put("links", ImmutableList.of());
-    options.put("areas", ImmutableList.of());
-    options.put("vendors", ImmutableList.of());
-    options.put("models", ImmutableList.of());
-    options.put("channelWidths", ImmutableList.of());
-    options.put("norms", ImmutableList.of());
-    options.put("frequencies", ImmutableList.of());
+    options.put("links", fetchOptions(NODES_DETAIL.LINK_TO));
+    options.put("areas", fetchOptions(NODES_DETAIL.AREA));
+    options.put("vendors", fetchOptions(NODES_DETAIL.VENDOR));
+    options.put("models", fetchOptions(NODES_DETAIL.MODEL));
+    options.put("channelWidths", fetchOptions(NODES_DETAIL.WIDTH));
+    options.put("norms", fetchOptions(NODES_DETAIL.NORM));
+    options.put("frequencies", fetchOptions(NODES_DETAIL.FREQUENCY));
     return options;
   }
 
