@@ -62,7 +62,7 @@ public class NetworkResource {
   }
 
   @GET
-  @Path("/labels")
+  @Path("nodes/options")
   public Response fetchNodeLabels() {
     final HashMap<String, List<String>> labels = new HashMap<>();
     labels.put("masters", ImmutableList.of());
