@@ -64,6 +64,31 @@ class JooqNetworkRepository implements NetworkRepository {
       node.getAzimuth(),
       node.getActive()
   );
+  private static final ImmutableList<String> TYPE_OPTIONS = ImmutableList.of(
+      "OTHER",
+      "ROUTER",
+      "BRIDGE",
+      "BRIDGE-AP",
+      "BRIDGE-BR",
+      "BRIDGE-STATION",
+      "SWITCH"
+  );
+  private static final ImmutableList<String> MONITORING_TYPE_OPTIONS = ImmutableList.of(
+      "NONE",
+      "PING",
+      "PING-SMS"
+  );
+  private static final ImmutableList<String> POLARIZATION_OPTIONS = ImmutableList.of(
+      "HORIZONTAL",
+      "VERTICAL",
+      "DUAL"
+  );
+  private static final ImmutableList<String> AUTHORIZATION_OPTIONS = ImmutableList.of(
+      "NONE",
+      "BOTH",
+      "MAC",
+      "RADIUS"
+  );
 
   private final DSLContext db;
 
@@ -126,14 +151,19 @@ class JooqNetworkRepository implements NetworkRepository {
   @Override
   public Map<String, Iterable<String>> fetchNodeOptions() {
     final Map<String, Iterable<String>> options = new HashMap<>();
+    options.put("types", TYPE_OPTIONS);
     options.put("masters", fetchOptions(NODES_DETAIL.MASTER));
+    // FIXME: should be removed
     options.put("links", fetchOptions(NODES_DETAIL.LINK_TO));
     options.put("areas", fetchOptions(NODES_DETAIL.AREA));
     options.put("vendors", fetchOptions(NODES_DETAIL.VENDOR));
     options.put("models", fetchOptions(NODES_DETAIL.MODEL));
+    options.put("monitoringTypes", MONITORING_TYPE_OPTIONS);
+    options.put("polarizations", POLARIZATION_OPTIONS);
     options.put("channelWidths", fetchOptions(NODES_DETAIL.WIDTH));
     options.put("norms", fetchOptions(NODES_DETAIL.NORM));
     options.put("frequencies", fetchOptions(NODES_DETAIL.FREQUENCY));
+    options.put("authorizations", AUTHORIZATION_OPTIONS);
     return options;
   }
 
