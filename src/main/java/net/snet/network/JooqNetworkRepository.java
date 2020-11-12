@@ -158,9 +158,9 @@ class JooqNetworkRepository implements NetworkRepository {
     options.put("areas", fetchOptions(NODES_DETAIL.AREA));
     options.put("vendors", fetchOptions(NODES_DETAIL.VENDOR));
     options.put("models", fetchOptions(NODES_DETAIL.MODEL));
-    options.put("monitoringTypes", MONITORING_TYPE_OPTIONS);
+    options.put("monitoring-types", MONITORING_TYPE_OPTIONS);
     options.put("polarizations", POLARIZATION_OPTIONS);
-    options.put("channelWidths", fetchOptions(NODES_DETAIL.WIDTH));
+    options.put("channel-widths", fetchOptions(NODES_DETAIL.WIDTH));
     options.put("norms", fetchOptions(NODES_DETAIL.NORM));
     options.put("frequencies", fetchOptions(NODES_DETAIL.FREQUENCY));
     options.put("authorizations", AUTHORIZATION_OPTIONS);
