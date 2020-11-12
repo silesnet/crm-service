@@ -162,13 +162,13 @@ class JooqNetworkRepository implements NetworkRepository {
     options.put("polarizations", POLARIZATION_OPTIONS);
     options.put("channel-widths", fetchOptions(NODES_DETAIL.WIDTH));
     options.put("norms", fetchOptions(NODES_DETAIL.NORM));
-    options.put("frequencies", fetchOptions(NODES_DETAIL.FREQUENCY));
+    options.put("frequencies", fetchOptions(NODES_DETAIL.FREQUENCY.cast(String.class)));
     options.put("authorizations", AUTHORIZATION_OPTIONS);
     return options;
   }
 
   private List<String> fetchOptions(Field field) {
-    return db.selectDistinct(field).from(NODES_DETAIL).orderBy(field).fetch(field);
+    return db.selectDistinct(field).from(NODES_DETAIL).where(field.isNotNull()).orderBy(field).fetch(field);
   }
 
   private Optional<Condition> condition(final Field<?> field, final String prefix) {
