@@ -28,7 +28,7 @@ public class Node {
   private final String power;
   private final String antenna;
   private final Boolean wds;
-  private final String authorization;
+  private final String authentication;
   private final String azimuth;
   private final Boolean active;
 }

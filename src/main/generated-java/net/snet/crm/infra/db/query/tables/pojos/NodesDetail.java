@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class NodesDetail implements Serializable {
 
-    private static final long serialVersionUID = 1956563951;
+    private static final long serialVersionUID = -1586337302;
 
     private final Integer id;
     private final String  country;
@@ -48,7 +48,7 @@ public class NodesDetail implements Serializable {
     private final String  power;
     private final String  antenna;
     private final Boolean wds;
-    private final String  authorization;
+    private final String  authentication;
     private final String  azimuth;
     private final Boolean active;
 
@@ -77,7 +77,7 @@ public class NodesDetail implements Serializable {
         this.power = value.power;
         this.antenna = value.antenna;
         this.wds = value.wds;
-        this.authorization = value.authorization;
+        this.authentication = value.authentication;
         this.azimuth = value.azimuth;
         this.active = value.active;
     }
@@ -107,7 +107,7 @@ public class NodesDetail implements Serializable {
         String  power,
         String  antenna,
         Boolean wds,
-        String  authorization,
+        String  authentication,
         String  azimuth,
         Boolean active
     ) {
@@ -135,7 +135,7 @@ public class NodesDetail implements Serializable {
         this.power = power;
         this.antenna = antenna;
         this.wds = wds;
-        this.authorization = authorization;
+        this.authentication = authentication;
         this.azimuth = azimuth;
         this.active = active;
     }
@@ -236,8 +236,8 @@ public class NodesDetail implements Serializable {
         return this.wds;
     }
 
-    public String getAuthorization() {
-        return this.authorization;
+    public String getAuthentication() {
+        return this.authentication;
     }
 
     public String getAzimuth() {
@@ -276,7 +276,7 @@ public class NodesDetail implements Serializable {
         sb.append(", ").append(power);
         sb.append(", ").append(antenna);
         sb.append(", ").append(wds);
-        sb.append(", ").append(authorization);
+        sb.append(", ").append(authentication);
         sb.append(", ").append(azimuth);
         sb.append(", ").append(active);
 

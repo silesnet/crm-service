@@ -58,7 +58,7 @@ select n.id,
             when n.auth = '20' then 'BOTH'
             when n.auth = '30' then 'MAC ACL'
             when n.auth = '40' then 'RADIUS'
-           end)                                                              as authorization,
+           end)                                                              as authentication,
        n.azimuth,
        n.active -- wifi end
 from public.network n

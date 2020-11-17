@@ -32,7 +32,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class NodesDetail extends TableImpl<Record> {
 
-    private static final long serialVersionUID = 1259394484;
+    private static final long serialVersionUID = -290786621;
 
     /**
      * The reference instance of <code>query.nodes_detail</code>
@@ -168,9 +168,9 @@ public class NodesDetail extends TableImpl<Record> {
     public final TableField<Record, Boolean> WDS = createField(DSL.name("wds"), org.jooq.impl.SQLDataType.BOOLEAN, this, "");
 
     /**
-     * The column <code>query.nodes_detail.authorization</code>.
+     * The column <code>query.nodes_detail.authentication</code>.
      */
-    public final TableField<Record, String> AUTHORIZATION = createField(DSL.name("authorization"), org.jooq.impl.SQLDataType.CLOB, this, "");
+    public final TableField<Record, String> AUTHENTICATION = createField(DSL.name("authentication"), org.jooq.impl.SQLDataType.CLOB, this, "");
 
     /**
      * The column <code>query.nodes_detail.azimuth</code>.

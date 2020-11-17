@@ -60,7 +60,7 @@ class JooqNetworkRepository implements NetworkRepository {
       node.getPower(),
       node.getAntenna(),
       node.getWds(),
-      node.getAuthorization(),
+      node.getAuthentication(),
       node.getAzimuth(),
       node.getActive()
   );

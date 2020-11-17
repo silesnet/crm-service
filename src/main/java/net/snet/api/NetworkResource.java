@@ -125,7 +125,7 @@ public class NetworkResource {
     attributes.put("power", node.getPower());
     attributes.put("antenna", node.getAntenna());
     attributes.put("wds", node.getWds());
-    attributes.put("authentication", node.getAuthorization());
+    attributes.put("authentication", node.getAuthentication());
     attributes.put("azimuth", node.getAzimuth());
     attributes.put("active", node.getActive());
     return ImmutableMap.of(

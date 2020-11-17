@@ -1,5 +1,6 @@
 package net.snet.api
 
+import com.google.common.collect.ImmutableMap
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.network.NetworkComponent
 import net.snet.network.Node
@@ -7,6 +8,7 @@ import net.snet.network.NodeFilter
 import net.snet.network.NodeId
 import net.snet.network.NodeItem
 import net.snet.network.NodeQuery
+import org.assertj.core.util.Maps
 import org.junit.ClassRule
 import spock.lang.Shared
 import spock.lang.Specification
@@ -26,6 +28,11 @@ class NetworkResourceTest extends Specification {
     @Override
     Optional<Node> fetchNode(NodeId nodeId) {
       return Optional.empty()
+    }
+
+    @Override
+    Map<String, Iterable<String>> fetchNodeOptions() {
+      return ImmutableMap.of();
     }
   }
 
