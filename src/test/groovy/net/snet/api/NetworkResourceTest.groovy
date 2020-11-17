@@ -8,7 +8,6 @@ import net.snet.network.NodeFilter
 import net.snet.network.NodeId
 import net.snet.network.NodeItem
 import net.snet.network.NodeQuery
-import org.assertj.core.util.Maps
 import org.junit.ClassRule
 import spock.lang.Shared
 import spock.lang.Specification
