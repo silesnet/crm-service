@@ -64,6 +64,10 @@ class JooqNetworkRepository implements NetworkRepository {
       node.getAzimuth(),
       node.getActive()
   );
+  private static final ImmutableList<String> COUNTRY_OPTIONS = ImmutableList.of(
+      "CZ",
+      "PL"
+  );
   private static final ImmutableList<String> TYPE_OPTIONS = ImmutableList.of(
       "OTHER",
       "ROUTER",
@@ -83,15 +87,11 @@ class JooqNetworkRepository implements NetworkRepository {
       "VERTICAL",
       "DUAL"
   );
-  private static final ImmutableList<String> AUTHORIZATION_OPTIONS = ImmutableList.of(
+  private static final ImmutableList<String> AUTHENTICATION_OPTIONS = ImmutableList.of(
       "NONE",
       "BOTH",
       "MAC",
       "RADIUS"
-  );
-  private static final ImmutableList<String> COUNTRY_OPTIONS = ImmutableList.of(
-      "CZ",
-      "PL"
   );
 
   private final DSLContext db;
@@ -158,7 +158,7 @@ class JooqNetworkRepository implements NetworkRepository {
     options.put("countries", COUNTRY_OPTIONS);
     options.put("types", TYPE_OPTIONS);
     options.put("masters", fetchOptions(NODES_DETAIL.MASTER));
-    // FIXME: should be removed
+    // FIXME: links should be removed
     options.put("links", fetchOptions(NODES_DETAIL.LINK_TO));
     options.put("areas", fetchOptions(NODES_DETAIL.AREA));
     options.put("vendors", fetchOptions(NODES_DETAIL.VENDOR));
@@ -168,7 +168,7 @@ class JooqNetworkRepository implements NetworkRepository {
     options.put("channel-widths", fetchOptions(NODES_DETAIL.WIDTH));
     options.put("norms", fetchOptions(NODES_DETAIL.NORM));
     options.put("frequencies", fetchOptions(NODES_DETAIL.FREQUENCY.cast(String.class)));
-    options.put("authorizations", AUTHORIZATION_OPTIONS);
+    options.put("authentications", AUTHENTICATION_OPTIONS);
     return options;
   }
 

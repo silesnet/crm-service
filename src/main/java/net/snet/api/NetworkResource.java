@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.dropwizard.auth.Auth;
-import jersey.repackaged.com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import net.snet.crm.service.auth.AuthenticatedUser;
 import net.snet.network.*;
@@ -120,13 +119,13 @@ public class NetworkResource {
     attributes.put("width", node.getWidth());
     attributes.put("norm", node.getNorm());
     attributes.put("tdma", node.getTdma());
-    attributes.put("aggreagtion", node.getAggregation());
+    attributes.put("aggregation", node.getAggregation());
     attributes.put("ssid", node.getSsid());
     attributes.put("frequency", node.getFrequency());
     attributes.put("power", node.getPower());
-    attributes.put("antena", node.getAntenna());
+    attributes.put("antenna", node.getAntenna());
     attributes.put("wds", node.getWds());
-    attributes.put("authorization", node.getAuthorization());
+    attributes.put("authentication", node.getAuthorization());
     attributes.put("azimuth", node.getAzimuth());
     attributes.put("active", node.getActive());
     return ImmutableMap.of(
