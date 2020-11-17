@@ -89,6 +89,10 @@ class JooqNetworkRepository implements NetworkRepository {
       "MAC",
       "RADIUS"
   );
+  private static final ImmutableList<String> COUNTRY_OPTIONS = ImmutableList.of(
+      "CZ",
+      "PL"
+  );
 
   private final DSLContext db;
 
@@ -151,6 +155,7 @@ class JooqNetworkRepository implements NetworkRepository {
   @Override
   public Map<String, Iterable<String>> fetchNodeOptions() {
     final Map<String, Iterable<String>> options = new HashMap<>();
+    options.put("countries", COUNTRY_OPTIONS);
     options.put("types", TYPE_OPTIONS);
     options.put("masters", fetchOptions(NODES_DETAIL.MASTER));
     // FIXME: should be removed
