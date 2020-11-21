@@ -70,7 +70,7 @@ jooq {
       database {
         name = 'org.jooq.meta.postgres.PostgresDatabase'
         inputSchema = 'public'
-        includes = 'users|customers|services|network_nodes_view'
+        includes = 'users|customers|services|network'
         excludes = ''
       }
       generate {

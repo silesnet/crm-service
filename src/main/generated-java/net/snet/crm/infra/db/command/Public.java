@@ -11,7 +11,7 @@ import java.util.List;
 import javax.annotation.Generated;
 
 import net.snet.crm.infra.db.command.tables.Customers;
-import net.snet.crm.infra.db.command.tables.NetworkNodesView;
+import net.snet.crm.infra.db.command.tables.Network;
 import net.snet.crm.infra.db.command.tables.Services;
 import net.snet.crm.infra.db.command.tables.Users;
 
@@ -33,7 +33,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 312172034;
+    private static final long serialVersionUID = 1424044224;
 
     /**
      * The reference instance of <code>public</code>
@@ -46,9 +46,9 @@ public class Public extends SchemaImpl {
     public final Customers CUSTOMERS = net.snet.crm.infra.db.command.tables.Customers.CUSTOMERS;
 
     /**
-     * The table <code>public.network_nodes_view</code>.
+     * The table <code>public.network</code>.
      */
-    public final NetworkNodesView NETWORK_NODES_VIEW = net.snet.crm.infra.db.command.tables.NetworkNodesView.NETWORK_NODES_VIEW;
+    public final Network NETWORK = net.snet.crm.infra.db.command.tables.Network.NETWORK;
 
     /**
      * The table <code>public.services</code>.
@@ -83,7 +83,7 @@ public class Public extends SchemaImpl {
     private final List<Table<?>> getTables0() {
         return Arrays.<Table<?>>asList(
             Customers.CUSTOMERS,
-            NetworkNodesView.NETWORK_NODES_VIEW,
+            Network.NETWORK,
             Services.SERVICES,
             Users.USERS);
     }

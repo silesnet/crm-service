@@ -7,13 +7,16 @@ package net.snet.crm.infra.db.command;
 import javax.annotation.Generated;
 
 import net.snet.crm.infra.db.command.tables.Customers;
+import net.snet.crm.infra.db.command.tables.Network;
 import net.snet.crm.infra.db.command.tables.Services;
 import net.snet.crm.infra.db.command.tables.Users;
 import net.snet.crm.infra.db.command.tables.records.CustomersRecord;
+import net.snet.crm.infra.db.command.tables.records.NetworkRecord;
 import net.snet.crm.infra.db.command.tables.records.ServicesRecord;
 import net.snet.crm.infra.db.command.tables.records.UsersRecord;
 
 import org.jooq.ForeignKey;
+import org.jooq.Identity;
 import org.jooq.UniqueKey;
 import org.jooq.impl.Internal;
 
@@ -36,6 +39,7 @@ public class Keys {
     // IDENTITY definitions
     // -------------------------------------------------------------------------
 
+    public static final Identity<NetworkRecord, Integer> IDENTITY_NETWORK = Identities0.IDENTITY_NETWORK;
 
     // -------------------------------------------------------------------------
     // UNIQUE and PRIMARY KEY definitions
@@ -43,6 +47,7 @@ public class Keys {
 
     public static final UniqueKey<CustomersRecord> CUSTOMERS_PKEY = UniqueKeys0.CUSTOMERS_PKEY;
     public static final UniqueKey<CustomersRecord> CUSTOMERS_HISTORY_ID_KEY = UniqueKeys0.CUSTOMERS_HISTORY_ID_KEY;
+    public static final UniqueKey<NetworkRecord> NETWORK_NAME_KEY = UniqueKeys0.NETWORK_NAME_KEY;
     public static final UniqueKey<ServicesRecord> SERVICES_PKEY = UniqueKeys0.SERVICES_PKEY;
     public static final UniqueKey<UsersRecord> SIS_USER_PKEY = UniqueKeys0.SIS_USER_PKEY;
     public static final UniqueKey<UsersRecord> SIS_USER_LOGIN_KEY = UniqueKeys0.SIS_USER_LOGIN_KEY;
@@ -58,9 +63,14 @@ public class Keys {
     // [#1459] distribute members to avoid static initialisers > 64kb
     // -------------------------------------------------------------------------
 
+    private static class Identities0 {
+        public static Identity<NetworkRecord, Integer> IDENTITY_NETWORK = Internal.createIdentity(Network.NETWORK, Network.NETWORK.ID);
+    }
+
     private static class UniqueKeys0 {
         public static final UniqueKey<CustomersRecord> CUSTOMERS_PKEY = Internal.createUniqueKey(Customers.CUSTOMERS, "customers_pkey", Customers.CUSTOMERS.ID);
         public static final UniqueKey<CustomersRecord> CUSTOMERS_HISTORY_ID_KEY = Internal.createUniqueKey(Customers.CUSTOMERS, "customers_history_id_key", Customers.CUSTOMERS.HISTORY_ID);
+        public static final UniqueKey<NetworkRecord> NETWORK_NAME_KEY = Internal.createUniqueKey(Network.NETWORK, "network_name_key", Network.NETWORK.NAME);
         public static final UniqueKey<ServicesRecord> SERVICES_PKEY = Internal.createUniqueKey(Services.SERVICES, "services_pkey", Services.SERVICES.ID);
         public static final UniqueKey<UsersRecord> SIS_USER_PKEY = Internal.createUniqueKey(Users.USERS, "sis_user_pkey", Users.USERS.ID);
         public static final UniqueKey<UsersRecord> SIS_USER_LOGIN_KEY = Internal.createUniqueKey(Users.USERS, "sis_user_login_key", Users.USERS.LOGIN);
