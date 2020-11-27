@@ -59,6 +59,7 @@ class NetworkCommandResourceTest extends Specification {
             master: 'node-3',
             authentication: 'BOTH',
             polarization: 'VERTICAL',
+            area: null
         ]]], 'application/vnd.api+json'), Map.class)
     then:
     1 * writeRepository.insertNode(!null) >> new net.snet.network.command.domain.model.Node([id: '1', name: 'node-1', linkTo: 'node-2'])

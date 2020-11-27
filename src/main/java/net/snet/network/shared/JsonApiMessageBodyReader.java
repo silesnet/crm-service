@@ -1,7 +1,7 @@
 package net.snet.network.shared;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.CaseFormat;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
+import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 
 @Provider
 @Consumes("application/vnd.api+json")
@@ -34,7 +34,7 @@ public class JsonApiMessageBodyReader implements MessageBodyReader<JsonApiBody> 
 
   @Override
   public JsonApiBody readFrom(Class<JsonApiBody> aClass, Type type, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> multivaluedMap, InputStream inputStream) throws IOException, WebApplicationException {
-    final Map<String, Object> map = mapper.readValue(inputStream, Map.class);
+    final Map<String, Object> map = mapper.readValue(inputStream, new TypeReference<Map<String, Object>>() {});
     final List<JsonApiResource> resources = new ArrayList<>();
     final Object data = map.get("data");
     if (data instanceof List) {
@@ -56,8 +56,12 @@ public class JsonApiMessageBodyReader implements MessageBodyReader<JsonApiBody> 
   }
 
   private Map<String, Object> kebabCaseKeysToCamelCaseKeys(Map<String, Object> map) {
-    return map.entrySet().stream().collect(Collectors.toMap(entry ->
-        CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, entry.getKey()), Map.Entry::getValue));
+    final Map<String, Object> result = new HashMap<>();
+    map.forEach((key, value) -> {
+      final String camelCaseKey = LOWER_HYPHEN.to(LOWER_CAMEL, key);
+      result.put(camelCaseKey, value);
+    });
+    return result;
   }
 
 }
