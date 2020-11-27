@@ -21,7 +21,7 @@ import static net.snet.crm.infra.db.query.tables.Nodes.NODES;
 import static net.snet.crm.infra.db.query.tables.NodesDetail.NODES_DETAIL;
 
 @Slf4j
-class JooqNetworkRepository implements NetworkRepository {
+public class JooqNetworkRepository implements NetworkRepository {
 
   private static final Function<Nodes, NodeItem> NODE_ITEM_MAPPER = (nodeItem) -> new NodeItem(
       nodeItem.getId(),
