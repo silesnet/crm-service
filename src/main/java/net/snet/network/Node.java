@@ -1,8 +1,10 @@
 package net.snet.network;
 
+import lombok.Builder;
 import lombok.Value;
 
 @Value
+@Builder
 public class Node {
    int id;
    String country;
