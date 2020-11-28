@@ -2,6 +2,7 @@ package net.snet.network.shared;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -22,9 +23,10 @@ import static com.google.common.base.CaseFormat.LOWER_HYPHEN;
 @Provider
 @Consumes("application/vnd.api+json")
 public class JsonApiMessageBodyReader implements MessageBodyReader<JsonApiBody> {
-  private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper;
 
-  public JsonApiMessageBodyReader() {
+  public JsonApiMessageBodyReader(ObjectMapper mapper) {
+    this.mapper = mapper;
   }
 
   @Override

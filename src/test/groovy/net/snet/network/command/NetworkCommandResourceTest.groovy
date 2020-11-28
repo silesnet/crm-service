@@ -1,6 +1,7 @@
 package net.snet.network.command
 
 import ch.qos.logback.classic.Level
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.dropwizard.logging.BootstrapLogging
 import io.dropwizard.testing.junit.ResourceTestRule
 import net.snet.network.NetworkRepository
@@ -28,7 +29,7 @@ class NetworkCommandResourceTest extends Specification {
   @Shared
   @ClassRule
   ResourceTestRule testRule = ResourceTestHelper.resourceTestRuleBuilder()
-      .addProvider(new JsonApiMessageBodyReader())
+      .addProvider(new JsonApiMessageBodyReader(new ObjectMapper()))
       .addResource(resource)
       .build()
 

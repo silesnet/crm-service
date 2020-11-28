@@ -206,7 +206,7 @@ public class CrmService extends Application<CrmConfiguration> {
     jersey.register(new PlaceResource(placeRepository));
     jersey.register(new net.snet.api.NetworkResource(networkComponent));
     jersey.register(new NetworkCommandResource(networkWriteRepository, new JooqNetworkRepository(dslContext)));
-    jersey.register(new JsonApiMessageBodyReader());
+    jersey.register(new JsonApiMessageBodyReader(mapper));
     jersey.register(new RuntimeExceptionMapper());
 
     final TaskFactory taskFactory = new DefaultTaskFactory(dbi, networkService, eventLog);
