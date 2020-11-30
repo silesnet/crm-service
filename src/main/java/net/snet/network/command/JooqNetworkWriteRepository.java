@@ -27,4 +27,9 @@ public class JooqNetworkWriteRepository implements NetworkWriteRepository {
     LOGGER.info("inserted node {}", inserted.toString());
     return inserted;
   }
+
+  @Override
+  public Node updateNode(Node node) {
+    return null;
+  }
 }
