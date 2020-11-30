@@ -59,7 +59,7 @@ public class NetworkCommandResource {
   @Path("/nodes/{nodeId}")
   public Response updateNode(@PathParam("nodeId") String nodeId, JsonApiBody body, @Auth AuthenticatedUser user) {
     final Node node = new Node(mapNodeDetailToNode(body.resource().attributes()));
-    if (!nodeId.equals("" + node.getAttributes().get("id"))) {
+    if (!nodeId.equals(body.resource().id())) {
       throw new IllegalArgumentException("path param id and request body node id does not match");
     }
     final Node updated = writeRepository.updateNode(node);
