@@ -34,7 +34,7 @@ public class JooqNetworkWriteRepository implements NetworkWriteRepository {
   @Override
   public Node updateNode(Node node) {
     LOGGER.info("updating node {}", node.toString());
-    final NetworkRecord record = db.fetchOne(NETWORK, NETWORK.ID.eq(Integer.valueOf(node.getAttributes().get("id").toString())));
+    final NetworkRecord record = db.fetchOne(NETWORK, NETWORK.ID.eq(node.getId()));
     record.fromMap(node.getAttributes());
     LOGGER.info("network record before update {}", record);
     record.store();
