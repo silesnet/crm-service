@@ -10,6 +10,9 @@ import java.sql.Timestamp;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -30,13 +33,15 @@ import javax.validation.constraints.Size;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "network", schema = "public", uniqueConstraints = {
+    @UniqueConstraint(name = "network_pkey", columnNames = {"id"}),
     @UniqueConstraint(name = "network_name_key", columnNames = {"name"})
 }, indexes = {
-    @Index(name = "network_name_key", unique = true, columnList = "name ASC")
+    @Index(name = "network_name_key", unique = true, columnList = "name ASC"),
+    @Index(name = "network_pkey", unique = true, columnList = "id ASC")
 })
 public class Network implements Serializable {
 
-    private static final long serialVersionUID = -435362889;
+    private static final long serialVersionUID = 890305732;
 
     private final Integer   id;
     private final String    name;
@@ -87,6 +92,7 @@ public class Network implements Serializable {
     private final Integer   service;
     private final String    portInfo;
     private final String    zbxGroups;
+    private final Integer   version;
 
     public Network(Network value) {
         this.id = value.id;
@@ -138,6 +144,7 @@ public class Network implements Serializable {
         this.service = value.service;
         this.portInfo = value.portInfo;
         this.zbxGroups = value.zbxGroups;
+        this.version = value.version;
     }
 
     public Network(
@@ -189,7 +196,8 @@ public class Network implements Serializable {
         String    linktoPort,
         Integer   service,
         String    portInfo,
-        String    zbxGroups
+        String    zbxGroups,
+        Integer   version
     ) {
         this.id = id;
         this.name = name;
@@ -240,8 +248,11 @@ public class Network implements Serializable {
         this.service = service;
         this.portInfo = portInfo;
         this.zbxGroups = zbxGroups;
+        this.version = version;
     }
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, precision = 32)
     public Integer getId() {
         return this.id;
@@ -521,6 +532,11 @@ public class Network implements Serializable {
         return this.zbxGroups;
     }
 
+    @Column(name = "version", nullable = false, precision = 32)
+    public Integer getVersion() {
+        return this.version;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Network (");
@@ -574,6 +590,7 @@ public class Network implements Serializable {
         sb.append(", ").append(service);
         sb.append(", ").append(portInfo);
         sb.append(", ").append(zbxGroups);
+        sb.append(", ").append(version);
 
         sb.append(")");
         return sb.toString();

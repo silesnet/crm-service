@@ -37,6 +37,7 @@ public class Indexes {
     public static final Index CUSTOMERS_PKEY = Indexes0.CUSTOMERS_PKEY;
     public static final Index CUSTOMERS_SEARCH_IDX = Indexes0.CUSTOMERS_SEARCH_IDX;
     public static final Index NETWORK_NAME_KEY = Indexes0.NETWORK_NAME_KEY;
+    public static final Index NETWORK_PKEY = Indexes0.NETWORK_PKEY;
     public static final Index CUSTOMER_INDEX2 = Indexes0.CUSTOMER_INDEX2;
     public static final Index SERVICES_PKEY = Indexes0.SERVICES_PKEY;
     public static final Index SERVICES_SEARCH_IDX = Indexes0.SERVICES_SEARCH_IDX;
@@ -53,6 +54,7 @@ public class Indexes {
         public static Index CUSTOMERS_PKEY = Internal.createIndex("customers_pkey", Customers.CUSTOMERS, new OrderField[] { Customers.CUSTOMERS.ID }, true);
         public static Index CUSTOMERS_SEARCH_IDX = Internal.createIndex("customers_search_idx", Customers.CUSTOMERS, new OrderField[] { Customers.CUSTOMERS.LEXEMS }, false);
         public static Index NETWORK_NAME_KEY = Internal.createIndex("network_name_key", Network.NETWORK, new OrderField[] { Network.NETWORK.NAME }, true);
+        public static Index NETWORK_PKEY = Internal.createIndex("network_pkey", Network.NETWORK, new OrderField[] { Network.NETWORK.ID }, true);
         public static Index CUSTOMER_INDEX2 = Internal.createIndex("customer_index2", Services.SERVICES, new OrderField[] { Services.SERVICES.CUSTOMER_ID }, false);
         public static Index SERVICES_PKEY = Internal.createIndex("services_pkey", Services.SERVICES, new OrderField[] { Services.SERVICES.ID }, true);
         public static Index SERVICES_SEARCH_IDX = Internal.createIndex("services_search_idx", Services.SERVICES, new OrderField[] { Services.SERVICES.LEXEMS }, false);

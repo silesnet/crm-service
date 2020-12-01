@@ -9,6 +9,9 @@ import java.sql.Timestamp;
 import javax.annotation.Generated;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -17,7 +20,8 @@ import javax.validation.constraints.Size;
 
 import net.snet.crm.infra.db.command.tables.Network;
 
-import org.jooq.impl.TableRecordImpl;
+import org.jooq.Record1;
+import org.jooq.impl.UpdatableRecordImpl;
 
 
 /**
@@ -33,13 +37,15 @@ import org.jooq.impl.TableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 @Entity
 @Table(name = "network", schema = "public", uniqueConstraints = {
+    @UniqueConstraint(name = "network_pkey", columnNames = {"id"}),
     @UniqueConstraint(name = "network_name_key", columnNames = {"name"})
 }, indexes = {
-    @Index(name = "network_name_key", unique = true, columnList = "name ASC")
+    @Index(name = "network_name_key", unique = true, columnList = "name ASC"),
+    @Index(name = "network_pkey", unique = true, columnList = "id ASC")
 })
-public class NetworkRecord extends TableRecordImpl<NetworkRecord> {
+public class NetworkRecord extends UpdatableRecordImpl<NetworkRecord> {
 
-    private static final long serialVersionUID = 1014803280;
+    private static final long serialVersionUID = -778746247;
 
     /**
      * Setter for <code>public.network.id</code>.
@@ -52,6 +58,8 @@ public class NetworkRecord extends TableRecordImpl<NetworkRecord> {
     /**
      * Getter for <code>public.network.id</code>.
      */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false, precision = 32)
     public Integer getId() {
         return (Integer) get(0);
@@ -859,6 +867,31 @@ public class NetworkRecord extends TableRecordImpl<NetworkRecord> {
         return (String) get(48);
     }
 
+    /**
+     * Setter for <code>public.network.version</code>.
+     */
+    public NetworkRecord setVersion(Integer value) {
+        set(49, value);
+        return this;
+    }
+
+    /**
+     * Getter for <code>public.network.version</code>.
+     */
+    @Column(name = "version", nullable = false, precision = 32)
+    public Integer getVersion() {
+        return (Integer) get(49);
+    }
+
+    // -------------------------------------------------------------------------
+    // Primary key information
+    // -------------------------------------------------------------------------
+
+    @Override
+    public Record1<Integer> key() {
+        return (Record1) super.key();
+    }
+
     // -------------------------------------------------------------------------
     // Constructors
     // -------------------------------------------------------------------------
@@ -873,7 +906,7 @@ public class NetworkRecord extends TableRecordImpl<NetworkRecord> {
     /**
      * Create a detached, initialised NetworkRecord
      */
-    public NetworkRecord(Integer id, String name, String info, Boolean active, Integer type, Integer mode, Boolean wds, Integer frequency, String vendor, String azimuth, String ssid, String auth, Integer polarization, Integer country, String norm, String area, Boolean aggregation, String width, String antenna, String power, String master, String linkto, String hardware, Boolean tdma, String latitude, String longitude, Timestamp rUpdatetime, String rFirmware, String rPlatform, String rSignal, String rCcq, String rTxrate, String rRxrate, String rQuality, String rCapacity, String rLanspeed, String rTxpower, String monitoring, String traceroute, String ping, Integer rFrequency, String model, String uplinkPort, Integer rstpNumRing, Integer uplinkSfpTx, String linktoPort, Integer service, String portInfo, String zbxGroups) {
+    public NetworkRecord(Integer id, String name, String info, Boolean active, Integer type, Integer mode, Boolean wds, Integer frequency, String vendor, String azimuth, String ssid, String auth, Integer polarization, Integer country, String norm, String area, Boolean aggregation, String width, String antenna, String power, String master, String linkto, String hardware, Boolean tdma, String latitude, String longitude, Timestamp rUpdatetime, String rFirmware, String rPlatform, String rSignal, String rCcq, String rTxrate, String rRxrate, String rQuality, String rCapacity, String rLanspeed, String rTxpower, String monitoring, String traceroute, String ping, Integer rFrequency, String model, String uplinkPort, Integer rstpNumRing, Integer uplinkSfpTx, String linktoPort, Integer service, String portInfo, String zbxGroups, Integer version) {
         super(Network.NETWORK);
 
         set(0, id);
@@ -925,5 +958,6 @@ public class NetworkRecord extends TableRecordImpl<NetworkRecord> {
         set(46, service);
         set(47, portInfo);
         set(48, zbxGroups);
+        set(49, version);
     }
 }

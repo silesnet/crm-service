@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Network extends TableImpl<NetworkRecord> {
 
-    private static final long serialVersionUID = 486499233;
+    private static final long serialVersionUID = 776436420;
 
     /**
      * The reference instance of <code>public.network</code>
@@ -303,6 +303,11 @@ public class Network extends TableImpl<NetworkRecord> {
     public final TableField<NetworkRecord, String> ZBX_GROUPS = createField(DSL.name("zbx_groups"), org.jooq.impl.SQLDataType.VARCHAR(100), this, "");
 
     /**
+     * The column <code>public.network.version</code>.
+     */
+    public final TableField<NetworkRecord, Integer> VERSION = createField(DSL.name("version"), org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
+
+    /**
      * Create a <code>public.network</code> table reference
      */
     public Network() {
@@ -342,7 +347,7 @@ public class Network extends TableImpl<NetworkRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.NETWORK_NAME_KEY);
+        return Arrays.<Index>asList(Indexes.NETWORK_NAME_KEY, Indexes.NETWORK_PKEY);
     }
 
     @Override
@@ -351,8 +356,13 @@ public class Network extends TableImpl<NetworkRecord> {
     }
 
     @Override
+    public UniqueKey<NetworkRecord> getPrimaryKey() {
+        return Keys.NETWORK_PKEY;
+    }
+
+    @Override
     public List<UniqueKey<NetworkRecord>> getKeys() {
-        return Arrays.<UniqueKey<NetworkRecord>>asList(Keys.NETWORK_NAME_KEY);
+        return Arrays.<UniqueKey<NetworkRecord>>asList(Keys.NETWORK_PKEY, Keys.NETWORK_NAME_KEY);
     }
 
     @Override

@@ -47,6 +47,7 @@ public class Keys {
 
     public static final UniqueKey<CustomersRecord> CUSTOMERS_PKEY = UniqueKeys0.CUSTOMERS_PKEY;
     public static final UniqueKey<CustomersRecord> CUSTOMERS_HISTORY_ID_KEY = UniqueKeys0.CUSTOMERS_HISTORY_ID_KEY;
+    public static final UniqueKey<NetworkRecord> NETWORK_PKEY = UniqueKeys0.NETWORK_PKEY;
     public static final UniqueKey<NetworkRecord> NETWORK_NAME_KEY = UniqueKeys0.NETWORK_NAME_KEY;
     public static final UniqueKey<ServicesRecord> SERVICES_PKEY = UniqueKeys0.SERVICES_PKEY;
     public static final UniqueKey<UsersRecord> SIS_USER_PKEY = UniqueKeys0.SIS_USER_PKEY;
@@ -70,6 +71,7 @@ public class Keys {
     private static class UniqueKeys0 {
         public static final UniqueKey<CustomersRecord> CUSTOMERS_PKEY = Internal.createUniqueKey(Customers.CUSTOMERS, "customers_pkey", Customers.CUSTOMERS.ID);
         public static final UniqueKey<CustomersRecord> CUSTOMERS_HISTORY_ID_KEY = Internal.createUniqueKey(Customers.CUSTOMERS, "customers_history_id_key", Customers.CUSTOMERS.HISTORY_ID);
+        public static final UniqueKey<NetworkRecord> NETWORK_PKEY = Internal.createUniqueKey(Network.NETWORK, "network_pkey", Network.NETWORK.ID);
         public static final UniqueKey<NetworkRecord> NETWORK_NAME_KEY = Internal.createUniqueKey(Network.NETWORK, "network_name_key", Network.NETWORK.NAME);
         public static final UniqueKey<ServicesRecord> SERVICES_PKEY = Internal.createUniqueKey(Services.SERVICES, "services_pkey", Services.SERVICES.ID);
         public static final UniqueKey<UsersRecord> SIS_USER_PKEY = Internal.createUniqueKey(Users.USERS, "sis_user_pkey", Users.USERS.ID);
