@@ -63,7 +63,7 @@ class NetworkCommandResourceTest extends Specification {
             area: null
         ]]], 'application/vnd.api+json'), Map.class)
     then:
-    1 * writeRepository.insertNode(!null) >> new net.snet.network.command.domain.model.Node([id: '1', name: 'node-1', linkTo: 'node-2'])
+    1 * writeRepository.insertNode(!null) >> new net.snet.network.command.domain.model.Node(1, [id: '1', name: 'node-1', linkTo: 'node-2'])
     1 * readRepository.fetchNode(!null) >> Optional.of(net.snet.network.Node.builder().id(1).name('node-1').linkTo('node-2').build())
     response.data.id == 1
     response.data.type == 'nodes'

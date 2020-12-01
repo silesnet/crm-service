@@ -40,7 +40,7 @@ public class NetworkCommandResource {
   @POST
   @Path("/nodes")
   public Response insertNode(JsonApiBody body, @Auth AuthenticatedUser user) {
-    final Node node = new Node(mapNodeDetailToNode(body.resource().attributes()));
+    final Node node = new Node(null, mapNodeDetailToNode(body.resource().attributes()));
     final Node inserted = writeRepository.insertNode(node);
 
     final NodeId nodeId = new NodeId(inserted.getAttributes().get("id").toString());
@@ -58,7 +58,7 @@ public class NetworkCommandResource {
   @PATCH
   @Path("/nodes/{nodeId}")
   public Response updateNode(@PathParam("nodeId") String nodeId, JsonApiBody body, @Auth AuthenticatedUser user) {
-    final Node node = new Node(mapNodeDetailToNode(body.resource().attributes()));
+    final Node node = new Node(Integer.valueOf(body.resource().id()), mapNodeDetailToNode(body.resource().attributes()));
     if (!nodeId.equals(body.resource().id())) {
       throw new IllegalArgumentException("path param id and request body node id does not match");
     }

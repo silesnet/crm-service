@@ -26,7 +26,7 @@ public class JooqNetworkWriteRepository implements NetworkWriteRepository {
     LOGGER.info("network record before insert {}", networkRecord);
     networkRecord.insert();
     LOGGER.info("network record before insert {}", networkRecord);
-    final Node inserted = new Node(networkRecord.intoMap());
+    final Node inserted = new Node(networkRecord.getId(), networkRecord.intoMap());
     LOGGER.info("inserted node {}", inserted.toString());
     return inserted;
   }
@@ -39,7 +39,7 @@ public class JooqNetworkWriteRepository implements NetworkWriteRepository {
     LOGGER.info("network record before update {}", record);
     record.store();
     LOGGER.info("network record after update {}", record);
-    final Node updated = new Node(record.intoMap());
+    final Node updated = new Node(record.getId(), record.intoMap());
     LOGGER.info("updated node {}", updated.toString());
     return updated;
   }
