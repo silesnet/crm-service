@@ -32,7 +32,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Nodes extends TableImpl<Record> {
 
-    private static final long serialVersionUID = -570662120;
+    private static final long serialVersionUID = 1280738682;
 
     /**
      * The reference instance of <code>query.nodes</code>
@@ -86,6 +86,11 @@ public class Nodes extends TableImpl<Record> {
      * The column <code>query.nodes.country</code>.
      */
     public final TableField<Record, String> COUNTRY = createField(DSL.name("country"), org.jooq.impl.SQLDataType.CLOB, this, "");
+
+    /**
+     * The column <code>query.nodes.width</code>.
+     */
+    public final TableField<Record, String> WIDTH = createField(DSL.name("width"), org.jooq.impl.SQLDataType.VARCHAR(50), this, "");
 
     /**
      * The column <code>query.nodes.frequency</code>.

@@ -22,7 +22,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Nodes implements Serializable {
 
-    private static final long serialVersionUID = 514155102;
+    private static final long serialVersionUID = 280215919;
 
     private final Integer id;
     private final String  name;
@@ -32,6 +32,7 @@ public class Nodes implements Serializable {
     private final String  model;
     private final String  linkTo;
     private final String  country;
+    private final String  width;
     private final Integer frequency;
 
     public Nodes(Nodes value) {
@@ -43,6 +44,7 @@ public class Nodes implements Serializable {
         this.model = value.model;
         this.linkTo = value.linkTo;
         this.country = value.country;
+        this.width = value.width;
         this.frequency = value.frequency;
     }
 
@@ -55,6 +57,7 @@ public class Nodes implements Serializable {
         String  model,
         String  linkTo,
         String  country,
+        String  width,
         Integer frequency
     ) {
         this.id = id;
@@ -65,6 +68,7 @@ public class Nodes implements Serializable {
         this.model = model;
         this.linkTo = linkTo;
         this.country = country;
+        this.width = width;
         this.frequency = frequency;
     }
 
@@ -100,6 +104,10 @@ public class Nodes implements Serializable {
         return this.country;
     }
 
+    public String getWidth() {
+        return this.width;
+    }
+
     public Integer getFrequency() {
         return this.frequency;
     }
@@ -116,6 +124,7 @@ public class Nodes implements Serializable {
         sb.append(", ").append(model);
         sb.append(", ").append(linkTo);
         sb.append(", ").append(country);
+        sb.append(", ").append(width);
         sb.append(", ").append(frequency);
 
         sb.append(")");
