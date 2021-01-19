@@ -25,4 +25,11 @@ public class NodeId {
   public boolean isIdNumber() {
     return NODE_ID_NUMBER.matcher(value).matches();
   }
+
+  public int getNumberValue() {
+    if (!isIdNumber()) {
+      throw new IllegalStateException("network node id is not number: '" + value + "'");
+    }
+    return Integer.valueOf(value);
+  }
 }

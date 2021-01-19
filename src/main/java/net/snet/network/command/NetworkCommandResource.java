@@ -75,4 +75,11 @@ public class NetworkCommandResource {
             "type", "nodes",
             "attributes", nodeAttributes))).build();
   }
+
+  @DELETE
+  @Path("/nodes/{nodeId}")
+  public Response deleteNode(@PathParam("nodeId") String nodeId, @Auth AuthenticatedUser user) {
+    writeRepository.deleteNode(new NodeId(nodeId));
+    return Response.noContent().build();
+  }
 }

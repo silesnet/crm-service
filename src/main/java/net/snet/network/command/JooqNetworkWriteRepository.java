@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.snet.crm.infra.db.command.Tables;
 import net.snet.crm.infra.db.command.tables.Network;
 import net.snet.crm.infra.db.command.tables.records.NetworkRecord;
+import net.snet.network.NodeId;
 import net.snet.network.command.domain.model.NetworkWriteRepository;
 import net.snet.network.command.domain.model.Node;
 import org.jooq.DSLContext;
@@ -42,5 +43,11 @@ public class JooqNetworkWriteRepository implements NetworkWriteRepository {
     final Node updated = new Node(record.getId(), record.intoMap());
     LOGGER.info("updated node {}", updated.toString());
     return updated;
+  }
+
+  @Override
+  public void deleteNode(NodeId nodeId) {
+    LOGGER.info("deleting node {}", nodeId.getValue());
+    db.deleteFrom(NETWORK).where(NETWORK.ID.eq(nodeId.getNumberValue())).execute();
   }
 }
