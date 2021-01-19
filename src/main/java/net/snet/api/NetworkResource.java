@@ -92,6 +92,7 @@ public class NetworkResource {
     attributes.put("model", nodeItem.getModel());
     attributes.put("link-to", nodeItem.getLinkTo());
     attributes.put("country", nodeItem.getCountry());
+    attributes.put("width", nodeItem.getWidth());
     attributes.put("frequency", nodeItem.getFrequency());
     return ImmutableMap.of(
         "type", "node-items",

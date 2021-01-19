@@ -12,5 +12,6 @@ public class NodeItem {
   private final String model;
   private final String linkTo;
   private final String country;
+  private final String width;
   private final Integer frequency;
 }

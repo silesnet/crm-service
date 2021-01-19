@@ -32,6 +32,7 @@ public class JooqNetworkRepository implements NetworkRepository {
       nodeItem.getModel(),
       nodeItem.getLinkTo(),
       nodeItem.getCountry(),
+      nodeItem.getWidth(),
       nodeItem.getFrequency()
   );
 
