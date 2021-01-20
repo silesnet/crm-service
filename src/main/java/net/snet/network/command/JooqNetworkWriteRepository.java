@@ -50,14 +50,13 @@ public class JooqNetworkWriteRepository implements NetworkWriteRepository {
   @Override
   public void deleteNode(NodeId nodeId) {
     LOGGER.info("deleting node {}", nodeId.getValue());
-    // TODO fail on deleting node witch children, JSON API error how to...
-//    final List<String> children = db.select(NODES.NAME).from(NODES)
-//        .where(NODES.LINK_TO.eq(db.select(NODES.NAME).from(NODES).where(NODES.ID.eq(nodeId.getNumberValue()))))
-//        .orderBy(NODES.NAME)
-//        .fetchInto(String.class);
-//    if (children.size() > 0) {
-//      throw new IllegalStateException("can not delete node '" + nodeId.getValue() + "' as there are nodes that link to it: " + children);
-//    }
+    final List<String> children = db.select(NODES.NAME).from(NODES)
+        .where(NODES.LINK_TO.eq(db.select(NODES.NAME).from(NODES).where(NODES.ID.eq(nodeId.getNumberValue()))))
+        .orderBy(NODES.NAME)
+        .fetchInto(String.class);
+    if (children.size() > 0) {
+      throw new IllegalStateException("can not delete node '" + nodeId.getValue() + "' as there are nodes that link to it: " + children);
+    }
     db.deleteFrom(NETWORK).where(NETWORK.ID.eq(nodeId.getNumberValue())).execute();
   }
 }
