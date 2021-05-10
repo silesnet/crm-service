@@ -213,7 +213,7 @@ public class DefaultNetworkService implements NetworkService {
     for (String keyValue : pairs)
     {
       final String[] pair = keyValue.split(":");
-      result.put(pair[0], pair[1]);
+      result.put(pair[0], pair.length > 1 ? pair[1] : "");
     }
     return MapData.of(result);
   }
