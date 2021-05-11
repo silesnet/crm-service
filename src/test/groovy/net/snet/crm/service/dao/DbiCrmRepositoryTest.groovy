@@ -184,7 +184,6 @@ class DbiCrmRepositoryTest extends Specification {
       repository.deleteService(service.id as Long)
     then: 'service does not exist in the tables'
       handle.select('SELECT count(*) AS cnt FROM services WHERE id=' + service.id).first().cnt == 0
-      handle.select('SELECT count(*) AS cnt FROM services_info WHERE service_id=' + service.id).first().cnt == 0
 	}
 
   def 'it should insert new service connection'() {

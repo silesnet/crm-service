@@ -2,7 +2,6 @@ DROP VIEW service_drafts;
 DROP VIEW service_connections;
 DROP TABLE customers;
 DROP TABLE agreements;
-DROP TABLE services_info;
 DROP TABLE services;
 DROP TABLE connections;
 DROP TABLE users;

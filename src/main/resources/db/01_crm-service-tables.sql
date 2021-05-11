@@ -291,13 +291,7 @@ CREATE TABLE users (
     key character varying(255)
 );
 
-CREATE TABLE services_info (
-  service_id bigint NOT NULL,
-  status character varying(8),
-  other_info character varying(1024)
-);
-
-CREATE TABLE connections (
+REATE TABLE connections (
   service_id bigint NOT NULL,
   auth_type character varying(10),
   auth_name character varying(32),

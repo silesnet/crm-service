@@ -279,7 +279,6 @@ public class DbiCrmRepository implements CrmRepository
                  agreementId);
       long serviceId = lastServiceId + 1;
       db.insertService(serviceId, Long.valueOf(agreement.get("customer_id").toString()), now());
-//      db.insertServiceInfo(serviceId);
       db.commit();
       return findServiceById(serviceId);
     } catch (Exception e)
@@ -493,10 +492,6 @@ public class DbiCrmRepository implements CrmRepository
         {
           handle.createStatement("DELETE from services WHERE id=:id")
                 .bind("id", serviceId)
-                .execute();
-          handle.createStatement("DELETE from services_info WHERE service_id=:service_id")
-                .bind("service_" +
-                          "id", serviceId)
                 .execute();
           handle.commit();
         } catch (Exception e)
@@ -724,14 +719,7 @@ public class DbiCrmRepository implements CrmRepository
         @Bind("service_id") long serviceId, @Bind("customer_id") long customerId,
         @Bind("period_from") Timestamp periodFrom);
 
-    @SqlUpdate("INSERT INTO services_info (service_id, status, other_info) " +
-        "VALUES (:service_id, 'DRAFT', '{}')")
-    void insertServiceInfo(@Bind("service_id") long serviceId);
-
     @SqlUpdate("INSERT INTO connections (service_id) VALUES (:service_id)")
     void insertConnection(@Bind("service_id") long serviceId);
-
-    @SqlUpdate("UPDATE services_info SET status=:status WHERE service_id=:service_id")
-    void updateServiceStatus(@Bind("service_id") long serviceId, @Bind("status") String status);
   }
 }

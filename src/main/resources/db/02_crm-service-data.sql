@@ -18,7 +18,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 
--- DELETE FROM services_info;
 -- DELETE FROM services;
 -- DELETE FROM agreements;
 -- DELETE FROM audit_items;

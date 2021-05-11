@@ -80,12 +80,6 @@ CREATE TABLE services (
     product_id integer
 );
 
-CREATE TABLE services_info (
-  service_id bigint NOT NULL,
-  status character varying(16) NOT NULL DEFAULT 'DRAFT',
-  other_info character varying(1024)
-);
-
 CREATE TABLE connections (
   service_id bigint NOT NULL,
   auth_type character varying(10),
