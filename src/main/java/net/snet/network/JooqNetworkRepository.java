@@ -76,7 +76,8 @@ public class JooqNetworkRepository implements NetworkRepository {
       "BRIDGE-AP",
       "BRIDGE-BR",
       "BRIDGE-STATION",
-      "SWITCH"
+      "SWITCH",
+      "CONVERTER"
   );
   private static final ImmutableList<String> MONITORING_TYPE_OPTIONS = ImmutableList.of(
       "NONE",
